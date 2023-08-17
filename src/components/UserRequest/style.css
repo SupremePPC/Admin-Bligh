@@ -1,0 +1,77 @@
+
+/* Container Styles */
+.adminDash_page {
+    margin: 2rem;
+
+}
+
+.no_requests{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin: 2rem;
+    font-size: var(--font-eighteen);
+}
+
+.user_list{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}
+
+.user_list .user{
+    width: 300px;
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin: 1rem;
+    padding: 1rem;
+    border-radius: 10px;
+    background-color: var(--white);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+
+}
+
+.user_name{
+    font-size: var(--font-eighteen);
+    color: var(--black);
+}
+
+.name_label{
+    font-weight: 500;
+}
+
+.approve_btn, .decline_btn {
+    color: var(--white);
+    font-size: var(--font-twenty);
+    font-weight: 400;
+    width: 100%;
+    height: 3rem;
+    font-weight: 400;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 10px;
+    margin-top: .5rem;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    display: grid;
+    place-items: center;
+  }
+  
+  .approve_btn, .decline_btn :hover {
+    transform: scale(0.95, 1);
+  }
+  
+    .approve_btn {
+        background-color: var(--green);
+    }
+
+    .decline_btn {
+        background-color: var(--red);
+    }
