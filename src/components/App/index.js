@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 import Login from '../Login';
-import Dashboard from '../Dashboard';
+import Overview from '../Overview';
 import BankingDetails from '../BankingDetails';
 import TransactionDashboard from '../TransactionManagement';
 import UserRequestDashboard from '../UserRequest';
@@ -18,7 +18,7 @@ const App = () => {
     <>
       {isAuthenticated ? (
         <>
-        <Dashboard setIsAuthenticated={setIsAuthenticated} />
+        <Overview setIsAuthenticated={setIsAuthenticated} />
         <BankingDetails setIsAuthenticated={setIsAuthenticated} />
         <TransactionDashboard setIsAuthenticated={setIsAuthenticated} />
         <UserRequestDashboard setIsAuthenticated={setIsAuthenticated} />

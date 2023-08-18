@@ -2,10 +2,10 @@
   "name": "crud-app",
   "version": "3.3.0",
   "private": true,
-  "homepage": "https://lilianadad.github.io/crud-app/",
+  "homepage": "",
   "author": {
-    "name": "Safdar Jamal",
-    "url": "https://lilianadad.github.io"
+    "name": "Crud",
+    "url": ""
   },
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.4",
