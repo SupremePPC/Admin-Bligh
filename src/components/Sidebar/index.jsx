@@ -1,59 +1,116 @@
 // Sidebar.js
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { FaHome, FaUser, FaRegListAlt, FaFileAlt, FaSignOutAlt } from "react-icons/fa";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import {
+  FaHome,
+  FaUser,
+  FaRegListAlt,
+  FaFileAlt,
+  FaSignOutAlt,
+} from "react-icons/fa";
 import { CgMenuGridR } from "react-icons/cg";
 import { PiBankFill } from "react-icons/pi";
 import "./style.css";
+import { getAuth } from "firebase/auth";
+import Modal from "../CustomsModal";
 
 function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
+  const location = useLocation();
+  const isActive = (path) => location.pathname === path;
+  const [isLoading, setIsLoading] = useState(false);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+  const navigate = useNavigate();
+  const auth = getAuth();
 
   return (
-    <div className={`sidebar ${collapsed ? "collapsed" : ""}`}>
-      <button onClick={() => setCollapsed(!collapsed)}>
+    <aside className={`sidebar ${collapsed ? "collapsed" : ""}`}>
+      <button onClick={() => setCollapsed(!collapsed)} className="menu_button">
         <CgMenuGridR />
       </button>
-      <ul>
-        <li>
-          <Link to="/">
+      <ul className="menu_items">
+        <li className="menu_list">
+          <Link className={`menu_link ${isActive("/dashboard/") ? "active" : ""}`} to="/dashboard/">
             <FaHome />
             {!collapsed && "Account Overview"}
           </Link>
         </li>
-        <li>
-          <Link to="/banking-details">
-            <PiBankFill />
-            {!collapsed && "Banking Details Management"}
-          </Link>
-        </li>
-        <li>
-          <Link to="/transactions">
-            <FaRegListAlt />
-            {!collapsed && "Transactions Management"}
-          </Link>
-        </li>
-        <li>
-          <Link to="/user-requests">
+        <li className="menu_list">
+          <Link
+            className={`menu_link ${
+              isActive("/dashboard/user-requests") ? "active" : ""
+            }`}
+            to="/dashboard/user-requests"
+          >
             <FaUser />
-            {!collapsed && "User Request Management"}
+            {!collapsed && "User Requests"}
           </Link>
         </li>
-        <li>
-          <Link to="/documents">
+        <li className="menu_list">
+          <Link
+            className={`menu_link ${isActive("/dashboard/transactions") ? "active" : ""}`}
+            to="/dashboard/transactions"
+          >
+            <FaRegListAlt />
+            {!collapsed && "Transactions Request"}
+          </Link>
+        </li>
+        <li className="menu_list">
+          <Link
+            className={`menu_link ${
+              isActive("/dashboard/banking-details") ? "active" : ""
+            }`}
+            to="/dashboard/banking-details"
+          >
+            <PiBankFill />
+            {!collapsed && "Banking Details"}
+          </Link>
+        </li>
+        <li className="menu_list">
+          <Link
+            className={`menu_link ${isActive("/dashboard/documents") ? "active" : ""}`}
+            to="/dashboard/documents"
+          >
             <FaFileAlt />
-            {!collapsed && "Documents Management"}
+            {!collapsed && "Docs Management"}
           </Link>
         </li>
-        <li>
-          {/* Implement logout functionality */}
-          <Link to="/logout">
-            <FaSignOutAlt />
+        <li className="menu_list">
+          <div
+            className="menu_link"
+            onClick={() => {
+              setIsLogoutModalOpen(true);
+            }}
+          >
+            <FaSignOutAlt className="menu_icon" />
             {!collapsed && "Logout"}
-          </Link>
+            <Modal
+              isOpen={isLogoutModalOpen}
+              title="Logout"
+              description="Are you sure you want to logout?"
+              onClose={() => setIsLogoutModalOpen(false)}
+              onPositiveAction={() => {
+                setIsLoading(true);
+                auth
+                  .signOut()
+                  .then(() => {
+                    setIsLoading(false);
+                    console.log("Successfully signed out!");
+                    navigate("/");
+                  })
+                  .catch((error) => {
+                    setIsLoading(false);
+                    console.error("Error signing out:", error);
+                  });
+              }}
+              positiveLabel="Logout"
+              negativeLabel="Cancel"
+              isLoading={isLoading}
+            />
+          </div>
         </li>
       </ul>
-    </div>
+    </aside>
   );
 }
 

@@ -1,90 +1,35 @@
-import React, { useState, useEffect } from 'react';
-import Swal from 'sweetalert2';
+import React from 'react';
+import { Link } from 'react-router-dom';
 
-import Header from './Header';
-import Table from './Table';
-import Add from './Add';
-import Edit from './Edit';
-
-import { employeesData } from '../../data';
-
-const Overview = ({ setIsAuthenticated }) => {
-  const [employees, setEmployees] = useState(employeesData);
-  const [selectedEmployee, setSelectedEmployee] = useState(null);
-  const [isAdding, setIsAdding] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-
-  useEffect(() => {
-    const data = JSON.parse(localStorage.getItem('employees_data'));
-    if (data !== null && Object.keys(data).length !== 0) setEmployees(data);
-  }, []);
-
-  const handleEdit = id => {
-    const [employee] = employees.filter(employee => employee.id === id);
-
-    setSelectedEmployee(employee);
-    setIsEditing(true);
-  };
-
-  const handleDelete = id => {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Are you sure?',
-      text: "You won't be able to revert this!",
-      showCancelButton: true,
-      confirmButtonText: 'Yes, delete it!',
-      cancelButtonText: 'No, cancel!',
-    }).then(result => {
-      if (result.value) {
-        const [employee] = employees.filter(employee => employee.id === id);
-
-        Swal.fire({
-          icon: 'success',
-          title: 'Deleted!',
-          text: `${employee.firstName} ${employee.lastName}'s data has been deleted.`,
-          showConfirmButton: false,
-          timer: 1500,
-        });
-
-        const employeesCopy = employees.filter(employee => employee.id !== id);
-        localStorage.setItem('employees_data', JSON.stringify(employeesCopy));
-        setEmployees(employeesCopy);
-      }
-    });
-  };
-
+export default function DashboardOverview() {
   return (
-    <div className="container">
-      {!isAdding && !isEditing && (
-        <>
-          <Header
-            setIsAdding={setIsAdding}
-            setIsAuthenticated={setIsAuthenticated}
-          />
-          <Table
-            employees={employees}
-            handleEdit={handleEdit}
-            handleDelete={handleDelete}
-          />
-        </>
-      )}
-      {isAdding && (
-        <Add
-          employees={employees}
-          setEmployees={setEmployees}
-          setIsAdding={setIsAdding}
-        />
-      )}
-      {isEditing && (
-        <Edit
-          employees={employees}
-          selectedEmployee={selectedEmployee}
-          setEmployees={setEmployees}
-          setIsEditing={setIsEditing}
-        />
-      )}
+    <div className="dashboard-overview">
+      <h2>Dashboard Overview</h2>
+      
+      <div className="overview-section">
+        <h3><Link to="/dashboard">My Accounts</Link></h3>
+        <p>View and manage your account details.</p>
+      </div>
+
+      <div className="overview-section">
+        <h3><Link to="/dashboard/transactions">Transactions</Link></h3>
+        <p>View your transaction history and manage pending transactions.</p>
+      </div>
+
+      <div className="overview-section">
+        <h3><Link to="/dashboard/account-details">Account Details</Link></h3>
+        <p>Update and modify your account and personal details.</p>
+      </div>
+
+      <div className="overview-section">
+        <h3><Link to="/dashboard/interest-calculator">Interest Calculator</Link></h3>
+        <p>Calculate interest based on your account balance.</p>
+      </div>
+
+      <div className="overview-section">
+        <h3><Link to="/dashboard/admin">Admin Dashboard</Link></h3>
+        <p>Admin tools and settings.</p>
+      </div>
     </div>
   );
-};
-
-export default Overview;
+}

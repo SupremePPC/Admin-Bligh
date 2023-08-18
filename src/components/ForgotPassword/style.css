@@ -1,0 +1,153 @@
+.forgotPassword_page {
+  width: 100%;
+  height: 100vh;
+  margin: auto;
+  display: grid;
+  place-items: center;
+  background: url("../../assets/Backround.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.forgotPassword_form {
+  width: 95%;
+  max-width: 430px;
+  height: 100%;
+  max-height: 460px;
+  background-color: var(--tertiary);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  border-radius: 10px;
+  padding: 2rem;
+  margin: 1rem;
+}
+
+.forgotPassword_form .logo {
+  width: 4rem;
+  height: 4rem;
+}
+
+.forgotPassword_page .header {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: fit-content;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.header .title {
+  font-size: var(--font-twentyEight);
+  font-weight: 500;
+  color: var(--white);
+  line-height: 2;
+}
+
+.header .subtitle {
+  font-size: var(--font-sixteen);
+  font-weight: 400;
+  color: var(--white);
+  line-height: 1.2;
+}
+
+.forgotPassword_form .form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.form_wrap {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.forgotPassword_form .input_field {
+  width: 100%;
+  background-color: var(--white);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  height: 3rem;
+  border: 1px solid var(--grey);
+  outline: none;
+  font-size: var(--font-sixteen);
+  font-weight: 400;
+  color: var(--black);
+}
+
+.forgotPassword_form .input_field::placeholder {
+  color: var(--grey);
+}
+
+.input_field:focus {
+  border: 1px solid var(--primary);
+}
+
+.input_field:focus::placeholder {
+  color: var(--primary);
+}
+
+.input_field:focus,
+.input_field:active {
+  border: none;
+  border-bottom: 1.5px solid var(--secondary);
+}
+
+.input_field:focus,
+.input_field:active::placeholder {
+  color: var(--secondary);
+}
+
+.input_field:focus,
+.input_field:active {
+  border: none;
+  border-bottom: 1.5px solid var(--secondary);
+}
+
+.reset_btn {
+  background-color: var(--secondary);
+  color: var(--white);
+  font-size: var(--font-twenty);
+  font-weight: 400;
+  width: 100%;
+  height: 3rem;
+  font-weight: 400;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  display: grid;
+  place-items: center;
+}
+
+.reset_btn :hover {
+  transform: scale(0.95, 1);
+}
+
+.password_info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+}
+.password_info .text {
+  font-size: var(--font-twelve);
+  font-weight: 400;
+  color: var(--grey);
+  margin-right: 0.5rem;
+}
+
+.password_info .login_text {
+  font-size: var(--font-twelve);
+  font-weight: 400;
+  color: var(--secondary);
+  margin-right: 0.5rem;
+}

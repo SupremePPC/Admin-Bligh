@@ -1,4 +1,236 @@
-ul {
-    list-style-type: none;
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;900&display=swap');
+
+/*------------ [_Root] -----------*/
+:root {
+
+  /* Colors */
+  --primary: #041b3c;
+  --secondary: #688fb7;
+  --tertiary: #092948;
+  --white: #ecf0f1;
+  --text: #555555;
+  --black: #333333;
+  --grey: #a2a2a2;
+  --green: #3d8d00;
+  --red: #ff0000;
+
+  /* FontStyle*/
+  --font: 'Poppins','sans-serif';
+
+  /* Font Sizes */
+  --font-seventy: 2.875rem;
+  --font-fifty: 2rem;
+  --font-thirtyTwo: 1.5rem;
+  --font-twentyEight: 1.5rem;
+  --font-twentyFour: 1.2rem;
+  --font-twenty: 1.15rem;
+  --font-eighteen: 1rem;
+  --font-sixteen: .8725rem;
+  --font-fourteen: .88rem;
+  --font-twelve: .75rem;
+}
+
+@media screen and (min-width: 900px) {
+    :root {
+        --font-seventy: 4.375rem;
+        --font-fifty: 3.125rem;
+        --font-thirtyTwo: 2rem;
+        --font-twentyEight: 1.75rem;
+        --font-twentyFour: 1.5rem;
+        --font-twenty: 1.25rem;
+        --font-eighteen: 1.125rem;
+        --font-sixteen: 1rem;
+        --font-fourteen: .88rem;
+        --font-twelve: .75rem;
+    }
+}
+
+/*========================================*/
+/*------------ [_Reset_Styles] -----------*/
+/*========================================*/
+*,
+::before,
+::after {
+    box-sizing: border-box;
     padding: 0;
+    margin: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+
+
+
+/*========================================*/
+/*--------------- [_Utility] -------------*/
+/*========================================*/
+body {
+    max-width: 100vw;
+    max-height: 100vh;
+    /* background: var(--white-color) url(../src/assets/Lines.svg); */
+    font-family: var(--font);
+    color: var(--text);
+    letter-spacing: -0.5px;
+}
+
+p, h1, h2, h3,
+h4, h5, h6{
+    padding: 0;
+    margin: 0;
+}
+
+h2, h3,
+h4, h5, h6 {
+    color: var(--black);
+    font-family: var(--font);
+}
+
+p {
+    font-size: var(--font-fourteen);
+    line-height: 1.5rem;
+    color: var(--text); 
+}
+
+h1 {
+    font-size: var(--font-seventy);
+    font-style: normal;
+    font-weight: 900;
+    font-size: 70px;
+    line-height: 78px;
+    text-transform: capitalize;
+    color: var(--white);
+}
+
+h2 {
+    font-size: var(--font-fifty);
+    line-height: 2rem;
+    font-weight: 700;
+}
+
+h3 {
+    font-size: var(--font-twentyFour);
+    line-height: 2rem;
+    font-weight: 600;
+}
+
+h4 {
+    font-size: var(--font-twenty);
+    line-height: 1.5rem;
+    font-weight: 600;
+}
+
+h5 {
+    font-size: var(--font-eighteen);
+    font-weight: 600;
+    line-height: 1.5rem;
+}
+
+h6 {
+    font-size: var(--font-sixteen);
+    line-height: 1.2rem;
+    font-weight: 600;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+    font-family: var(--font);
+}
+
+ul {
+    list-style: none;
+}
+
+
+img {
+  border: none;
+  max-width: 100%;
+  background-position: center;
+  background-size: cover;
+}
+
+/*--------------- [Body Wrapper] -------------*/
+ .mainWrapper{
+  display: grid;
+  height: 100%;
+  grid-template-columns: 100%;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+} 
+
+.app_container{
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.content_area{
+    position: relative;
+    z-index: 0;
+    height: 100vh;
+    overflow: scroll;
+}
+
+.error_msg{
+    width: 100%;
+    font-size: var(--font-twelve);
+    color: #fea3a3;
+    font-weight: 500;
+    background-color: rgba(250 128 75 / 33%);
+    border: 1px solid var(--red);
+    border-radius: 8px;
+    padding: 0.15rem 1rem ;
+    text-align: center;
+    line-height: 1.2;
+}
+
+.success_msg{
+    width: 100%;
+    font-size: var(--font-twelve);
+    color: #3d8d00;
+    font-weight: 500;
+    background-color: rgba(61 141 0 / 33%);
+    border: 1px solid var(--green);
+    border-radius: 8px;
+    padding: 0.15rem 1rem ;
+    text-align: center;
+    line-height: 1.2;
+}
+
+.spinner {
+    width: 25px;
+    height: 25px;
+    box-sizing: border-box;
+    border: 3px solid var(--primary);
+    border-radius: 50%;
+    animation: spinner-rotate 1s infinite linear;
+    border-top-color: var(--white);; 
+
+}
+
+@keyframes spinner-rotate {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@media screen and (min-width: 900px) {
+    .app_container{
+        display: grid;
+        grid-template-columns: 260px 1fr;
+    }
+}
+
+@media only screen and (min-device-width: 1440px) {
+    .mainWrapper{
+        height: max-content;
+    }
 }
