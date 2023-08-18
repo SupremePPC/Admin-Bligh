@@ -2,7 +2,6 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Dashboard from "./components/Dashboard";
-import "./App.css";
 import Login from "./components/Login";
 import ForgotPassword from "./components/ForgotPassword";
 import ProtectedRoute from "./protectedRoutes";
@@ -11,6 +10,7 @@ import UserRequestDashboard from "./components/UserRequest";
 import TransactionDashboard from "./components/TransactionManagement";
 import BankingDetails from "./components/BankingDetails";
 import DocumentDashboard from "./components/DocumentManagement";
+import "./App.css";
 
 function App() {
   return (

@@ -10,9 +10,9 @@ import {
 } from "react-icons/fa";
 import { CgMenuGridR } from "react-icons/cg";
 import { PiBankFill } from "react-icons/pi";
-import "./style.css";
 import { getAuth } from "firebase/auth";
 import Modal from "../CustomsModal";
+import "./style.css";
 
 function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);

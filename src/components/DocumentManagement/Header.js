@@ -1,6 +1,6 @@
 import React from 'react';
 
-import Logout from '../Logout';
+// import Logout from '../Logout';
 
 const Header = ({ setIsAdding, setIsAuthenticated }) => {
   return (
@@ -8,7 +8,7 @@ const Header = ({ setIsAdding, setIsAuthenticated }) => {
       <h1>Document Management Dashboard</h1>
       <div style={{ marginTop: '30px', marginBottom: '18px' }}>
         <button onClick={() => setIsAdding(true)}>Add Employee</button>
-        <Logout setIsAuthenticated={setIsAuthenticated} />
+        {/* <Logout setIsAuthenticated={setIsAuthenticated} /> */}
       </div>
     </header>
   );

@@ -169,6 +169,12 @@ img {
     overflow: hidden;
 }
 
+.container{
+    width: calc(100% - 50px);
+    margin-right: 0;
+    margin-left: auto;
+}
+
 .content_area{
     position: relative;
     z-index: 0;

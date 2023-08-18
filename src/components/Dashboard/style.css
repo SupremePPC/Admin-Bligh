@@ -1,16 +1,8 @@
-.dashboard-overview {
-    padding: 20px;
-  }
-  
-  .overview-section {
-    margin-bottom: 20px;
-  }
-  
-  .overview-section h3 {
-    margin: 0;
-  }
-  
-  .overview-section p {
-    margin: 5px 0;
-  }
-  
+.dashboard_container{
+    display: grid;
+    /* grid-template-columns: auto 1fr; */
+}
+
+.main_content .container{
+    
+}

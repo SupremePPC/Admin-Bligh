@@ -1,3 +1,6 @@
+import React from "react";
+import "./style.css";
+
 export default function Modal({
     isOpen,
     onClose,
@@ -16,12 +19,7 @@ export default function Modal({
     return (
       <div className="modal_overlay">
         <div
-          className="modal"
-          style={{
-            width: "400px",
-            height: "230px",
-          }}
-        >
+          className="modal">
           <div className="section_header">
             <h2 className="title">{title}</h2>
           </div>
