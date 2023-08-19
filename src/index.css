@@ -561,7 +561,7 @@ dd {
   padding: 0 1rem;
 }
 
-.container,
+/* .container, */
 .small-container,
 .medium-container {
   max-width: 1200px;
@@ -1117,6 +1117,7 @@ caption {
 
 .contain-table {
   overflow-x: auto;
+  padding: 1rem;
 }
 
 @media (min-width: 600px) {

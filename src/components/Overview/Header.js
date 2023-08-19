@@ -1,15 +1,9 @@
 import React from 'react';
 
-// import Logout from '../Logout';
-
-const Header = ({ setIsAdding, setIsAuthenticated }) => {
+const Header = ({ setIsAdding }) => {
   return (
     <header>
-      <h1>Account Management Dashboard</h1>
-      <div style={{ marginTop: '30px', marginBottom: '18px' }}>
-        <button onClick={() => setIsAdding(true)}>Add Employee</button>
-        {/* <Logout setIsAuthenticated={setIsAuthenticated} /> */}
-      </div>
+      <h1 className='header_title'>DashboardOverview</h1>
     </header>
   );
 };

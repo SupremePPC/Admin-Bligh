@@ -5,8 +5,8 @@ import React from 'react';
 const Header = ({ setIsAdding, setIsAuthenticated }) => {
   return (
     <header>
-      <h1>Document Management Dashboard</h1>
-      <div style={{ marginTop: '30px', marginBottom: '18px' }}>
+      <h1 className='header_title'>Document Management Dashboard</h1>
+      <div className='addRow_btn'>
         <button onClick={() => setIsAdding(true)}>Add Employee</button>
         {/* <Logout setIsAuthenticated={setIsAuthenticated} /> */}
       </div>

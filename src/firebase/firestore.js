@@ -28,6 +28,7 @@ import {
 import { db } from "./firebase";
 
 const ADMINUSER_COLLECTION = "adminUser";
+const USER_COLLECTION = "user";
 
 export function addAdminUser(
   uid,
@@ -42,26 +43,26 @@ export function addAdminUser(
 }
 
 export async function getUser(uid) {
-  const adminUserRef = doc(db, ADMINUSER_COLLECTION, uid);
-  const adminUserSnap = await getDoc(adminUserRef);
+  const userRef = doc(db, USER_COLLECTION, uid);
+  const userSnap = await getDoc(userRef);
 
-  console.log("getAdminUser UID:", uid);
-  console.log("adminUser snapshot data:", adminUserSnap.data());
+  console.log("getuser UID:", uid);
+  console.log("user snapshot data:", userSnap.data());
 
-  if (adminUserSnap.exists()) {
-    return [{ ...adminUserSnap.data(), id: adminUserSnap.id }];
+  if (userSnap.exists()) {
+    return [{ ...userSnap.data(), id: userSnap.id }];
   } else {
     return [];
   }
 }
 
-export function updateAdminUser(uid, adminUserData) {
-  const userDoc = doc(db, ADMINUSER_COLLECTION, uid);
-  return updateDoc(userDoc, adminUserData);
+export function updateuser(uid, userData) {
+  const userDoc = doc(db, USER_COLLECTION, uid);
+  return updateDoc(userDoc, userData);
 }
 
-export function deleteAdminUser(uid) {
-  const userDoc = doc(db, ADMINUSER_COLLECTION, uid);
+export function deleteuser(uid) {
+  const userDoc = doc(db, USER_COLLECTION, uid);
   return deleteDoc(userDoc);
 }
 

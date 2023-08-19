@@ -6,7 +6,7 @@
   /* Colors */
   --primary: #041b3c;
   --secondary: #688fb7;
-  --tertiary: #092948;
+  --tertiary: #0366ee;
   --white: #ecf0f1;
   --text: #555555;
   --black: #333333;
@@ -94,17 +94,16 @@ p {
 }
 
 h1 {
-    font-size: var(--font-seventy);
+    font-size: var(--font-thirtyTwo);
     font-style: normal;
-    font-weight: 900;
-    font-size: 70px;
+    font-weight: 600;
     line-height: 78px;
     text-transform: capitalize;
-    color: var(--white);
+    color: var(--black);
 }
 
 h2 {
-    font-size: var(--font-fifty);
+    font-size: var(--font-twentyEight);
     line-height: 2rem;
     font-weight: 700;
 }
@@ -171,8 +170,12 @@ img {
 
 .container{
     width: calc(100% - 50px);
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
     margin-right: 0;
     margin-left: auto;
+    padding: 0;
 }
 
 .content_area{
@@ -180,6 +183,26 @@ img {
     z-index: 0;
     height: 100vh;
     overflow: scroll;
+}
+
+.section_header{
+    
+}
+
+.header_title{
+    background: var(--primary);
+    padding: 0 1rem;
+    text-align: center;
+    color: var(--white);
+}
+
+.section_title{
+    text-align: center;
+    color: var(--primary);
+}
+
+.addRow_btn{
+    margin: 2rem 1rem 1rem 1rem;
 }
 
 .error_msg{
