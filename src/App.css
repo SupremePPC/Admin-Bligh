@@ -231,6 +231,16 @@ img {
     line-height: 1.2;
 }
 
+.accept_btn{
+    background-color: var(--green);
+    color: var(--white);
+}
+
+.reject_btn{
+    background-color: var(--red);
+    color: var(--white);
+}
+
 .spinner {
     width: 25px;
     height: 25px;

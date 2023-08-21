@@ -5,28 +5,54 @@ import {
   doc,
   addDoc,
   deleteDoc,
+  getDoc,
 } from "firebase/firestore";
-import "./style.css";
-import { auth, db } from "../../firebase";
+import { auth, db } from "../../firebase/firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-// import UserOverview from "../UserManagement"
+import Header from "./Header";
+import Table from "./Table";
+import "./style.css";
 
 export default function UserRequest() {
   const [userRequests, setUserRequests] = useState([]);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isApproved, setIsApproved] = useState(false);
+  const [isRejected, setIsRejected] = useState(false);
 
   useEffect(() => {
     const fetchUserRequests = async () => {
-      const querySnapshot = await getDocs(collection(db, "admin-requests"));
-      setUserRequests(
-        querySnapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
-      );
+      const adminDashRef = collection(db, "adminDash");
+      const adminDocs = await getDocs(adminDashRef);
+
+      let allUserRequests = [];
+
+      for (const doc of adminDocs.docs) {
+        const userRequestsRef = collection(
+          db,
+          "adminDash",
+          doc.id,
+          "userRequests"
+        );
+        const userRequestsSnapshot = await getDocs(userRequestsRef);
+        const requests = userRequestsSnapshot.docs.map((userDoc) => ({
+          ...userDoc.data(),
+          id: userDoc.id,
+          uid: doc.id,
+        }));
+        allUserRequests = allUserRequests.concat(requests);
+      }
+
+      setUserRequests(allUserRequests);
     };
 
     fetchUserRequests();
   }, []);
+
+  useEffect(() => {
+    console.log("Updated userRequests:", userRequests);
+  }, [userRequests]);
 
   const handleApproval = async (userId, requestData) => {
     setIsLoading(true);
@@ -44,107 +70,88 @@ export default function UserRequest() {
         address: requestData.address,
         mobilePhone: requestData.mobilePhone,
       });
-      await deleteDoc(doc(db, "admin-requests", userId));
+      await deleteDoc(
+        doc(db, "adminDash", requestData.uid, "userRequests", userId)
+      );
+      // Remove the user request from the state
+      setUserRequests((prevRequests) =>
+        prevRequests.filter((request) => request.id !== userId)
+      );
       setSuccessMessage("User approved successfully.");
     } catch (error) {
-      console.error("Error approving user:", error);
-      setError("Error approving user: " + error.message);
+      if (error.code === "auth/email-already-in-use") {
+        setError("The email is already in use. Please use a different email.");
+      } else {
+        console.error("Error approving user:", error);
+        setError("Error approving user: " + error.message);
+      }
       setTimeout(() => {
         setError("");
-        }, 4000);
-
+      }, 4000);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleDecline = async (userId) => {
+  const handleRejection = async (userId, requestData) => {
     setIsLoading(true);
+    console.log("UID:", requestData.uid);
+    console.log("User Request ID:", userId);
+
     try {
-      await deleteDoc(doc(db, "admin-requests", userId));
-      setSuccessMessage("User declined successfully.");
+      const userRequestDocRef = doc(
+        db,
+        "adminDash",
+        requestData.uid,
+        "userRequests",
+        userId
+      );
+
+      const userDocRef = doc(db, "adminDash", requestData.uid);
+      console.log("userDocRef:", userDocRef);
+      // First, delete the specific user request from the userRequests sub-collection.
+      await deleteDoc(userRequestDocRef);
+      console.log("userRequestDocRef:", userRequestDocRef);
+
+      setUserRequests((prevRequests) =>
+        prevRequests.filter((request) => request.id !== userId)
+      );
+
+      const userDocSnapshot = await getDoc(userDocRef);
+      if (userDocSnapshot.exists()) {
+        await deleteDoc(userDocRef);
+      }
+      setSuccessMessage("User request rejected and removed successfully.");
       setTimeout(() => {
         setSuccessMessage("");
-        }, 3000);
+      }, 3000);
     } catch (error) {
-      console.error("Error declining user:", error);
-      setError("Error declining user");
-        setTimeout(() => {
-            setError("");
-        }, 4000);
-
+      console.error("Error rejecting and removing user:", error);
+      setError("Error rejecting and removing user");
+      setTimeout(() => {
+        setError("");
+      }, 4000);
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <section className="adminDash_page">
-      <div className="section_header">
-        <h2>Admin Dashboard</h2>
-        <div>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="180"
-            height="9"
-            viewBox="0 0 230 9"
-            >
-            <rect
-              id="Rectangle_28"
-              data-name="Rectangle 28"
-              width="230"
-              height="9"
-              rx="4.5"
-              fill="#688fb7"
-              ></rect>
-          </svg>
-        </div>
-              {
-                  isLoading && <p className="spinner"></p>
-              }
-      </div>
-      {
-        userRequests.length === 0 && <p className="no_requests">No user requests at this time.</p>
-      }
-      <ul className="user_list">
-        {userRequests.map((user) => (
-          <li className="user" key={user.id}>
-            <p className="user_name">
-              <span className="name_label">Name:</span>{" "}
-              <span className="name_value">{user.fullName}</span>
-            </p>
-            <p className="user_name">
-              <span className="name_label">Email:</span>{" "}
-              <span className="name_value"> {user.email} </span>
-            </p>
-            <p className="user_name">
-              <span className="name_label">Phone:</span>{" "}
-              <span className="name_value"> {user.mobilePhone} </span>
-            </p>
-            <p className="user_name">
-              <span className="name_label">Address:</span>{" "}
-              <span className="name_value"> {user.address} </span>
-            </p>
-            {
-                error && <p className="error_msg">{error}</p>
-            }
-            {
-                successMessage && <p className="success_msg">{successMessage}</p>
-            }
-            <button
-              className="approve_btn"
-              onClick={() => handleApproval(user.id, true)}
-            >
-              Approve
-            </button>
-            <button
-              className="decline_btn"
-              onClick={() => handleDecline(user.id, false)}
-            >Decline
-            </button>
-          </li>
-        ))}
-      </ul>
-    </section>
+    <div className="container">
+      {!isApproved && !isRejected && (
+        <>
+          <Header />
+          <Table
+            userRequests={userRequests}
+            handleApproval={handleApproval}
+            handleRejection={handleRejection}
+            isApproved={isApproved}
+            isRejected={isRejected}
+            setIsApproved={setIsApproved}
+            setIsRejected={setIsRejected}
+          />
+        </>
+      )}
+    </div>
   );
 }
