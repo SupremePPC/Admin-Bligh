@@ -61,8 +61,6 @@ html {
 }
 
 
-
-
 /*========================================*/
 /*--------------- [_Utility] -------------*/
 /*========================================*/
@@ -236,8 +234,18 @@ img {
     color: var(--white);
 }
 
+.accept_btn:hover{
+    background-color: #2e6a00;
+    color: var(--white);
+}
+
 .reject_btn{
     background-color: var(--red);
+    color: var(--white);
+}
+
+.reject_btn:hover{
+    background-color: #b30000;
     color: var(--white);
 }
 

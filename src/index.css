@@ -391,6 +391,10 @@ table {
   margin: 0 0 1.5rem 0;
 }
 
+table{
+  margin-top: 1.5rem;
+}
+
 ul li ul {
   margin-bottom: 0;
 }
