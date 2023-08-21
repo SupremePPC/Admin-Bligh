@@ -61,31 +61,7 @@ const Table = ({
           )}
         </tbody>
       </table>
-      {isApproved && (
-        <Modal
-          isOpen={isApproved}
-          onClose={() => setIsApproved(false)}
-          title="Accept User Request"
-          description="Are you sure you want to accept this user request?"
-          onPositiveAction={() => {
-            handleApproval(selectedUserId);
-            setIsApproved(false);
-          }}
-        />
-      )}
-
-      {isRejected && (
-        <Modal
-          isOpen={isRejected}
-          onClose={() => setIsRejected(false)}
-          title="Reject User Request"
-          description="Are you sure you want to reject this user request?"
-          onPositiveAction={() => {
-            handleRejection(selectedUserId);
-            setIsRejected(false);
-          }}
-        />
-      )}
+      
     </div>
   );
 };

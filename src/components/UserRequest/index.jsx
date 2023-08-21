@@ -12,6 +12,7 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import Header from "./Header";
 import Table from "./Table";
 import "./style.css";
+import Modal from "../CustomsModal";
 
 export default function UserRequest() {
   const [userRequests, setUserRequests] = useState([]);
@@ -20,6 +21,7 @@ export default function UserRequest() {
   const [isLoading, setIsLoading] = useState(false);
   const [isApproved, setIsApproved] = useState(false);
   const [isRejected, setIsRejected] = useState(false);
+  const [pendingRequestData, setPendingRequestData] = useState(null); // Store data of the request being processed
 
   useEffect(() => {
     const fetchUserRequests = async () => {
@@ -138,19 +140,61 @@ export default function UserRequest() {
 
   return (
     <div className="container">
-      {!isApproved && !isRejected && (
-        <>
-          <Header />
-          <Table
-            userRequests={userRequests}
-            handleApproval={handleApproval}
-            handleRejection={handleRejection}
-            isApproved={isApproved}
-            isRejected={isRejected}
-            setIsApproved={setIsApproved}
-            setIsRejected={setIsRejected}
-          />
-        </>
+      <Header />
+        <Table
+          userRequests={userRequests}
+          handleApproval={(userId, requestData) => {
+            setPendingRequestData({ userId, requestData });
+            setIsApproved(true);
+          }}
+          handleRejection={(userId, requestData) => {
+            setPendingRequestData({ userId, requestData });
+            setIsRejected(true);
+          }}
+        />
+      {error && <div className="error-message">{error}</div>}
+      {successMessage && (
+        <div className="success-message">{successMessage}</div>
+      )}
+
+      {isApproved && pendingRequestData && (
+        <Modal
+          isOpen={isApproved}
+          onClose={() => setIsApproved(false)}
+          title="Accept User Request"
+          description="Are you sure you want to accept this user request?"
+          onPositiveAction={() => {
+            handleApproval(
+              pendingRequestData.userId,
+              pendingRequestData.requestData
+            );
+            setIsApproved(false);
+            setPendingRequestData(null);
+            
+          }}
+          positiveLabel="Accept"
+          negativeLabel="Cancel"
+        />
+      )}
+
+      {isRejected && pendingRequestData && (
+        <Modal
+          isOpen={isRejected}
+          onClose={() => setIsRejected(false)}
+          title="Reject User Request"
+          description="Are you sure you want to reject this user request?"
+          onPositiveAction={() => {
+            handleRejection(
+              pendingRequestData.userId,
+              pendingRequestData.requestData
+            );
+            setIsRejected(false);
+            setPendingRequestData(null);
+          }}
+          onNegativeAction={() => setIsRejected(false)}
+          positiveLabel="Reject"
+          negativeLabel="Cancel"
+        />
       )}
     </div>
   );

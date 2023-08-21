@@ -170,7 +170,7 @@ img {
 
 .container{
     width: calc(100% - 50px);
-    max-width: 1200px;
+    /* max-width: 1200px; */
     margin-left: auto;
     margin-right: auto;
     margin-right: 0;

@@ -8,8 +8,8 @@ export default function Modal({
     description,
     onPositiveAction,
     isLoading,
-    positiveLabel = "Confirm",
-    negativeLabel = "Cancel",
+    positiveLabel,
+    negativeLabel,
     loadingLabel = "Loading..."
   }) {
     if (!isOpen) {
@@ -32,29 +32,29 @@ export default function Modal({
             {description}
           </p>
           <div className="buttons_wrap">
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onClose();
-              }}
-              className="submit_btn"
-            >
-              {negativeLabel}
-            </button>
-  
-            {isLoading ? (
-              <button className="cancel_btn">{loadingLabel}</button>
-            ) : (
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   onPositiveAction();
                   onClose();
                 }}
-                className="cancel_btn"
+                className="submit_btn"
               >
                 {positiveLabel}
               </button>
+  
+            {isLoading ? (
+              <button className="cancel_btn">{loadingLabel}</button>
+            ) : (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onClose();
+              }}
+              className="cancel_btn"
+            >
+              {negativeLabel}
+            </button>
             )}
           </div>
         </div>
