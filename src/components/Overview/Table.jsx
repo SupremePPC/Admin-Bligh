@@ -1,23 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { collection, getDocs } from '@firebase/firestore'; // Make sure you import necessary firebase utilities
-import { db } from '../../firebase/firebase';
+import React from 'react';
 
-const Table = ({ employees, handleEdit, handleDelete }) => {
-  const [users, setUsers] = useState([]);
-
-  useEffect(() => {
-    const fetchUsers = async () => {
-      const usersCollection = collection(db, 'users');
-      const userDocs = await getDocs(usersCollection);
-      const usersData = userDocs.docs.map(doc => ({
-        ...doc.data(),
-        id: doc.id
-      }));
-      setUsers(usersData);
-    };
-
-    fetchUsers();
-  }, []);
+const Table = ({ users, handleEdit, handleDelete }) => {
+  
   return (
     <div className="contain-table">
       <table className="striped-table">
@@ -27,7 +11,6 @@ const Table = ({ employees, handleEdit, handleDelete }) => {
             <th>Full Name</th>
             <th>Email</th>
             <th>Mobile</th>
-            <th>Uid</th>
             <th colSpan={2} className="text-center">
               Actions
             </th>
@@ -41,10 +24,9 @@ const Table = ({ employees, handleEdit, handleDelete }) => {
                 <td>{user.fullName}</td>
                 <td>{user.email}</td>
                 <td>{user.mobilePhone}</td>
-                <td>{user.uid}</td>
                 <td className="text-right">
                   <button
-                    onClick={() => handleEdit(user.id)}
+                    onClick={() => handleEdit(user)}
                     className="button muted-button"
                   >
                     Edit

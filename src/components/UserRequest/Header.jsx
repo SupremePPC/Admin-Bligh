@@ -1,0 +1,13 @@
+import React from 'react';
+
+// import Logout from '../Logout';
+
+const Header = () => {
+  return (
+    <header>
+      <h1 className='header_title'>User Request Management</h1>
+    </header>
+  );
+};
+
+export default Header;

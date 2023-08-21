@@ -1,9 +1,9 @@
 /* styles.css */
 .sidebar {
   width: 275px;
-  height: 100vh;
+  min-height: 100vh;
+  height: 100%;
   background-color: var(--primary);
-  overflow-x: hidden;
   position: fixed;
   color: var(--white);
   display: flex;
