@@ -121,27 +121,27 @@ const sortByEmailDescending = () => {
   
   return (
     <div className="container">
-      <Header
-      setIsAdding={setIsAdding}
-      isSortToggled={isSortToggled}
-      toggleSort={toggleSort}
-      onSort={handleSort}
-    />
       {isAdding && (
         <Add onClose={() => setIsAdding(false)} setIsAdding={setIsAdding}
         setUsers={setUsers} />
-      )}
+        )}
       {isEditPageOpen && (
         <Edit
-          user={selectedUserForEdit}
-          onClose={() => {
-            setIsEditPageOpen(false);
-            setSelectedUserForEdit(null);
-          }}
+        user={selectedUserForEdit}
+        onClose={() => {
+          setIsEditPageOpen(false);
+          setSelectedUserForEdit(null);
+        }}
         />
-      )}
+        )}
       {!isAdding && !isEditPageOpen && (
         <>
+        <Header
+        setIsAdding={setIsAdding}
+        isSortToggled={isSortToggled}
+        toggleSort={toggleSort}
+        onSort={handleSort}
+      />
           <Table
             users={users}
             handleDelete={handleDelete}

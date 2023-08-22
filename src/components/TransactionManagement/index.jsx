@@ -5,8 +5,6 @@ import {
   collection,
   doc,
   updateDoc,
-  deleteField,
-  addDoc,
 } from "firebase/firestore";
 import Header from "./Header";
 import Table from "./Table";
@@ -24,7 +22,6 @@ const TransactionDashboard = ({ setIsAuthenticated }) => {
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
-        console.log("Fetching transactions...");
         const usersRef = collection(db, "users");
         const usersSnapshot = await getDocs(usersRef);
         let allTransactions = [];
@@ -59,15 +56,6 @@ const TransactionDashboard = ({ setIsAuthenticated }) => {
 
     fetchTransactions();
   }, []);
-
-  const handleTransaction = (id) => {
-    console.log("handleTransaction called with ID:", id);
-    const [transaction] = transactions.filter(
-      (transaction) => transaction.id === id
-    );
-    setSelectedTransaction(transaction);
-    setIsApproving(true);
-  };
 
   const showApprovalModal = (id) => {
     const selected = transactions.find((transaction) => transaction.id === id);
@@ -105,11 +93,8 @@ const TransactionDashboard = ({ setIsAuthenticated }) => {
 
       // Update state
       setTransactions(transactionsCopy);
-      setIsApproving(false); // Close the modal after approval
+      setIsApproving(false); 
 
-      console.log("selectedTransaction:", selectedTransaction);
-      console.log("transactionsCopy:", transactionsCopy);
-      console.log("transactionIndex:", transactionIndex);
       Swal.fire({
         icon: "success",
         title: "Approved!",
@@ -150,11 +135,8 @@ const TransactionDashboard = ({ setIsAuthenticated }) => {
 
       // Update state
       setTransactions(transactionsCopy);
-      setIsDeclining(false); // Close the modal after rejection
+      setIsDeclining(false); 
 
-      console.log("selectedTransaction:", selectedTransaction);
-      console.log("transactionsCopy:", transactionsCopy);
-      console.log("transactionIndex:", transactionIndex);
       Swal.fire({
         icon: "success",
         title: "Declined!",
@@ -180,10 +162,9 @@ const TransactionDashboard = ({ setIsAuthenticated }) => {
         <LoadingScreen />
       ) : (
         <>
-          <Header setIsAuthenticated={setIsAuthenticated} />
+          <Header />
           <Table
             transactions={transactions}
-            handleReview={handleTransaction}
             handleApproval={showApprovalModal}
             handleRejection={showDeclineModal}
           />

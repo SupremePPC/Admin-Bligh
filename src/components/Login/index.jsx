@@ -7,20 +7,18 @@ import {
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import { onAuthStateChanged } from "firebase/auth";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { auth } from "../../firebase/firebase";
 import "./style.css";
-import { auth, db } from "../../firebase/firebase";
 
 const Login = () => {
-  
-  const [email, setEmail] = useState("admin@example.com");
-  const [password, setPassword] = useState("qwerty");
+  const [user, setUser] = useState(null);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const validatePassword = (pass) => {
-    // Check if the password is at least 8 characters long and contains at least one number
     const regex = /^(?=.*\d)[\w]{8,}$/;
     return regex.test(pass);
   };
@@ -28,12 +26,10 @@ const Login = () => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        // User is still authenticated
-        console.log("User still logged in with ID:", user.uid);
-        navigate("/");
+        navigate("/dashboard");
       } else {
         // User is not authenticated
-        console.log("No user logged in");
+        console.error("No user logged in");
       }
     });
 
@@ -43,42 +39,14 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-  
-    if (!validatePassword(password)) {
-      setError(
-        "Password must be at least 8 characters long and contain at least one number."
-      );
-      setIsLoading(false);
-      setTimeout(() => {
-        setError("");
-      }, 4000); 
-      return;
-    }
-  
+    
     try {
       await setPersistence(auth, browserSessionPersistence);
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
-  
-      console.log("Logged in user's UID:", user.uid);
-  
-      // Check if the user's UID already exists in the users collection
-      const usersRef = collection(db, "users");
-      const q = query(usersRef, where("uid", "==", user.uid));
-      const querySnapshot = await getDocs(q);
-  
-      if (querySnapshot.empty) {
-        // If UID doesn't exist in the users collection, this means user isn't registered
-        setError("User not found. Please sign up.");
-        setIsLoading(false);
-        setTimeout(() => {
-          setError("");
-        }, 4000);
-        return;
-      }
-  
-      setIsLoading(false); // Set loading to false after successful authentication
-      navigate("/");
+      setIsLoading(false);
+      navigate("/dashboard");
+      
     } catch (error) {
       console.error("Error during login:", error);
       setError(error.message);
@@ -89,6 +57,7 @@ const Login = () => {
     }
   };
   
+   
 
   return (
     <section className="login_container">

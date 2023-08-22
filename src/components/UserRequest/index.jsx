@@ -13,6 +13,7 @@ import Header from "./Header";
 import Table from "./Table";
 import "./style.css";
 import Modal from "../CustomsModal";
+import LoadingScreen from "../LoadingScreen";
 
 export default function UserRequest() {
   const [userRequests, setUserRequests] = useState([]);
@@ -141,6 +142,9 @@ export default function UserRequest() {
   return (
     <div className="container">
       <Header />
+      {isLoading ? (
+        <LoadingScreen/>
+      ) : (
         <Table
           userRequests={userRequests}
           handleApproval={(userId, requestData) => {
@@ -152,11 +156,11 @@ export default function UserRequest() {
             setIsRejected(true);
           }}
         />
+        )}
       {error && <div className="error-message">{error}</div>}
       {successMessage && (
         <div className="success-message">{successMessage}</div>
       )}
-
       {isApproved && pendingRequestData && (
         <Modal
           isOpen={isApproved}
