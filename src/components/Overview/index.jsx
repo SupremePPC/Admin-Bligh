@@ -8,7 +8,6 @@ import {
   deleteDoc,
   doc,
   getDocs,
-  updateDoc,
 } from "firebase/firestore";
 import Modal from "../CustomsModal";
 import Edit from "./Edit";
@@ -21,6 +20,7 @@ export default function DashboardOverview() {
   const [isEditPageOpen, setIsEditPageOpen] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
   const [selectedUserForEdit, setSelectedUserForEdit] = useState(null);
+  const [toggleSort, setToggleSort] = useState(false);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -55,9 +55,78 @@ export default function DashboardOverview() {
     setIsEditPageOpen(true);
   };
 
+  const isSortToggled = () => {
+    setToggleSort(!toggleSort);
+  };
+  
+  // Sort by Username - Ascending
+const sortByFullNameAscending = () => {
+  const sortedUsers = [...users].sort((a, b) => {
+    const nameA = a.fullName || "";
+    const nameB = b.fullName || "";
+    return nameA.localeCompare(nameB);
+  });
+  setUsers(sortedUsers);
+};
+
+// Sort by Username - Descending
+const sortByFullNameDescending = () => {
+  const sortedUsers = [...users].sort((a, b) => {
+    const nameA = a.fullName || "";
+    const nameB = b.fullName || "";
+    return nameB.localeCompare(nameA); // Note the order change
+  });
+  setUsers(sortedUsers);
+};
+
+// Sort by Email - Ascending
+const sortByEmailAscending = () => {
+  const sortedUsers = [...users].sort((a, b) => {
+    const emailA = a.email || "";
+    const emailB = b.email || "";
+    return emailA.localeCompare(emailB);
+  });
+  setUsers(sortedUsers);
+};
+
+// Sort by Email - Descending
+const sortByEmailDescending = () => {
+  const sortedUsers = [...users].sort((a, b) => {
+    const emailA = a.email || "";
+    const emailB = b.email || "";
+    return emailB.localeCompare(emailA); // Note the order change
+  });
+  setUsers(sortedUsers);
+};
+
+
+  const handleSort = (sortType) => {
+    switch(sortType) {
+      case 'name_ascend':
+        sortByFullNameAscending();
+        break;
+      case 'name_descend':
+        sortByFullNameDescending();
+        break;
+      case 'email_ascend':
+        sortByEmailAscending();
+        break;
+      case 'email_descend':
+        sortByEmailDescending();
+        break;
+      default:
+        break;
+    }
+  };
+  
   return (
     <div className="container">
-      <Header setIsAdding={setIsAdding} />
+      <Header
+      setIsAdding={setIsAdding}
+      isSortToggled={isSortToggled}
+      toggleSort={toggleSort}
+      onSort={handleSort}
+    />
       {isAdding && (
         <Add onClose={() => setIsAdding(false)} setIsAdding={setIsAdding}
         setUsers={setUsers} />

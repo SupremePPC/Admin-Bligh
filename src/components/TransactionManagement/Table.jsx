@@ -39,7 +39,7 @@ const Table = ({ transactions, handleApproval, handleRejection }) => {
                   <td>{i + 1}</td>
                   <td>{transaction.userName}</td>
                   <td>{formatter.format(transaction.amount)}</td>
-                  <td>{transaction.requestType}</td>
+                  <td>{transaction.type}</td>
                   <td>{transaction.status}</td>
                   <td>{formattedDate}</td>
                   <td className="text-right">
