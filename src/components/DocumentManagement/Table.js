@@ -1,13 +1,8 @@
 import React from 'react';
 
-const Table = ({ employees, handleEdit, handleDelete }) => {
-  employees.forEach((employee, i) => {
-    employee.id = i + 1;
-  });
- 
- // add first name and last name to get full name
-  employees.forEach((employee, i) => {
-    employee.fullName = employee.firstName + " " + employee.lastName;
+const Table = ({ users, handleEdit, handleDelete, handleDownload }) => {
+  users.forEach((user, i) => {
+    user.id = i + 1;
   });
 
   return (
@@ -16,7 +11,7 @@ const Table = ({ employees, handleEdit, handleDelete }) => {
         <thead>
           <tr>
             <th>No.</th>
-            <th>First Name</th>
+            <th>Full Name</th>
             <th>Upload Name</th>
             {/* <th>Salary</th> */}
             <th>Date</th>
@@ -26,24 +21,32 @@ const Table = ({ employees, handleEdit, handleDelete }) => {
           </tr>
         </thead>
         <tbody>
-          {employees.length > 0 ? (
-            employees.map((employee, i) => (
-              <tr key={employee.id}>
+          {users.length > 0 ? (
+            users.map((user, i) => (
+              <tr key={user.id}>
                 <td>{i + 1}</td>
-                <td>{employee.fullName}</td>
-                <td>{employee.email}</td>
-                <td>{employee.date} </td>
+                <td>{user.fullName}</td>
+                <td>{user.email}</td>
+                <td>{user.date} </td>
                 <td className="text-right">
                   <button
-                    onClick={() => handleEdit(employee.id)}
+                    onClick={() => handleEdit(user.id)}
                     className="button muted-button"
                   >
-                    Edit
+                    View
                   </button>
                 </td>
                 <td className="text-left">
                   <button
-                    onClick={() => handleDelete(employee.id)}
+                    onClick={() => handleDelete(user.id)}
+                    className="button muted-button"
+                  >
+                    Delete
+                  </button>
+                </td>
+                <td className="text-left">
+                  <button
+                    onClick={() => handleDownload(user.id)}
                     className="button muted-button"
                   >
                     Delete
@@ -53,7 +56,7 @@ const Table = ({ employees, handleEdit, handleDelete }) => {
             ))
           ) : (
             <tr>
-              <td colSpan={7}>No Employees</td>
+              <td colSpan={7}>No users</td>
             </tr>
           )}
         </tbody>

@@ -11,9 +11,14 @@ import TransactionDashboard from "./components/TransactionManagement";
 import BankingDetails from "./components/BankingDetails";
 import DocumentDashboard from "./components/DocumentManagement";
 import "./App.css";
+import LoadingScreen from "./components/LoadingScreen";
+import { useAuth } from "./authState";
 
 function App() {
+  const { loadingAuthState } = useAuth();
+
   return (
+    <div className="App">
     <Router>
       <Routes>
         <Route
@@ -69,6 +74,8 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
       </Routes>
     </Router>
+    {loadingAuthState && <LoadingScreen />} 
+    </div>
   );
 }
 

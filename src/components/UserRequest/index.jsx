@@ -26,11 +26,12 @@ export default function UserRequest() {
 
   useEffect(() => {
     const fetchUserRequests = async () => {
+      try {
       const adminDashRef = collection(db, "adminDash");
       const adminDocs = await getDocs(adminDashRef);
 
       let allUserRequests = [];
-
+      setIsLoading(true);
       for (const doc of adminDocs.docs) {
         const userRequestsRef = collection(
           db,
@@ -48,8 +49,11 @@ export default function UserRequest() {
       }
 
       setUserRequests(allUserRequests);
-    };
-
+      setIsLoading(false);
+    } catch (error) {
+      console.error("Error fetching banking details:", error);
+    }
+  };
     fetchUserRequests();
   }, []);
 

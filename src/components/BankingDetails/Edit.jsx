@@ -44,7 +44,7 @@ const Edit = ({ userId, bankingDetailsId, bankingDetails, onClose }) => {
     try {
       const bankingDetailsRef = doc(db, "users", userId, "bankingDetails", bankingDetailsId);
       await updateDoc(bankingDetailsRef, updatedDetails);
-      
+      window.location.reload();
       Swal.fire({
         icon: "success",
         title: "Updated!",

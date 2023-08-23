@@ -1,6 +1,7 @@
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from './firebase/firebase';
 import { createContext, useContext, useEffect, useState } from 'react';
+import LoadingScreen from './components/LoadingScreen';
 
 const AuthContext = createContext();
 
@@ -20,6 +21,10 @@ const AuthProvider = ({ children }) => {
 
     return () => unsubscribe();  
   }, []);
+  
+  if (loadingAuthState) {
+    return <LoadingScreen />; 
+  }
 
   const contextValue = {
     user,
