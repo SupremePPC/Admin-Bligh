@@ -234,13 +234,13 @@ img {
 }
 
 .accept_btn {
-  background-color: var(--green);
-  color: var(--white);
+  background-color: var(--green) !important;
+  color: var(--white) !important;
 }
 
 .accept_btn:hover {
-  background-color: #2e6a00;
-  color: var(--white);
+  background-color: #2e6a00 !important;
+  color: var(--white) !important;
 }
 
 .btn_wrap {
