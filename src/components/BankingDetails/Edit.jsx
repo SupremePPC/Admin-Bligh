@@ -50,7 +50,7 @@ const Edit = ({ userId, bankingDetailsId, bankingDetails, onClose }) => {
         title: "Updated!",
         text: `${updatedDetails.accountName}'s data has been updated.`,
         showConfirmButton: false,
-        timer: 1500,
+        timer: 2000,
       });
 
       // Close the edit form

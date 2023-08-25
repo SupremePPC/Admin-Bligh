@@ -47,7 +47,7 @@ const Edit = ({ employees, selectedEmployee, setEmployees, setIsEditing }) => {
       title: 'Updated!',
       text: `${employee.firstName} ${employee.lastName}'s data has been updated.`,
       showConfirmButton: false,
-      timer: 1500,
+      timer: 2000,
     });
   };
 

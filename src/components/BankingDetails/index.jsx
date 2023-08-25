@@ -14,7 +14,6 @@ const BankingDetails = () => {
   const [bankingDetails, setBankingDetails] = useState([]);  
   const [selectedBankingDetail, setSelectedBankingDetail] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {

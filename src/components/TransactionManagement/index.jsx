@@ -100,7 +100,7 @@ const TransactionDashboard = ({ setIsAuthenticated }) => {
         title: "Approved!",
         text: `Transaction has been approved.`,
         showConfirmButton: false,
-        timer: 1500,
+        timer: 2000,
       });
     } catch (error) {
       console.error("Error updating transaction:", error);
@@ -142,7 +142,7 @@ const TransactionDashboard = ({ setIsAuthenticated }) => {
         title: "Declined!",
         text: `Transaction has been declined.`,
         showConfirmButton: false,
-        timer: 1500,
+        timer: 2000,
       });
     } catch (error) {
       console.error("Error updating transaction:", error);

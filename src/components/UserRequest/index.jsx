@@ -14,6 +14,7 @@ import Table from "./Table";
 import "./style.css";
 import Modal from "../CustomsModal";
 import LoadingScreen from "../LoadingScreen";
+import Swal from "sweetalert2";
 
 export default function UserRequest() {
   const [userRequests, setUserRequests] = useState([]);
@@ -27,33 +28,33 @@ export default function UserRequest() {
   useEffect(() => {
     const fetchUserRequests = async () => {
       try {
-      const adminDashRef = collection(db, "adminDash");
-      const adminDocs = await getDocs(adminDashRef);
+        const adminDashRef = collection(db, "adminDash");
+        const adminDocs = await getDocs(adminDashRef);
 
-      let allUserRequests = [];
-      setIsLoading(true);
-      for (const doc of adminDocs.docs) {
-        const userRequestsRef = collection(
-          db,
-          "adminDash",
-          doc.id,
-          "userRequests"
-        );
-        const userRequestsSnapshot = await getDocs(userRequestsRef);
-        const requests = userRequestsSnapshot.docs.map((userDoc) => ({
-          ...userDoc.data(),
-          id: userDoc.id,
-          uid: doc.id,
-        }));
-        allUserRequests = allUserRequests.concat(requests);
+        let allUserRequests = [];
+        setIsLoading(true);
+        for (const doc of adminDocs.docs) {
+          const userRequestsRef = collection(
+            db,
+            "adminDash",
+            doc.id,
+            "userRequests"
+          );
+          const userRequestsSnapshot = await getDocs(userRequestsRef);
+          const requests = userRequestsSnapshot.docs.map((userDoc) => ({
+            ...userDoc.data(),
+            id: userDoc.id,
+            uid: doc.id,
+          }));
+          allUserRequests = allUserRequests.concat(requests);
+        }
+
+        setUserRequests(allUserRequests);
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error fetching banking details:", error);
       }
-
-      setUserRequests(allUserRequests);
-      setIsLoading(false);
-    } catch (error) {
-      console.error("Error fetching banking details:", error);
-    }
-  };
+    };
     fetchUserRequests();
   }, []);
 
@@ -84,17 +85,34 @@ export default function UserRequest() {
       setUserRequests((prevRequests) =>
         prevRequests.filter((request) => request.id !== userId)
       );
-      setSuccessMessage("User approved successfully.");
+      Swal.fire({
+        icon: "success",
+        title: "Approved!",
+        text: `User request approved successfully.`,
+        showConfirmButton: false,
+        timer: 2000,
+      });
+      // After successfully adding the user to the 'users' collection:
+      const mailRef = collection(db, "mail");
+      await addDoc(mailRef, {
+        to: requestData.email,
+        message: {
+          subject: "Signup Request Approved",
+          html: `<p>Hello ${requestData.fullName},</p>
+            <p>Your signup request has been approved! You can now log in using your credentials.</p>
+            <p>Thank you for joining us!</p>`,
+        },
+      });
     } catch (error) {
       if (error.code === "auth/email-already-in-use") {
         setError("The email is already in use. Please use a different email.");
       } else {
         console.error("Error approving user:", error);
         setError("Error approving user: " + error.message);
+        setTimeout(() => {
+          setError("");
+        }, 4000);
       }
-      setTimeout(() => {
-        setError("");
-      }, 4000);
     } finally {
       setIsLoading(false);
     }
@@ -128,10 +146,24 @@ export default function UserRequest() {
       if (userDocSnapshot.exists()) {
         await deleteDoc(userDocRef);
       }
-      setSuccessMessage("User request rejected and removed successfully.");
-      setTimeout(() => {
-        setSuccessMessage("");
-      }, 3000);
+      Swal.fire({
+        icon: "success",
+        title: "Removed!",
+        text: `User request rejected and removed successfully.`,
+        showConfirmButton: false,
+        timer: 2000,
+      });
+      const mailRef = collection(db, "mail");
+      await addDoc(mailRef, {
+        to: requestData.email,
+        message: {
+          subject: "Signup Request Rejected",
+          html: `<p>Hello ${requestData.fullName},</p>
+            <p>We regret to inform you that your signup request has been rejected. 
+            If you believe this is an error or want to inquire further, please contact our support team.</p>
+            <p>Thank you for your understanding!</p>`,
+        },
+      });
     } catch (error) {
       console.error("Error rejecting and removing user:", error);
       setError("Error rejecting and removing user");
@@ -147,7 +179,7 @@ export default function UserRequest() {
     <div className="container">
       <Header />
       {isLoading ? (
-        <LoadingScreen/>
+        <LoadingScreen />
       ) : (
         <Table
           userRequests={userRequests}
@@ -160,7 +192,7 @@ export default function UserRequest() {
             setIsRejected(true);
           }}
         />
-        )}
+      )}
       {error && <div className="error-message">{error}</div>}
       {successMessage && (
         <div className="success-message">{successMessage}</div>
@@ -178,7 +210,6 @@ export default function UserRequest() {
             );
             setIsApproved(false);
             setPendingRequestData(null);
-            
           }}
           positiveLabel="Accept"
           negativeLabel="Cancel"

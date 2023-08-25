@@ -37,7 +37,6 @@ const DocumentDashboard = () => {
         });
       }
       setUsers(allDocuments);
-      console.log(allDocuments);
     } catch (error) {
       Swal.fire({
         icon: "error",

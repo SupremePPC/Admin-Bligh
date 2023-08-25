@@ -51,7 +51,7 @@ const Add = ({ setUsers, setIsAdding }) => {
         title: 'Added!',
         text: `${fullName}'s data has been added.`,
         showConfirmButton: false,
-        timer: 1500,
+        timer: 2000,
       });
     } catch (error) {
       console.error("Error adding user:", error);
