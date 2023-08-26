@@ -147,6 +147,8 @@ export default function DashboardOverview() {
             description="Are you sure you want to delete this user?"
             onPositiveAction={confirmDelete}
             onNegativeAction={() => setIsDeleteModalOpen(false)}
+            positiveLabel={"Delete"}
+            negativeLabel={"Cancel"}
           />
         </>
       )}

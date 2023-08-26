@@ -15,6 +15,7 @@ const Table = ({ transactions, handleApproval, handleRejection }) => {
             <th>No.</th>
             <th>Full Name</th>
             <th>Amount</th>
+            <th>Account</th>
             <th>Type</th>
             <th>Status</th>
             <th>Date</th>
@@ -39,6 +40,7 @@ const Table = ({ transactions, handleApproval, handleRejection }) => {
                   <td>{i + 1}</td>
                   <td>{transaction.userName}</td>
                   <td>{formatter.format(transaction.amount)}</td>
+                  <td>{transaction.accountType}</td>
                   <td>{transaction.type}</td>
                   <td>{transaction.status}</td>
                   <td>{formattedDate}</td>
