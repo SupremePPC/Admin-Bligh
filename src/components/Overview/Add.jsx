@@ -1,54 +1,110 @@
-import React, { useState } from 'react';
-import Swal from 'sweetalert2';
-import { db } from '../../firebase/firebase';
-import { addDoc, collection } from 'firebase/firestore';
+import React, { useState } from "react";
+import Swal from "sweetalert2";
+import { db } from "../../firebaseConfig/firebase";
+import { createUserWithEmailAndPassword, getAuth, sendEmailVerification } from "firebase/auth";
+import { addDoc, collection, doc, setDoc } from "firebase/firestore";
+import { useDispatch } from "react-redux";
+import { addUser } from "../../store/userStore/userActions";
 
 const Add = ({ setUsers, setIsAdding }) => {
-  const [title, setTitle] = useState('');
-  const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('');
-  const [mobile, setMobile] = useState('');
-  const [home, setHome] = useState('');
-  const [address, setAddress] = useState('');
-  const [city, setCity] = useState('');
-  const [country, setCountry] = useState('');
-  const [postcode, setPostcode] = useState('');
+  const dispatch = useDispatch();
+  
+  const [formData, setFormData] = useState({
+    title: "",
+    fullName: "",
+    email: "",
+    password: "",
+    mobile: "",
+    home: "",
+    address: "",
+    city: "",
+    country: "",
+    postcode: "",
+  });
 
-  const handleAdd = async e => {
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
+
+  const handleAdd = async (e) => {
     e.preventDefault();
-
-    if (!title || !fullName || !email || !mobile || !address || !city || !country || !postcode) {
-      return Swal.fire({
-        icon: 'error',
-        title: 'Error!',
-        text: 'All fields are required.',
-        showConfirmButton: true,
-      });
-    }
-
-    const newUser = {
+  
+    const {
       title,
       fullName,
       email,
-      mobilePhone: mobile,
-      homePhone: home,
+      password,
+      mobile,
+      home,
       address,
       city,
       country,
       postcode,
-    };
-
+    } = formData;
+  
+    // Validation
+    if (
+      !title ||
+      !fullName ||
+      !email ||
+      !password ||
+      !mobile ||
+      !address ||
+      !city ||
+      !country ||
+      !postcode
+    ) {
+      return Swal.fire({
+        icon: "error",
+        title: "Error!",
+        text: "All fields are required.",
+        showConfirmButton: true,
+      });
+    }
+  
     try {
-      const usersRef = collection(db, "users");
-      const docRef = await addDoc(usersRef, newUser);
-
-      // Update state with the new user including the generated ID
-      setUsers(prevUsers => [...prevUsers, { ...newUser, id: docRef.id }]);
+      // Create user in Firebase Authentication
+      const auth = getAuth();
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
+  
+      // Send email verification
+      await sendEmailVerification(user);
+  
+      // Add user to Firestore using user.uid as the document ID
+      const newUser = {
+        uid: user.uid,
+        title,
+        fullName,
+        email,
+        mobilePhone: mobile,
+        homePhone: home,
+        address,
+        city,
+        country,
+        postcode,
+      };
+      const usersRef = doc(db, "users", user.uid);
+      await setDoc(usersRef, newUser);
+  
+      // Update state
+      setUsers((prevUsers) => [...prevUsers, newUser]);
       setIsAdding(false);
-
+  
+      // Dispatch to Redux
+      dispatch(addUser(newUser));
+  
       Swal.fire({
-        icon: 'success',
-        title: 'Added!',
+        icon: "success",
+        title: "Added!",
         text: `${fullName}'s data has been added.`,
         showConfirmButton: false,
         timer: 2000,
@@ -56,9 +112,9 @@ const Add = ({ setUsers, setIsAdding }) => {
     } catch (error) {
       console.error("Error adding user:", error);
       Swal.fire({
-        icon: 'error',
-        title: 'Error!',
-        text: 'There was an error adding the user.',
+        icon: "error",
+        title: "Error!",
+        text: `There was an error adding the user. ${error}`,
         showConfirmButton: true,
       });
     }
@@ -67,24 +123,28 @@ const Add = ({ setUsers, setIsAdding }) => {
   return (
     <div className="small-container">
       <form onSubmit={handleAdd}>
-        <h1>Add User</h1>
-        
         <label htmlFor="title">Title</label>
-        <input
+        <select
           id="title"
-          type="text"
           name="title"
-          value={title}
-          onChange={e => setTitle(e.target.value)}
-        />
+          value={formData.title}
+          onChange={handleInputChange}
+          required
+        >
+          <option value="">Select Title</option>
+          <option value="Miss">Miss</option>
+          <option value="Mrs">Mrs</option>
+          <option value="Mr">Mr</option>
+        </select>
 
         <label htmlFor="fullName">Full Name</label>
         <input
           id="fullName"
           type="text"
           name="fullName"
-          value={fullName}
-          onChange={e => setFullName(e.target.value)}
+          value={formData.fullName}
+          onChange={handleInputChange}
+          required
         />
 
         <label htmlFor="email">Email</label>
@@ -92,8 +152,9 @@ const Add = ({ setUsers, setIsAdding }) => {
           id="email"
           type="email"
           name="email"
-          value={email}
-          onChange={e => setEmail(e.target.value)}
+          value={formData.email}
+          onChange={handleInputChange}
+          required
         />
 
         <label htmlFor="mobile">Mobile</label>
@@ -101,8 +162,9 @@ const Add = ({ setUsers, setIsAdding }) => {
           id="mobile"
           type="text"
           name="mobile"
-          value={mobile}
-          onChange={e => setMobile(e.target.value)}
+          value={formData.mobile}
+          onChange={handleInputChange}
+          required
         />
 
         <label htmlFor="home">Home</label>
@@ -110,8 +172,9 @@ const Add = ({ setUsers, setIsAdding }) => {
           id="home"
           type="text"
           name="home"
-          value={home}
-          onChange={e => setHome(e.target.value)}
+          value={formData.home}
+          onChange={handleInputChange}
+          required
         />
 
         <label htmlFor="address">Address</label>
@@ -119,8 +182,9 @@ const Add = ({ setUsers, setIsAdding }) => {
           id="address"
           type="text"
           name="address"
-          value={address}
-          onChange={e => setAddress(e.target.value)}
+          value={formData.address}
+          onChange={handleInputChange}
+          required
         />
 
         <label htmlFor="city">City</label>
@@ -128,8 +192,9 @@ const Add = ({ setUsers, setIsAdding }) => {
           id="city"
           type="text"
           name="city"
-          value={city}
-          onChange={e => setCity(e.target.value)}
+          value={formData.city}
+          onChange={handleInputChange}
+          required
         />
 
         <label htmlFor="country">Country</label>
@@ -137,23 +202,38 @@ const Add = ({ setUsers, setIsAdding }) => {
           id="country"
           type="text"
           name="country"
-          value={country}
-          onChange={e => setCountry(e.target.value)}
+          value={formData.country}
+          onChange={handleInputChange}
+          required
         />
 
-        <label htmlFor="postcode">Postcode</label>
+        <label htmlFor="postcode">Eircode</label>
         <input
           id="postcode"
           type="text"
           name="postcode"
-          value={postcode}
-          onChange={e => setPostcode(e.target.value)}
+          value={formData.postcode}
+          onChange={handleInputChange}
+          pattern="^[A-Za-z0-9]{3} [A-Za-z0-9]{4}$"
+          maxLength="8"
+          title="Eircode must be in the format like D02 DX88"
+          required
         />
 
-        <div style={{ marginTop: '30px' }}>
+        <label htmlFor="password">Password</label>
+        <input
+          id="password"
+          type="password"
+          name="password"
+          value={formData.password}
+          onChange={handleInputChange}
+          required
+        />
+
+        <div style={{ marginTop: "30px" }}>
           <input type="submit" value="Add" />
           <input
-            style={{ marginLeft: '12px' }}
+            style={{ marginLeft: "12px" }}
             className="muted-button"
             type="button"
             value="Cancel"

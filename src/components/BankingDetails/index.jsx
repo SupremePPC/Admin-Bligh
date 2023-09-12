@@ -7,7 +7,7 @@ import Header from "./Header";
 import Table from "./Table";
 import Modal from "../CustomsModal";
 import Edit from "./Edit";
-import { db } from "../../firebase/firebase";
+import { db } from "../../firebaseConfig/firebase";
 import LoadingScreen from "../LoadingScreen";
 
 const BankingDetails = () => {

@@ -2,12 +2,14 @@ import React, { useEffect, useState } from "react";
 import Header from "./Header";
 import Table from "./Table";
 import "./style.css";
-import { db } from "../../firebase/firebase";
-import { collection, deleteDoc, doc, getDocs } from "firebase/firestore";
+import { db } from "../../firebaseConfig/firebase";
+import { collection, getDocs } from "firebase/firestore";
 import Modal from "../CustomsModal";
 import Edit from "./Edit";
 import Add from "./Add";
 import LoadingScreen from "../LoadingScreen";
+import Swal from "sweetalert2";
+import { getFunctions, httpsCallable } from "firebase/functions";
 
 export default function DashboardOverview() {
   const [users, setUsers] = useState([]);
@@ -45,13 +47,46 @@ export default function DashboardOverview() {
   };
 
   const confirmDelete = async () => {
-    const userRef = doc(db, "users", selectedUserId);
-    await deleteDoc(userRef);
-    setUsers((users) => users.filter((user) => user.id !== selectedUserId));
-    setIsDeleteModalOpen(false); // close the modal
-    setSelectedUserId(null); // reset the selected user ID
+    setIsLoading(true);
+  
+    try {
+      // Initialize the Cloud Function
+      const functionsInstance = getFunctions();
+      const deleteFunction = httpsCallable(functionsInstance, "deleteUserAccount");
+  
+      // Call the Cloud Function to delete the user from Firestore and Authentication
+      const result = await deleteFunction({ userId: selectedUserId });
+  
+      console.log(result.data);
+  
+      // Update the local state
+      setUsers((users) => users.filter((user) => user.id !== selectedUserId));
+  
+      // Close the modal and reset the selected user ID
+      setIsDeleteModalOpen(false);
+      setIsLoading(false);
+      setSelectedUserId(null);
+  
+      Swal.fire({
+        icon: "success",
+        title: "Deleted!",
+        text: `User deleted successfully.`,
+        showConfirmButton: false,
+        timer: 2000,
+      });
+    } catch (error) {
+      console.error("Failed to delete user:", error);
+      setIsLoading(false);
+      Swal.fire({
+        icon: "error",
+        title: "Error!",
+        text: `Error in deleting user.`,
+        showConfirmButton: false,
+        timer: 2000,
+      });
+    }
   };
-
+  
   const handleEdit = (user) => {
     // Set the selected user and open the edit modal
     setSelectedUserForEdit(user);

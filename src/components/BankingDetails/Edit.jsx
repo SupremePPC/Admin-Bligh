@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Swal from 'sweetalert2';
 import { doc, updateDoc } from "firebase/firestore";
-import { db } from "../../firebase/firebase";
+import { db } from "../../firebaseConfig/firebase";
 
 const Edit = ({ userId, bankingDetailsId, bankingDetails, onClose }) => {
   const [accountName, setAccountName] = useState(bankingDetails?.accountName);

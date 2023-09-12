@@ -13,11 +13,14 @@ import DocumentDashboard from "./components/DocumentManagement";
 import "./App.css";
 import LoadingScreen from "./components/LoadingScreen";
 import { useAuth } from "./authState";
+import { Provider } from "react-redux";
+import store from "../src/store/store";
 
 function App() {
   const { loadingAuthState } = useAuth();
 
   return (
+    <Provider store={store}>
     <div className="App">
     <Router>
       <Routes>
@@ -76,6 +79,7 @@ function App() {
     </Router>
     {loadingAuthState && <LoadingScreen />} 
     </div>
+    </Provider>
   );
 }
 

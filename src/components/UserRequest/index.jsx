@@ -8,7 +8,7 @@ import {
   getDoc,
   setDoc,
 } from "firebase/firestore";
-import { auth, db } from "../../firebase/firebase";
+import { auth, db } from "../../firebaseConfig/firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import Header from "./Header";
 import Table from "./Table";
@@ -72,7 +72,7 @@ export default function UserRequest() {
         requestData.email,
         requestData.password
       );
-      
+
       // Step 2: Use the User ID as the document ID in the 'users' collection
       const newUserId = userCredential.user.uid;
       await setDoc(doc(db, "users", newUserId), {
@@ -81,17 +81,17 @@ export default function UserRequest() {
         address: requestData.address,
         mobilePhone: requestData.mobilePhone,
       });
-  
+
       // Delete the admin request
       await deleteDoc(
         doc(db, "adminDash", requestData.uid, "userRequests", userId)
       );
-  
+
       // Remove the user request from the state
       setUserRequests((prevRequests) =>
         prevRequests.filter((request) => request.id !== userId)
       );
-  
+
       Swal.fire({
         icon: "success",
         title: "Approved!",
@@ -99,7 +99,7 @@ export default function UserRequest() {
         showConfirmButton: false,
         timer: 2000,
       });
-  
+
       // After successfully adding the user to the 'users' collection:
       const mailRef = collection(db, "mail");
       await addDoc(mailRef, {
@@ -107,11 +107,10 @@ export default function UserRequest() {
         message: {
           subject: "Signup Request Approved",
           html: `<p>Hello ${requestData.fullName},</p>
-            <p>Your signup request has been approved! You can now log in using your credentials.</p>
-            <p>Thank you for joining us!</p>`,
+        <p>Your signup request has been approved! You can now log in using your credentials.</p>
+        <p>Thank you for joining us!</p>`,
         },
       });
-  
     } catch (error) {
       if (error.code === "auth/email-already-in-use") {
         setError("The email is already in use. Please use a different email.");
@@ -126,8 +125,6 @@ export default function UserRequest() {
       setIsLoading(false);
     }
   };
-  
-
 
   const handleRejection = async (userId, requestData) => {
     setIsLoading(true);

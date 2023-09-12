@@ -4,9 +4,9 @@ import { getDocs, collection, doc, updateDoc, runTransaction } from "firebase/fi
 import Header from "./Header";
 import Table from "./Table";
 import Modal from "../CustomsModal";
-import { db } from "../../firebase/firebase";
+import { db } from "../../firebaseConfig/firebase";
 import LoadingScreen from "../LoadingScreen";
-import { type } from "@testing-library/user-event/dist/type";
+// import { type } from "@testing-library/user-event/dist/type";
 
 const TransactionDashboard = ({ setIsAuthenticated }) => {
   const [transactions, setTransactions] = useState([]);

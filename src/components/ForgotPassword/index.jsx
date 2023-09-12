@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import logo from '../../assets/white_logo.png';
-import { auth } from '../../firebase/firebase';
+import { auth } from '../../firebaseConfig/firebase';
 import './style.css';
 
 export default function ForgotPassword () {

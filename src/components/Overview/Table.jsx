@@ -1,7 +1,6 @@
 import React from 'react';
 
-const Table = ({ users, handleEdit, handleDelete }) => {
-  
+export default function Table ({ users, handleEdit, handleDelete })  {
   return (
     <div className="contain-table">
       <table className="striped-table">
@@ -53,4 +52,4 @@ const Table = ({ users, handleEdit, handleDelete }) => {
   );
 };
 
-export default Table;
+

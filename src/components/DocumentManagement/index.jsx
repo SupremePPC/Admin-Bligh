@@ -3,7 +3,7 @@ import Swal from "sweetalert2";
 import Header from "./Header";
 import Table from "./Table";
 import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
-import { db } from "../../firebase/firebase";
+import { db } from "../../firebaseConfig/firebase";
 import {
   getStorage,
   ref,
