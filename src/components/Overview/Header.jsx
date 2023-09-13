@@ -1,14 +1,16 @@
 import React from "react";
-import { BiSortAlt2 } from "react-icons/bi";
-import { AiOutlineSortAscending, AiOutlineSortDescending } from "react-icons/ai";
+import { BiSortAlt2, BiSearch } from "react-icons/bi";
+import {
+  AiOutlineSortAscending,
+  AiOutlineSortDescending,
+} from "react-icons/ai";
 
-const Header = ({ setIsAdding, isSortToggled, toggleSort, onSort }) => {
-
+const Header = ({ setIsAdding, isSortToggled, toggleSort, onSort, handleSearch, searchQuery, setSearchQuery }) => {
   const handleSort = (event) => {
     const sortType = event.target.value;
     onSort(sortType);
     // Uncheck other checkboxes to ensure only one is active at a time
-    document.querySelectorAll('.sort__check').forEach(checkbox => {
+    document.querySelectorAll(".sort__check").forEach((checkbox) => {
       if (checkbox !== event.target) {
         checkbox.checked = false;
       }
@@ -21,13 +23,26 @@ const Header = ({ setIsAdding, isSortToggled, toggleSort, onSort }) => {
       <div className="addRow_btn">
         <button onClick={() => setIsAdding(true)}>Add User</button>
       </div>
-      {/* <div className="btn_wrap"> */}
-      <div className="header__right">
+      <div className="header__wrap">
+        <div className="header__left">
+          {/* <input type="search" name="search-bar" className="search__field" placeholder="Search for users..." /> */}
+          <div className="search__field">
+            <input
+              type="text"
+              placeholder="Search by email or name..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <button onClick={handleSearch}>
+              <BiSearch />
+            </button>
+          </div>
+        </div>
+        <div className="header__right">
           <div className="sort">
             <button className="sort__button" onClick={isSortToggled}>
               Sort <BiSortAlt2 />
             </button>
-
             <div className={toggleSort ? "show__sort" : "sort__group"}>
               <div className="sort__item">
                 <label htmlFor="location">Sort items:</label>
@@ -40,8 +55,9 @@ const Header = ({ setIsAdding, isSortToggled, toggleSort, onSort }) => {
                       value="name_ascend"
                       onChange={handleSort}
                     />
-                    <p>Name 
-                      <AiOutlineSortAscending/>
+                    <p>
+                      Name
+                      <AiOutlineSortAscending />
                     </p>
                   </div>
                   <div className="check__item">
@@ -52,7 +68,8 @@ const Header = ({ setIsAdding, isSortToggled, toggleSort, onSort }) => {
                       value="name_descend"
                       onChange={handleSort}
                     />
-                    <p>Name 
+                    <p>
+                      Name
                       <AiOutlineSortDescending />
                     </p>
                   </div>
@@ -64,8 +81,9 @@ const Header = ({ setIsAdding, isSortToggled, toggleSort, onSort }) => {
                       value="email_ascend"
                       onChange={handleSort}
                     />
-                    <p>Email
-                      <AiOutlineSortAscending/>
+                    <p>
+                      Email
+                      <AiOutlineSortAscending />
                     </p>
                   </div>
                   <div className="check__item">
@@ -85,7 +103,7 @@ const Header = ({ setIsAdding, isSortToggled, toggleSort, onSort }) => {
               </div>
             </div>
           </div>
-        {/* </div> */}
+        </div>
       </div>
     </header>
   );

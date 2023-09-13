@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Header from "./Header";
 import Table from "./Table";
 import "./style.css";
-import { db } from "../../firebaseConfig/firebase";
+import { app, db } from "../../firebaseConfig/firebase";
 import { collection, getDocs } from "firebase/firestore";
 import Modal from "../CustomsModal";
 import Edit from "./Edit";
@@ -20,6 +20,8 @@ export default function DashboardOverview() {
   const [selectedUserForEdit, setSelectedUserForEdit] = useState(null);
   const [toggleSort, setToggleSort] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -41,6 +43,28 @@ export default function DashboardOverview() {
     fetchUsers();
   }, []);
 
+  const handleSearch = async () => {
+    setIsLoading(true); // Assuming you have an isLoading state
+    try {
+      const functionsInstance = getFunctions(app, 'europe-west2'); // Replace 'your-region' with your function's region if you've set one
+      const searchUsers = httpsCallable(functionsInstance, "searchUser"); // Make sure "searchUser" is deployed on Firebase
+      const results = await searchUsers({ searchTerm: searchQuery });
+      console.log(results) 
+      setSearchResults(results.data);
+      setIsLoading(false);
+    } catch (error) {
+      console.error("Failed to search user:", error);
+      setIsLoading(false);
+      Swal.fire({
+        icon: "error",
+        title: "Error!",
+        text: `Error in searching user: ${error.message || 'Unknown error'}`,
+        showConfirmButton: false,
+        timer: 2000,
+      });
+    }
+  };  
+  
   const handleDelete = (userId) => {
     setSelectedUserId(userId); // set the user ID you want to delete
     setIsDeleteModalOpen(true); // open the delete confirmation modal
@@ -165,6 +189,9 @@ export default function DashboardOverview() {
             isSortToggled={isSortToggled}
             toggleSort={toggleSort}
             onSort={handleSort}
+            handleSearch={handleSearch}
+            setSearchQuery={setSearchQuery}
+  searchQuery={searchQuery}
           />
           {isLoading ? (
             <LoadingScreen />
@@ -173,6 +200,7 @@ export default function DashboardOverview() {
               users={users}
               handleDelete={handleDelete}
               handleEdit={handleEdit}
+              searchResults={searchResults}
             />
           )}
           <Modal
