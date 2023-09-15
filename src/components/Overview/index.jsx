@@ -46,10 +46,10 @@ export default function DashboardOverview() {
   const handleSearch = async () => {
     setIsLoading(true); // Assuming you have an isLoading state
     try {
-      const functionsInstance = getFunctions(app, 'europe-west2'); // Replace 'your-region' with your function's region if you've set one
+      const functionsInstance = getFunctions(app, "europe-west2"); // Replace 'your-region' with your function's region if you've set one
       const searchUsers = httpsCallable(functionsInstance, "searchUser"); // Make sure "searchUser" is deployed on Firebase
       const results = await searchUsers({ searchTerm: searchQuery });
-      console.log(results) 
+      console.log(results);
       setSearchResults(results.data);
       setIsLoading(false);
     } catch (error) {
@@ -58,13 +58,13 @@ export default function DashboardOverview() {
       Swal.fire({
         icon: "error",
         title: "Error!",
-        text: `Error in searching user: ${error.message || 'Unknown error'}`,
+        text: `Error in searching user: ${error.message || "Unknown error"}`,
         showConfirmButton: false,
         timer: 2000,
       });
     }
-  };  
-  
+  };
+
   const handleDelete = (userId) => {
     setSelectedUserId(userId); // set the user ID you want to delete
     setIsDeleteModalOpen(true); // open the delete confirmation modal
@@ -72,25 +72,28 @@ export default function DashboardOverview() {
 
   const confirmDelete = async () => {
     setIsLoading(true);
-  
+
     try {
       // Initialize the Cloud Function
       const functionsInstance = getFunctions();
-      const deleteFunction = httpsCallable(functionsInstance, "deleteUserAccount");
-  
+      const deleteFunction = httpsCallable(
+        functionsInstance,
+        "deleteUserAccount"
+      );
+
       // Call the Cloud Function to delete the user from Firestore and Authentication
       const result = await deleteFunction({ userId: selectedUserId });
-  
+
       console.log(result.data);
-  
+
       // Update the local state
       setUsers((users) => users.filter((user) => user.id !== selectedUserId));
-  
+
       // Close the modal and reset the selected user ID
       setIsDeleteModalOpen(false);
       setIsLoading(false);
       setSelectedUserId(null);
-  
+
       Swal.fire({
         icon: "success",
         title: "Deleted!",
@@ -110,7 +113,7 @@ export default function DashboardOverview() {
       });
     }
   };
-  
+
   const handleEdit = (user) => {
     // Set the selected user and open the edit modal
     setSelectedUserForEdit(user);
@@ -191,7 +194,7 @@ export default function DashboardOverview() {
             onSort={handleSort}
             handleSearch={handleSearch}
             setSearchQuery={setSearchQuery}
-  searchQuery={searchQuery}
+            searchQuery={searchQuery}
           />
           {isLoading ? (
             <LoadingScreen />
