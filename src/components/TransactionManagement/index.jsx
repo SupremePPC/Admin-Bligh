@@ -6,9 +6,8 @@ import Table from "./Table";
 import Modal from "../CustomsModal";
 import { db } from "../../firebaseConfig/firebase";
 import LoadingScreen from "../LoadingScreen";
-// import { type } from "@testing-library/user-event/dist/type";
 
-const TransactionDashboard = ({ setIsAuthenticated }) => {
+const TransactionDashboard = () => {
   const [transactions, setTransactions] = useState([]);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [isApproving, setIsApproving] = useState(false);
@@ -138,8 +137,7 @@ const handleApproval = async () => {
     });
   }
 };
-
-  
+ 
   const handleRejection = async () => {
     try {
       // Update the local state and local storage

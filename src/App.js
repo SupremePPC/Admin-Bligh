@@ -15,6 +15,7 @@ import LoadingScreen from "./components/LoadingScreen";
 import { useAuth } from "./authState";
 import { Provider } from "react-redux";
 import store from "../src/store/store";
+import BondsDashboard from "./components/BondsManagement";
 
 function App() {
   const { loadingAuthState } = useAuth();
@@ -53,6 +54,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <TransactionDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="bonds"
+              element={
+                <ProtectedRoute>
+                  <BondsDashboard />
                 </ProtectedRoute>
               }
             />

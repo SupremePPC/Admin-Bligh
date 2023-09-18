@@ -224,3 +224,92 @@ export function deleteBankingDetails(uid, bankingDetailsId) {
     )
   );
 }
+
+//BONDS
+// Function to handle buying bonds
+export async function handleBuyApproval(uid, bondData) {
+  const userBondsPath = `users/${uid}/bondsHoldings`;
+  const bondDocRef = doc(db, `${userBondsPath}/${bondData.id}`); // Assuming bondData.id is unique for each bond
+
+  const bondDoc = await getDoc(bondDocRef);
+
+  if (bondDoc.exists()) {
+    // If bond already exists in user's holdings, update it
+    const currentData = bondDoc.data();
+    const newQuantity = currentData.quantity + bondData.quantity;
+    const newCurrentValue = currentData.currentValue + bondData.currentValue;
+
+    await updateDoc(bondDocRef, {
+      quantity: newQuantity,
+      currentValue: newCurrentValue,
+    });
+  } else {
+    // If bond doesn't exist in user's holdings, add it
+    await setDoc(bondDocRef, bondData);
+  }
+}
+
+// Function to handle selling bonds
+export async function handleSellApproval(uid, bondData) {
+  const userBondsPath = `users/${uid}/bondsHoldings`;
+  const bondDocRef = doc(db, `${userBondsPath}/${bondData.id}`); // Assuming bondData.id is unique for each bond
+
+  const bondDoc = await getDoc(bondDocRef);
+
+  if (bondDoc.exists()) {
+    // If bond exists in user's holdings, update it or delete it
+    const currentData = bondDoc.data();
+
+    if (currentData.quantity > bondData.quantity) {
+      const newQuantity = currentData.quantity - bondData.quantity;
+      const newCurrentValue = currentData.currentValue - bondData.currentValue;
+
+      await updateDoc(bondDocRef, {
+        quantity: newQuantity,
+        currentValue: newCurrentValue,
+      });
+    } else {
+      // If all units of this bond are being sold, remove it from user's holdings
+      await deleteDoc(bondDocRef);
+    }
+  } else {
+    console.error("Bond does not exist in user's holdings");
+  }
+}
+
+// Function to update request status in the Firestore
+export async function updateRequestStatusInFirestore(
+  userId,
+  requestId,
+  newStatus
+) {
+  const requestDocPath = doc(
+    db,
+    `${ADMINUSER_COLLECTION}/${userId}/${BONDS_REQUEST_SUB_COLLECTION}/${requestId}`
+  );
+  await updateDoc(requestDocPath, { status: newStatus });
+}
+
+// Function to add bond to user's bondsHoldings sub-collection
+export async function addBondToUserHoldings(userId, requestData) {
+  const userBondsHoldingsPath = collection(db, `users/${userId}/bondsHoldings`);
+  await addDoc(userBondsHoldingsPath, requestData);
+}
+
+// Function to delete request from bondsRequest sub-collection
+export async function deleteRequestFromFirestore(userId, requestId) {
+  const requestDocPath = doc(
+    db,
+    `${ADMINUSER_COLLECTION}/${userId}/${BONDS_REQUEST_SUB_COLLECTION}/${requestId}`
+  );
+  await deleteDoc(requestDocPath);
+}
+
+// Function to fetch data from a specific request
+export async function fetchRequestData(userId, requestId) {
+  const requestDocPath = doc(
+    db,
+    `${ADMINUSER_COLLECTION}/${userId}/${BONDS_REQUEST_SUB_COLLECTION}/${requestId}`
+  );
+  return (await getDoc(requestDocPath)).data();
+}

@@ -9,6 +9,7 @@ import {
   FaSignOutAlt,
 } from "react-icons/fa";
 import { CgMenuGridR } from "react-icons/cg";
+import { CiMoneyCheck1 } from "react-icons/ci";
 import { PiBankFill } from "react-icons/pi";
 import { getAuth } from "firebase/auth";
 import Modal from "../CustomsModal";
@@ -30,7 +31,10 @@ function Sidebar() {
       </button>
       <ul className="menu_items">
         <li className="menu_list">
-          <Link className={`menu_link ${isActive("/dashboard/") ? "active" : ""}`} to="/dashboard/">
+          <Link
+            className={`menu_link ${isActive("/dashboard/") ? "active" : ""}`}
+            to="/dashboard/"
+          >
             <FaHome />
             {!collapsed && "Account Overview"}
           </Link>
@@ -48,11 +52,24 @@ function Sidebar() {
         </li>
         <li className="menu_list">
           <Link
-            className={`menu_link ${isActive("/dashboard/transactions") ? "active" : ""}`}
+            className={`menu_link ${
+              isActive("/dashboard/transactions") ? "active" : ""
+            }`}
             to="/dashboard/transactions"
           >
             <FaRegListAlt />
             {!collapsed && "Transactions Request"}
+          </Link>
+        </li>
+        <li className="menu_list">
+          <Link
+            className={`menu_link ${
+              isActive("/dashboard/bonds") ? "active" : ""
+            }`}
+            to="/dashboard/bonds"
+          >
+            <CiMoneyCheck1 size={24} />
+            {!collapsed && "Bonds Request"}
           </Link>
         </li>
         <li className="menu_list">
@@ -68,7 +85,9 @@ function Sidebar() {
         </li>
         <li className="menu_list">
           <Link
-            className={`menu_link ${isActive("/dashboard/documents") ? "active" : ""}`}
+            className={`menu_link ${
+              isActive("/dashboard/documents") ? "active" : ""
+            }`}
             to="/dashboard/documents"
           >
             <FaFileAlt />
