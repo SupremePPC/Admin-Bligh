@@ -21,23 +21,7 @@ const Header = ({ isSortToggled, toggleSort, onSort, handleSearch, searchQuery, 
   return (
     <header>
       <h1 className='header_title'>User Request Management</h1>
-      <br />
-      <br />
       <div className="header__wrap">
-        <div className="header__left">
-          <div className="search__field">
-            <input
-              type="text"
-              placeholder="Search by email or name..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            <button onClick={handleSearch}>
-              <BiSearch />
-            </button>
-          </div>
-        </div>
-        <div className="header__right">
           <div className="sort">
             <button className="sort__button" onClick={isSortToggled}>
               Sort <BiSortAlt2 />
@@ -102,8 +86,22 @@ const Header = ({ isSortToggled, toggleSort, onSort, handleSearch, searchQuery, 
               </div>
             </div>
           </div>
-        </div>
+          <div className="search__field">
+            <input
+              type="text"
+              placeholder="Search by email or name..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <button onClick={handleSearch}>
+              <BiSearch />
+            </button>
+          </div>
       </div>
+        <div className="header__left">
+        </div>
+        <div className="header__right">
+        </div>
     </header>
   );
 };

@@ -5,7 +5,15 @@ import {
   AiOutlineSortDescending,
 } from "react-icons/ai";
 
-const Header = ({ setIsAdding, isSortToggled, toggleSort, onSort, handleSearch, searchQuery, setSearchQuery }) => {
+const Header = ({
+  setIsAdding,
+  isSortToggled,
+  toggleSort,
+  onSort,
+  handleSearch,
+  searchQuery,
+  setSearchQuery,
+}) => {
   const handleSort = (event) => {
     const sortType = event.target.value;
     onSort(sortType);
@@ -20,25 +28,26 @@ const Header = ({ setIsAdding, isSortToggled, toggleSort, onSort, handleSearch, 
   return (
     <header>
       <h1 className="header_title">All Registered Users</h1>
-      <div className="addRow_btn">
-        <button onClick={() => setIsAdding(true)}>Add User</button>
+      <div className="header__wrap">
+        <div className="addRow_btn">
+          <button onClick={() => setIsAdding(true)}>Add User</button>
+        </div>
+        <div className="search__field">
+          <input
+            type="text"
+            placeholder="Search by email or name..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          <button onClick={handleSearch}>
+            <BiSearch />
+          </button>
+        </div>
       </div>
+
       <div className="header__wrap">
         <div className="header__left">
           {/* <input type="search" name="search-bar" className="search__field" placeholder="Search for users..." /> */}
-          <div className="search__field">
-            <input
-              type="text"
-              placeholder="Search by email or name..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            <button onClick={handleSearch}>
-              <BiSearch />
-            </button>
-          </div>
-        </div>
-        <div className="header__right">
           <div className="sort">
             <button className="sort__button" onClick={isSortToggled}>
               Sort <BiSortAlt2 />
@@ -104,6 +113,7 @@ const Header = ({ setIsAdding, isSortToggled, toggleSort, onSort, handleSearch, 
             </div>
           </div>
         </div>
+        <div className="header__right"></div>
       </div>
     </header>
   );

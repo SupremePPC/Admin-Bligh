@@ -203,10 +203,6 @@ img {
   color: var(--primary);
 }
 
-.addRow_btn {
-  margin: 2rem 1rem 1rem 1rem;
-}
-
 .error_msg {
   width: 100%;
   font-size: var(--font-twelve);
@@ -296,53 +292,86 @@ img {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: 0 1rem;
+  margin: 2rem 1rem;
   width: 95%;
 }
 
+/* Add button */
+.addRow_btn button {
+  margin: 0;
+  height: 3rem;
+}
+
 /* Search bar */
-.header__left{
+.header__left {
   width: 50%;
 }
 
-.search__field{
+.search__field {
   display: flex;
   align-items: center;
   border: 1px solid #e0e6f7;
   border-radius: 10px;
   /* padding: 0.5rem; */
-  width: 100%;
+  width: 60%;
   height: 3rem;
   font-weight: 500;
   color: var(--black);
   background-color: rgb(238 242 255);
 }
 
-.search__field input{
+@media screen and (max-width: 768px) {
+  .search__field{
+    width: 95%;
+  }
+  .header__wrap{
+    flex-wrap: wrap;
+  }
+}
+
+.search__field input {
   border: none;
   width: 90%;
   height: 100%;
   margin: 0;
 }
 
-.search__field button{
+.search__field button {
   width: 10%;
-    height: 100%;
-    margin: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 0;
-    border-radius: 0 10px 10px 0;
+  height: 100%;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  border-radius: 0 10px 10px 0;
 }
 
-.search__field input ::placeholder{
+.search__field input ::placeholder {
   color: var(--grey);
 }
 
-
-
 /* Filter button */
+
+.filter .filter__button{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e0e6f7;
+  border-radius: 10px;
+  padding: 0.5rem 1.5rem;
+  width: 7.5rem;
+  height: 2.5rem;
+  font-weight: 500;
+  color: var(--black);
+  background:  rgb(238 242 255);
+  /* background-color: ; */
+  cursor: pointer;
+}
+
+.filter .filter__button:hover {
+  background-color: #e0e6f7;
+}
 
 
 /* Sort button*/
@@ -367,7 +396,7 @@ img {
   color: var(--black);
   background-color: rgb(238 242 255);
   cursor: pointer;
-  /* margin-right: 1rem; */
+  
 }
 .sort .sort__button:hover {
   background-color: #e0e6f7;

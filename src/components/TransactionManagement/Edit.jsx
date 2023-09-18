@@ -1,19 +1,20 @@
 import React, { useState } from 'react';
 import Swal from 'sweetalert2';
 
-const Edit = ({ employees, selectedEmployee, setEmployees, setIsEditing }) => {
+const Edit = ({ transactions, selectedTransactions, setTransactions, setIsEditing }) => {
   const id = selectedEmployee.id;
 
-  const [firstName, setFirstName] = useState(selectedEmployee.firstName);
-  const [lastName, setLastName] = useState(selectedEmployee.lastName);
-  const [email, setEmail] = useState(selectedEmployee.email);
-  const [salary, setSalary] = useState(selectedEmployee.salary);
-  const [date, setDate] = useState(selectedEmployee.date);
+  const [fullName, setFullName] = useState(selectedTransactions.fullName);
+  const [amount, setAmount] = useState(selectedTransactions.amount);
+  const [accountType, setAccountType] = useState(selectedTransactions.email);
+  const [type, setType] = useState(selectedTransactions.salary);
+  const [status, setStatus] = useState(selectedTransactions.status);
+  const [date, setDate] = useState(selectedTransactions.date);
 
-  const handleUpdate = e => {
+  const handleUpdate = async (e) => {
     e.preventDefault();
-
-    if (!firstName || !lastName || !email || !salary || !date) {
+  
+    if (!fullName || !amount || !accountType || !type || !status || !date) {
       return Swal.fire({
         icon: 'error',
         title: 'Error!',
@@ -21,84 +22,110 @@ const Edit = ({ employees, selectedEmployee, setEmployees, setIsEditing }) => {
         showConfirmButton: true,
       });
     }
-
-    const employee = {
-      id,
-      firstName,
-      lastName,
-      email,
-      salary,
+  
+    const updatedTransaction = {
+      fullName,
+      amount,
+      accountType,
+      type,
+      status,
       date,
     };
-
-    for (let i = 0; i < employees.length; i++) {
-      if (employees[i].id === id) {
-        employees.splice(i, 1, employee);
-        break;
+  
+    try {
+      const userId = "someUserId"; // You'll need to identify the specific user ID
+      const transactionId = "someTransactionId"; // You'll need to identify the specific transaction ID
+      const result = await editTransaction(userId, transactionId, updatedTransaction);
+      if (result.success) {
+        // Update local state as well
+        const updatedTransactions = transactions.map(t => 
+          t.id === transactionId ? { ...t, ...updatedTransaction } : t
+        );
+        setTransactions(updatedTransactions);
+        setIsEditing(false);
+        Swal.fire({
+          icon: 'success',
+          title: 'Updated!',
+          text: `Transaction for ${fullName} has been updated.`,
+          showConfirmButton: false,
+          timer: 2000,
+        });
+      } else {
+        throw new Error("Failed to update the transaction");
       }
+    } catch (error) {
+      console.error(error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error!',
+        text: `Error updating transaction: ${error}`,
+        showConfirmButton: true,
+      });
     }
-
-    localStorage.setItem('employees_data', JSON.stringify(employees));
-    setEmployees(employees);
-    setIsEditing(false);
-
-    Swal.fire({
-      icon: 'success',
-      title: 'Updated!',
-      text: `${employee.firstName} ${employee.lastName}'s data has been updated.`,
-      showConfirmButton: false,
-      timer: 2000,
-    });
   };
-
+  
   return (
     <div className="small-container">
       <form onSubmit={handleUpdate}>
-        <h1>Edit Employee</h1>
-        <label htmlFor="firstName">First Name</label>
+        <h1>Edit Transaction</h1>
+        <label htmlFor="fullName">Full Name</label>
         <input
-          id="firstName"
+          id="fullName"
           type="text"
-          name="firstName"
-          value={firstName}
-          onChange={e => setFirstName(e.target.value)}
+          value={fullName}
+          onChange={(e) => setFullName(e.target.value)}
         />
-        <label htmlFor="lastName">Last Name</label>
+        <label htmlFor="amount">Amount</label>
         <input
-          id="lastName"
-          type="text"
-          name="lastName"
-          value={lastName}
-          onChange={e => setLastName(e.target.value)}
-        />
-        <label htmlFor="email">Email</label>
-        <input
-          id="email"
-          type="email"
-          name="email"
-          value={email}
-          onChange={e => setEmail(e.target.value)}
-        />
-        <label htmlFor="salary">Salary ($)</label>
-        <input
-          id="salary"
+          id="amount"
           type="number"
-          name="salary"
-          value={salary}
-          onChange={e => setSalary(e.target.value)}
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
         />
+        <label htmlFor="accountType">Account Type</label>
+        <select
+          id="accountType"
+          value={accountType}
+          onChange={(e) => setAccountType(e.target.value)}
+        >
+          <option value="">--Select--</option>
+          <option value="Easy Access">Easy Access</option>
+          <option value="1 Year Fixed Saver">1 Year Fixed Saver</option>
+          <option value="3 Year Fixed Saver">3 Year Fixed Saver</option>
+          <option value="5 Year Fixed Saver">5 Year Fixed Saver</option>
+        </select>
+        <label htmlFor="type">Transaction Type</label>
+        <select
+          id="type"
+          value={type}
+          onChange={(e) => setType(e.target.value)}
+        >
+          <option value="">--Select--</option>
+          <option value="Deposit">Deposit</option>
+          <option value="Withdrawal">Withdrawal</option>
+        </select>
+        <label htmlFor="status">Status</label>
+        <select
+          id="status"
+          value={status}
+          onChange={(e) => setStatus(e.target.value)}
+        >
+          <option value="">--Select--</option>
+          <option value="Pending">Pending</option>
+          <option value="Approved">Approved</option>
+          <option value="Declined">Declined</option>
+        </select>
         <label htmlFor="date">Date</label>
         <input
           id="date"
           type="date"
-          name="date"
           value={date}
-          onChange={e => setDate(e.target.value)}
+          onChange={(e) => setDate(e.target.value)}
         />
-        <div style={{ marginTop: '30px' }}>
-          <input type="submit" value="Update" />
+        <div style={{ marginTop: "30px" }}>
+          <input type="submit" value="Add" />
           <input
-            style={{ marginLeft: '12px' }}
+            style={{ marginLeft: "12px" }}
             className="muted-button"
             type="button"
             value="Cancel"

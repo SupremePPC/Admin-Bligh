@@ -19,7 +19,7 @@ import {
   doc,
   getDoc,
   getDocs,
-  orderBy,
+  where,
   query,
   setDoc,
   updateDoc,
@@ -65,18 +65,18 @@ export function deleteuser(uid) {
 const USERS_COLLECTION = "user";
 const TRANSACTIONS_SUB_COLLECTION = "transactions";
 
-export function addTransaction(uid, date, amount, type, status) {
-  // Add a transaction to the user-specific transactions sub-collection
-  return addDoc(
-    collection(db, USERS_COLLECTION, uid, TRANSACTIONS_SUB_COLLECTION),
-    {
-      date,
-      amount,
-      type,
-      status,
-    }
-  );
-}
+// export function addTransaction(uid, date, amount, type, status) {
+//   // Add a transaction to the user-specific transactions sub-collection
+//   return addDoc(
+//     collection(db, USERS_COLLECTION, uid, TRANSACTIONS_SUB_COLLECTION),
+//     {
+//       date,
+//       amount,
+//       type,
+//       status,
+//     }
+//   );
+// }
 
 export async function getAllTransactions() {
   // Get a reference to the USERS_COLLECTION
@@ -110,6 +110,48 @@ export async function getAllTransactions() {
   }
 
   return allTransactions;
+}
+
+export async function addTransaction(fullName, newTransaction, ) {
+  // Find the user with the given full name
+  const q = query(
+    collection(db, USERS_COLLECTION, ),
+    where("fullName", "==", fullName)
+  );
+  const userSnapshot = await getDocs(q);
+
+  // If no such user exists, return an error
+  if (userSnapshot.empty) {
+    return { error: "No user with the given full name found." };
+  }
+
+  // Get the first user's UID (assuming full names are unique)
+  const userUid = userSnapshot.docs[0].id;
+
+  // Add the transaction to that user's transactions sub-collection
+  const transactionsRef = collection(
+    db,
+    USERS_COLLECTION,
+    userUid,
+    TRANSACTIONS_SUB_COLLECTION
+  );
+
+  const docRef = await addDoc(transactionsRef, newTransaction);
+  return { success: true, id: docRef.id };
+}
+
+export async function editTransaction(userId, transactionId, updatedFields) {
+  const transactionRef = doc(
+    db,
+    USERS_COLLECTION,
+    userId,
+    TRANSACTIONS_SUB_COLLECTION,
+    transactionId
+  );
+
+  await updateDoc(transactionRef, updatedFields);
+
+  return { success: true };
 }
 
 // Banking Details

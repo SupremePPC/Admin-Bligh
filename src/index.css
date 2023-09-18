@@ -1099,6 +1099,10 @@ tfoot th {
   border-top: 2px solid #dedede;
 }
 
+tr{
+  cursor: pointer;
+}
+
 td {
   border-bottom: 1px solid #dedede;
 }
@@ -1128,6 +1132,14 @@ caption {
 @media (min-width: 600px) {
   .contain-table {
     width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .contain-table {
+    overflow: scroll;
+    width: 95%;
+    margin: 0 auto;
   }
 }
 
