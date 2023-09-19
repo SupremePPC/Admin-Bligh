@@ -1,7 +1,7 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
-export default function Table({ users, handleEdit, handleDelete, searchResults }) {
-  // Determine which array to map over based on the presence of search results
+export default function Table({ users, handleEdit, handleDelete, handleUserOverview, searchResults }) {
   const dataToDisplay = searchResults.length > 0 ? searchResults : users;
 
   return (
@@ -13,7 +13,7 @@ export default function Table({ users, handleEdit, handleDelete, searchResults }
             <th>Full Name</th>
             <th>Email</th>
             <th>Mobile</th>
-            <th colSpan={2} className="text-center">
+            <th colSpan={3} className="text-center">
               Actions
             </th>
           </tr>
@@ -26,6 +26,12 @@ export default function Table({ users, handleEdit, handleDelete, searchResults }
                 <td>{user.fullName}</td>
                 <td>{user.email}</td>
                 <td>{user.mobilePhone}</td>
+                <td>
+                <button onClick={() => handleUserOverview(user)} className="button muted-button">
+  Details
+</button>
+
+                </td>
                 <td className="text-right">
                   <button onClick={() => handleEdit(user)} className="button muted-button">
                     Edit
@@ -40,7 +46,7 @@ export default function Table({ users, handleEdit, handleDelete, searchResults }
             ))
           ) : (
             <tr>
-              <td colSpan={7}>No User</td>
+              <td colSpan={7}>No Users</td>
             </tr>
           )}
         </tbody>

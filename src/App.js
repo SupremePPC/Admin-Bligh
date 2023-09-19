@@ -5,7 +5,6 @@ import Dashboard from "./components/Dashboard";
 import Login from "./components/Login";
 import ForgotPassword from "./components/ForgotPassword";
 import ProtectedRoute from "./protectedRoutes";
-import DashboardOverview from "./components/Overview";
 import UserRequestDashboard from "./components/UserRequest";
 import TransactionDashboard from "./components/TransactionManagement";
 import BankingDetails from "./components/BankingDetails";
@@ -16,6 +15,8 @@ import { useAuth } from "./authState";
 import { Provider } from "react-redux";
 import store from "../src/store/store";
 import BondsDashboard from "./components/BondsManagement";
+import RegisteredUsers from "./components/RegisteredUsers";
+import UserOverview from "./components/UserOverview";
 
 function App() {
   const { loadingAuthState } = useAuth();
@@ -37,7 +38,7 @@ function App() {
             index
             element={
               <ProtectedRoute>
-                <DashboardOverview />
+                <RegisteredUsers />
               </ProtectedRoute>
             }
           />
@@ -81,9 +82,18 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="user-overview/:userId"
+              element={
+                <ProtectedRoute>
+                  <UserOverview />
+                </ProtectedRoute>
+              }
+            />
         </Route>
         <Route path="/" index element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="*" component={() => "404 Not Found"} />
       </Routes>
     </Router>
     {loadingAuthState && <LoadingScreen />} 

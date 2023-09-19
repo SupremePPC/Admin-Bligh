@@ -36,7 +36,7 @@ function Sidebar() {
             to="/dashboard/"
           >
             <FaHome />
-            {!collapsed && "Account Overview"}
+            {!collapsed && "Registered Users"}
           </Link>
         </li>
         <li className="menu_list">

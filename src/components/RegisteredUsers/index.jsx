@@ -10,8 +10,9 @@ import Add from "./Add";
 import LoadingScreen from "../LoadingScreen";
 import Swal from "sweetalert2";
 import { getFunctions, httpsCallable } from "firebase/functions";
+import UserOverview from "../UserOverview";
 
-export default function DashboardOverview() {
+export default function RegisteredUsers() {
   const [users, setUsers] = useState([]);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState(null);
@@ -22,6 +23,8 @@ export default function DashboardOverview() {
   const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
+  const [isUserOverviewOpen, setIsUserOverviewOpen] = useState(false);
+  const [selectedUserForOverview, setSelectedUserForOverview] = useState(null);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -42,6 +45,11 @@ export default function DashboardOverview() {
 
     fetchUsers();
   }, []);
+
+  const handleUserOverview = (user) => {
+    setSelectedUserForOverview(user);
+    setIsUserOverviewOpen(true);
+  };
 
   const handleSearch = async () => {
     setIsLoading(true); // Assuming you have an isLoading state
@@ -204,6 +212,7 @@ export default function DashboardOverview() {
               handleDelete={handleDelete}
               handleEdit={handleEdit}
               searchResults={searchResults}
+              handleUserOverview={handleUserOverview}
             />
           )}
           <Modal
@@ -234,6 +243,15 @@ export default function DashboardOverview() {
           }}
         />
       )}
+      {/* {isUserOverviewOpen && (
+        <UserOverview
+          user={selectedUserForOverview}
+          onClose={() => {
+            setIsUserOverviewOpen(false);
+            setSelectedUserForOverview(null);
+          }}
+        />
+      )} */}
     </div>
   );
 }

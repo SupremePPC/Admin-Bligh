@@ -12,7 +12,7 @@ import Table from "./Table";
 import Modal from "../CustomsModal";
 import { db } from "../../firebaseConfig/firebase";
 import LoadingScreen from "../LoadingScreen";
-import AddTransaction from "./Add";
+import AddTransaction from "../UserOverview/AddTransaction";
 
 const TransactionDashboard = () => {
   const [transactions, setTransactions] = useState([]);
@@ -319,13 +319,13 @@ const TransactionDashboard = () => {
           )}
         </>
       )}
-      {isAdding && (
+      {/* {isAdding && (
         <AddTransaction
           onClose={() => setIsAdding(false)}
           setIsAdding={setIsAdding}
           setTransactions={setTransactions}
         />
-      )}
+      )} */}
       {isEditPageOpen && (
         <Edit
           transaction={transactionForEdit}

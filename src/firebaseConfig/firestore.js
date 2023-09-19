@@ -62,7 +62,7 @@ export function deleteuser(uid) {
 }
 
 // Transactions
-const USERS_COLLECTION = "user";
+const USERS_COLLECTION = "users";
 const TRANSACTIONS_SUB_COLLECTION = "transactions";
 
 // export function addTransaction(uid, date, amount, type, status) {
@@ -112,33 +112,18 @@ export async function getAllTransactions() {
   return allTransactions;
 }
 
-export async function addTransaction(fullName, newTransaction, ) {
-  // Find the user with the given full name
-  const q = query(
-    collection(db, USERS_COLLECTION, ),
-    where("fullName", "==", fullName)
-  );
-  const userSnapshot = await getDocs(q);
+export async function addTransaction(userId, newTransaction) {
+  try {
+    // Add the transaction to the specific user's transactions sub-collection
+    const transactionsRef = collection(db, USERS_COLLECTION, userId, TRANSACTIONS_SUB_COLLECTION);
+    const docRef = await addDoc(transactionsRef, newTransaction);
 
-  // If no such user exists, return an error
-  if (userSnapshot.empty) {
-    return { error: "No user with the given full name found." };
+    return { success: true, id: docRef.id };
+  } catch (error) {
+    return { error: `Failed to add transaction: ${error.message}` };
   }
-
-  // Get the first user's UID (assuming full names are unique)
-  const userUid = userSnapshot.docs[0].id;
-
-  // Add the transaction to that user's transactions sub-collection
-  const transactionsRef = collection(
-    db,
-    USERS_COLLECTION,
-    userUid,
-    TRANSACTIONS_SUB_COLLECTION
-  );
-
-  const docRef = await addDoc(transactionsRef, newTransaction);
-  return { success: true, id: docRef.id };
 }
+
 
 export async function editTransaction(userId, transactionId, updatedFields) {
   const transactionRef = doc(
