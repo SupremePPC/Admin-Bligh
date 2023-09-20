@@ -114,7 +114,6 @@ export async function getAllTransactions() {
 
 export async function addTransaction(userId, newTransaction) {
   try {
-    // Add the transaction to the specific user's transactions sub-collection
     const transactionsRef = collection(db, USERS_COLLECTION, userId, TRANSACTIONS_SUB_COLLECTION);
     const docRef = await addDoc(transactionsRef, newTransaction);
 

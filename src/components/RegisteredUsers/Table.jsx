@@ -5,7 +5,6 @@ export default function Table({
   users,
   handleEdit,
   handleDelete,
-  handleUserOverview,
   searchResults,
 }) {
   const dataToDisplay = searchResults.length > 0 ? searchResults : users;
@@ -33,12 +32,6 @@ export default function Table({
                 <td>{user.email}</td>
                 <td>{user.mobilePhone}</td>
                 <td>
-                  {/* <button
-                    onClick={() => handleUserOverview(user)}
-                    className="button muted-button"
-                  >
-                    Details
-                  </button> */}
                   <Link to={`/dashboard/user-overview/${user.id}`} className="button muted-button" >
                     View
                   </Link>

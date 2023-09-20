@@ -90,6 +90,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            
         </Route>
         <Route path="/" index element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />

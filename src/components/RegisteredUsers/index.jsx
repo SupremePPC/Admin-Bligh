@@ -23,9 +23,7 @@ export default function RegisteredUsers() {
   const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
-  const [isUserOverviewOpen, setIsUserOverviewOpen] = useState(false);
-  const [selectedUserForOverview, setSelectedUserForOverview] = useState(null);
-
+  
   useEffect(() => {
     const fetchUsers = async () => {
       setIsLoading(true);
@@ -45,11 +43,6 @@ export default function RegisteredUsers() {
 
     fetchUsers();
   }, []);
-
-  const handleUserOverview = (user) => {
-    setSelectedUserForOverview(user);
-    setIsUserOverviewOpen(true);
-  };
 
   const handleSearch = async () => {
     setIsLoading(true); // Assuming you have an isLoading state
@@ -212,7 +205,6 @@ export default function RegisteredUsers() {
               handleDelete={handleDelete}
               handleEdit={handleEdit}
               searchResults={searchResults}
-              handleUserOverview={handleUserOverview}
             />
           )}
           <Modal
@@ -243,15 +235,6 @@ export default function RegisteredUsers() {
           }}
         />
       )}
-      {/* {isUserOverviewOpen && (
-        <UserOverview
-          user={selectedUserForOverview}
-          onClose={() => {
-            setIsUserOverviewOpen(false);
-            setSelectedUserForOverview(null);
-          }}
-        />
-      )} */}
     </div>
   );
 }

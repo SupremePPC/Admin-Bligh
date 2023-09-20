@@ -15,8 +15,12 @@ const UserOverview = () => {
   const [bondsRequest, setBondsRequest] = useState([]);
   const [docs, setDocs] = useState([]);
   const [transactions, setTransactions] = useState([]);
-  const [isAddTransactionModalOpen, setIsAddTransactionModalOpen] =
-    useState(false);
+  const [selectedUserForAdd, setSelectedUserForAdd] = useState(null);
+  const [isAddPageOpen, setIsAddPageOpen] = useState(false);
+
+  const handleAdd = () => {
+    setIsAddPageOpen(true);
+  };
 
   const fetchSubCollection = async (subCollectionName, setFunction) => {
     const subCollectionRef = collection(
@@ -64,6 +68,7 @@ const UserOverview = () => {
       });
     }
   }, [user ? user.userId : null]);
+
   const totalBalance = accountTypes.reduce(
     (total, item) => total + parseFloat(item.balance),
     0
@@ -71,6 +76,8 @@ const UserOverview = () => {
 
   return (
     <div className="container">
+      {
+        !isAddPageOpen && (
       <div className="userOverview_container">
         {/* <h1>Overview {user ? user.userId : "User ID Missing"} </h1> */}
         {userDetails && (
@@ -295,22 +302,27 @@ const UserOverview = () => {
                 ))}
               </ul>
               <div className="dropdown_btn">
-                <button onClick={() => setIsAddTransactionModalOpen(true)}>
-                  Add Transaction
-                </button>
+                <button onClick={handleAdd}>Add Transaction</button>
               </div>
             </>
           )}
-          {isAddTransactionModalOpen && (
-            <AddTransaction
-              onClose={() => setIsAddTransactionModalOpen(false)}
-              transactions={transactions}
-              setTransactions={setTransactions}
-              userId={user.id}
-            />
-          )}
         </div>
       </div>
+
+        )
+      }
+          {isAddPageOpen && (
+            <AddTransaction
+              onClose={() => {
+                setIsAddPageOpen(false);
+                setSelectedUserForAdd(null);
+              }}
+              transactions={transactions}
+              setTransactions={setTransactions}
+              userId={user}
+              totalBalance={totalBalance}
+            />
+          )}
     </div>
   );
 };
