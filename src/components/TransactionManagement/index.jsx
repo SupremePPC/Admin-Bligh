@@ -12,7 +12,6 @@ import Table from "./Table";
 import Modal from "../CustomsModal";
 import { db } from "../../firebaseConfig/firebase";
 import LoadingScreen from "../LoadingScreen";
-import AddTransaction from "../UserOverview/AddTransaction";
 
 const TransactionDashboard = () => {
   const [transactions, setTransactions] = useState([]);
@@ -24,7 +23,6 @@ const TransactionDashboard = () => {
   const [isAdding, setIsAdding] = useState(false);
   const [transactionForEdit, setTransactionForEdit] = useState(false);
   const [isSortToggled, setIsSortToggled] = useState(false);
-  // const [sortField, setSortField] = useState("userName"); // 'userName' or 'amount'
   const [searchQuery, setSearchQuery] = useState("");
   const [searchField, setSearchField] = useState("userName"); // 'userName' or 'amount'
   const [statusFilter, setStatusFilter] = useState("All"); // 'All', 'Approved', 'Declined'

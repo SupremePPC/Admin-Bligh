@@ -27,9 +27,9 @@ const Table = ({ transactions, handleApproval, handleRejection }) => {
         <tbody>
           {transactions.length > 0 ? (
             transactions.map((transaction, i) => {
-              const dateObject = transaction.date.toDate();
-
-              // Format the date as "18/08/2023"
+              const dateObject = transaction.date.toDate
+                ? transaction.date.toDate()
+                : new Date(transaction.date);
               const day = String(dateObject.getDate()).padStart(2, "0");
               const month = String(dateObject.getMonth() + 1).padStart(2, "0"); // Month is 0-based, so we add 1
               const year = dateObject.getFullYear();

@@ -1,7 +1,13 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React from "react";
+import { Link } from "react-router-dom";
 
-export default function Table({ users, handleEdit, handleDelete, handleUserOverview, searchResults }) {
+export default function Table({
+  users,
+  handleEdit,
+  handleDelete,
+  handleUserOverview,
+  searchResults,
+}) {
   const dataToDisplay = searchResults.length > 0 ? searchResults : users;
 
   return (
@@ -27,18 +33,29 @@ export default function Table({ users, handleEdit, handleDelete, handleUserOverv
                 <td>{user.email}</td>
                 <td>{user.mobilePhone}</td>
                 <td>
-                <button onClick={() => handleUserOverview(user)} className="button muted-button">
-  Details
-</button>
-
+                  {/* <button
+                    onClick={() => handleUserOverview(user)}
+                    className="button muted-button"
+                  >
+                    Details
+                  </button> */}
+                  <Link to={`/dashboard/user-overview/${user.id}`} className="button muted-button" >
+                    View
+                  </Link>
                 </td>
                 <td className="text-right">
-                  <button onClick={() => handleEdit(user)} className="button muted-button">
+                  <button
+                    onClick={() => handleEdit(user)}
+                    className="button muted-button"
+                  >
                     Edit
                   </button>
                 </td>
                 <td className="text-left">
-                  <button onClick={() => handleDelete(user.id)} className="button muted-button">
+                  <button
+                    onClick={() => handleDelete(user.id)}
+                    className="button muted-button"
+                  >
                     Delete
                   </button>
                 </td>

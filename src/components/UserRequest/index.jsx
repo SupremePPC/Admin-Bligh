@@ -60,7 +60,6 @@ export default function UserRequest() {
   }, []);
 
   useEffect(() => {
-    console.log("Updated userRequests:", userRequests);
   }, [userRequests]);
 
   const handleApproval = async (userId, requestData) => {

@@ -3,7 +3,7 @@ import Swal from "sweetalert2";
 import { addTransaction } from "../../firebaseConfig/firestore";
 import LoadingScreen from "../LoadingScreen";
 
-const AddTransaction = ({transactions, setTransactions, userId, setIsAdding }) => {
+const AddTransaction = ({transactions, setTransactions, userId, onClose }) => {
   const [formData, setFormData] = useState({
     amount: '',
     accountType: '',
@@ -135,7 +135,7 @@ const AddTransaction = ({transactions, setTransactions, userId, setIsAdding }) =
             className="muted-button"
             type="button"
             value="Cancel"
-            onClick={() => setIsAdding(false)}
+            onClick={onClose}
           />
         </div>
       </form>
