@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
 import { getBondRequests } from "../../firebaseConfig/firestore";
-import LoadingScreen from "../LoadingScreen"
+import LoadingScreen from "../LoadingScreen";
 import Table from "./Table";
+import { db } from "../../firebaseConfig/firebase";
+import { getDoc, doc } from "firebase/firestore";
+import Header from "./Header";
 
 const BondsRequestTable = () => {
   const [bondRequests, setBondRequests] = useState([]);
@@ -36,7 +39,7 @@ const BondsRequestTable = () => {
       // Refresh the table data
       const allRequests = await getBondRequests();
       setBondRequests(allRequests);
-      console.log(allRequests)
+      console.log(allRequests);
       setMessage(`Request status updated to ${newStatus}`);
     } catch (err) {
       console.error("Error updating request:", err);
@@ -51,9 +54,17 @@ const BondsRequestTable = () => {
       try {
         setIsLoading(true);
         const allRequests = await getBondRequests();
-
-        setBondRequests(allRequests);
-        console.log(allRequests);
+        if (allRequests) {
+          const requestsWithUserDetails = await Promise.all(
+            allRequests.map(async (request) => {
+              const userDoc = await getDoc(doc(db, "users", request.userId));
+              const userDetails = userDoc.data();
+              console.log(userDetails);
+              return { ...request, userName: userDetails.fullName };
+            })
+          );
+          setBondRequests(requestsWithUserDetails);
+        }
         setIsLoading(false);
       } catch (error) {
         console.error("Error fetching request:", error);
@@ -71,10 +82,13 @@ const BondsRequestTable = () => {
       {isLoading ? (
         <LoadingScreen />
       ) : (
+        <>
+        <Header/>
         <Table
           bondRequests={bondRequests}
           handleUpdateRequest={handleUpdateRequest}
         />
+        </>
       )}
     </div>
   );
