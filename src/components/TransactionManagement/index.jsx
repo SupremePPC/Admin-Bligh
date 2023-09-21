@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import {
-  getDocs,
-  collection,
   doc,
   updateDoc,
   runTransaction,
@@ -12,6 +10,7 @@ import Table from "./Table";
 import Modal from "../CustomsModal";
 import { db } from "../../firebaseConfig/firebase";
 import LoadingScreen from "../LoadingScreen";
+import { getAllTransactions } from "../../firebaseConfig/firestore";
 
 const TransactionDashboard = () => {
   const [transactions, setTransactions] = useState([]);
@@ -35,32 +34,15 @@ const TransactionDashboard = () => {
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
-        const usersRef = collection(db, "users");
-        const usersSnapshot = await getDocs(usersRef);
-        let allTransactions = [];
         setIsLoading(true);
-
-        for (const userDoc of usersSnapshot.docs) {
-          const userName = userDoc.data().fullName;
-          const transactionsRef = collection(
-            db,
-            "users",
-            userDoc.id,
-            "transactions"
-          );
-          const transactionsSnapshot = await getDocs(transactionsRef);
-          const userTransactions = transactionsSnapshot.docs.map(
-            (transactionDoc) => ({
-              ...transactionDoc.data(),
-              id: transactionDoc.id,
-              userId: userDoc.id,
-              userName: userName,
-            })
-          );
-          allTransactions = allTransactions.concat(userTransactions);
+        const allTransactions = await getAllTransactions();
+        if(!allTransactions) {
+          console.error("No transactions found");
+          setIsLoading(false);
+          return;
         }
 
-        const filteredTransactions =
+        const filteredTransactions = 
           statusFilter === "All"
             ? allTransactions
             : allTransactions.filter(
@@ -68,9 +50,10 @@ const TransactionDashboard = () => {
               );
 
         setTransactions(filteredTransactions);
-        setIsLoading(false);
       } catch (error) {
         console.error("Error fetching transactions:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 

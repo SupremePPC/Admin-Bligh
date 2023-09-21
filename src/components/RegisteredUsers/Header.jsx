@@ -47,7 +47,6 @@ const Header = ({
 
       <div className="header__wrap">
         <div className="header__left">
-          {/* <input type="search" name="search-bar" className="search__field" placeholder="Search for users..." /> */}
           <div className="sort">
             <button className="sort__button" onClick={isSortToggled}>
               Sort <BiSortAlt2 />

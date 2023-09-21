@@ -1,24 +1,8 @@
 import React, { useState } from "react";
-import firebase from "firebase/app";
 import "firebase/firestore";
 
-const Edit = () => {
-  const [formData, setFormData] = useState({
-    companyWebsite: "",
-    couponFrequency: 0,
-    couponRate: 0,
-    currentValue: 0,
-    image: "",
-    isin: "",
-    issuerName: "",
-    maturityDate: "",
-    minimumAmount: 0,
-    purchaseDate: "",
-    quantity: 0,
-    sector: "",
-    type: "",
-  });
-
+const Edit = ({ bondToEdit, setIsEditPageOpen }) => {
+  const [formData, setFormData] = useState(bondToEdit);
   const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
@@ -49,28 +33,20 @@ const Edit = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateForm()) return;
 
-    if (!validateForm()) {
-      return;
-    }
-
-    // Add the bond to the Firebase collection
     try {
-      const db = firebase.firestore();
-      await db.collection("bonds").add(formData);
-      alert("Bond added successfully");
-      setFormData({
-        companyWebsite: "",
-        // Reset all other fields...
-      });
+      await updateBond(formData.id, formData);
+      alert("Bond updated successfully");
     } catch (error) {
-      alert("Error adding bond: ", error);
+      alert("Error updating bond: ", error);
     }
   };
 
   return (
+    <div className="small-container">
     <form onSubmit={handleSubmit}>
-      <h1>Add New Bond</h1>
+      <h1>Edit Bond</h1>
       <label htmlFor="image">Issuer Logo:</label>
       <input
         type="url"
@@ -165,12 +141,21 @@ const Edit = () => {
         value={formData.couponFrequency}
       />
 
-      <button type="submit">Add New Bond</button>
+      <div style={{ marginTop: "30px" }}>
+        <input type="submit" value="Add" />
+        <input
+          style={{ marginLeft: "12px" }}
+          className="muted-button"
+          type="button"
+          value="Cancel"
+          onClick={() => setIsEditPageOpen(false)}
+        />
+      </div>
       {errors.isin && <div>{errors.isin}</div>}
       {errors.issuerName && <div>{errors.issuerName}</div>}
     </form>
+    </div>
   );
 };
 
-export default AddNewBond;
-b;
+export default Edit;

@@ -75,6 +75,7 @@ export async function getAllTransactions() {
   // Iterate over each user and get their transactions
   for (const userDoc of usersSnapshot.docs) {
     const userUid = userDoc.id;
+    const userName = userDoc.data().fullName;
     const transactionsRef = collection(
       db,
       USERS_COLLECTION,
@@ -86,6 +87,8 @@ export async function getAllTransactions() {
     const userTransactions = transactionsSnapshot.docs.map((doc) => ({
       ...doc.data(),
       id: doc.id,
+      userId: userUid,
+      userName: userName,
     }));
 
     allTransactions = [...allTransactions, ...userTransactions];
@@ -397,11 +400,11 @@ export async function getBondRequests() {
 
 
 //BONDS 
-
+const BONDS_COLLECTION = 'bonds'
 //get all bonds
 export async function getAllBonds() {
   // Get a reference to the 'bonds' collection
-  const bondsRef = collection(db, 'bonds');
+  const bondsRef = collection(db, BONDS_COLLECTION);
   const bondsSnapshot = await getDocs(bondsRef);
 
   const allBonds = bondsSnapshot.docs.map(doc => ({

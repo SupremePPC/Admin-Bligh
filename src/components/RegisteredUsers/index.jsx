@@ -10,7 +10,6 @@ import Add from "./Add";
 import LoadingScreen from "../LoadingScreen";
 import Swal from "sweetalert2";
 import { getFunctions, httpsCallable } from "firebase/functions";
-import UserOverview from "../UserOverview";
 
 export default function RegisteredUsers() {
   const [users, setUsers] = useState([]);
