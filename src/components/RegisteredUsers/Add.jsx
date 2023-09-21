@@ -1,14 +1,20 @@
 import React, { useState } from "react";
 import Swal from "sweetalert2";
 import { db } from "../../firebaseConfig/firebase";
-import { createUserWithEmailAndPassword, getAuth, sendEmailVerification } from "firebase/auth";
-import { addDoc, collection, doc, setDoc } from "firebase/firestore";
+import {
+  createUserWithEmailAndPassword,
+  getAuth,
+  sendEmailVerification,
+} from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
 import { useDispatch } from "react-redux";
 import { addUser } from "../../store/userStore/userActions";
+import LoadingScreen from "../LoadingScreen";
 
 const Add = ({ setUsers, setIsAdding }) => {
   const dispatch = useDispatch();
-  
+  const [isLoading, setIsLoading] = useState(false);
+
   const [formData, setFormData] = useState({
     title: "",
     fullName: "",
@@ -32,7 +38,7 @@ const Add = ({ setUsers, setIsAdding }) => {
 
   const handleAdd = async (e) => {
     e.preventDefault();
-  
+
     const {
       title,
       fullName,
@@ -45,7 +51,7 @@ const Add = ({ setUsers, setIsAdding }) => {
       country,
       postcode,
     } = formData;
-  
+
     // Validation
     if (
       !title ||
@@ -65,7 +71,7 @@ const Add = ({ setUsers, setIsAdding }) => {
         showConfirmButton: true,
       });
     }
-  
+    setIsLoading(true);
     try {
       // Create user in Firebase Authentication
       const auth = getAuth();
@@ -75,10 +81,10 @@ const Add = ({ setUsers, setIsAdding }) => {
         password
       );
       const user = userCredential.user;
-  
+
       // Send email verification
       await sendEmailVerification(user);
-  
+
       // Add user to Firestore using user.uid as the document ID
       const newUser = {
         uid: user.uid,
@@ -94,14 +100,14 @@ const Add = ({ setUsers, setIsAdding }) => {
       };
       const usersRef = doc(db, "users", user.uid);
       await setDoc(usersRef, newUser);
-  
+
       // Update state
       setUsers((prevUsers) => [...prevUsers, newUser]);
       setIsAdding(false);
-  
+
       // Dispatch to Redux
       dispatch(addUser(newUser));
-  
+
       Swal.fire({
         icon: "success",
         title: "Added!",
@@ -118,129 +124,134 @@ const Add = ({ setUsers, setIsAdding }) => {
         showConfirmButton: true,
       });
     }
+    setIsLoading(false);
   };
 
   return (
     <div className="small-container">
-      <form onSubmit={handleAdd}>
-        <label htmlFor="title">Title</label>
-        <select
-          id="title"
-          name="title"
-          value={formData.title}
-          onChange={handleInputChange}
-          required
-        >
-          <option value="">Select Title</option>
-          <option value="Miss">Miss</option>
-          <option value="Mrs">Mrs</option>
-          <option value="Mr">Mr</option>
-        </select>
+      {isLoading ? (
+        <LoadingScreen />
+      ) : (
+        <form onSubmit={handleAdd}>
+          <label htmlFor="title">Title</label>
+          <select
+            id="title"
+            name="title"
+            value={formData.title}
+            onChange={handleInputChange}
+            required
+          >
+            <option value="">Select Title</option>
+            <option value="Miss">Miss</option>
+            <option value="Mrs">Mrs</option>
+            <option value="Mr">Mr</option>
+          </select>
 
-        <label htmlFor="fullName">Full Name</label>
-        <input
-          id="fullName"
-          type="text"
-          name="fullName"
-          value={formData.fullName}
-          onChange={handleInputChange}
-          required
-        />
-
-        <label htmlFor="email">Email</label>
-        <input
-          id="email"
-          type="email"
-          name="email"
-          value={formData.email}
-          onChange={handleInputChange}
-          required
-        />
-
-        <label htmlFor="mobile">Mobile</label>
-        <input
-          id="mobile"
-          type="text"
-          name="mobile"
-          value={formData.mobile}
-          onChange={handleInputChange}
-          required
-        />
-
-        <label htmlFor="home">Home</label>
-        <input
-          id="home"
-          type="text"
-          name="home"
-          value={formData.home}
-          onChange={handleInputChange}
-          required
-        />
-
-        <label htmlFor="address">Address</label>
-        <input
-          id="address"
-          type="text"
-          name="address"
-          value={formData.address}
-          onChange={handleInputChange}
-          required
-        />
-
-        <label htmlFor="city">City</label>
-        <input
-          id="city"
-          type="text"
-          name="city"
-          value={formData.city}
-          onChange={handleInputChange}
-          required
-        />
-
-        <label htmlFor="country">Country</label>
-        <input
-          id="country"
-          type="text"
-          name="country"
-          value={formData.country}
-          onChange={handleInputChange}
-          required
-        />
-
-        <label htmlFor="postcode">Eircode</label>
-        <input
-          id="postcode"
-          type="text"
-          name="postcode"
-          value={formData.postcode}
-          onChange={handleInputChange}
-          pattern="^[A-Za-z0-9]{3} [A-Za-z0-9]{4}$"
-          maxLength="8"
-          title="Eircode must be in the format like D02 DX88"
-          required
-        />
-
-        <label htmlFor="password">Password</label>
-        <input
-          id="password"
-          type="password"
-          name="password"
-          value={formData.password}
-          onChange={handleInputChange}
-          required
-        />
-
-        <div style={{ marginTop: "30px" }}>
-          <input type="submit" value="Add" />
+          <label htmlFor="fullName">Full Name</label>
           <input
-            style={{ marginLeft: "12px" }}
-            className="muted-button"
-            type="button"
-            value="Cancel"
-            onClick={() => setIsAdding(false)}
+            id="fullName"
+            type="text"
+            name="fullName"
+            value={formData.fullName}
+            onChange={handleInputChange}
+            required
           />
-        </div>
-      </form>
+
+          <label htmlFor="email">Email</label>
+          <input
+            id="email"
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleInputChange}
+            required
+          />
+
+          <label htmlFor="mobile">Mobile</label>
+          <input
+            id="mobile"
+            type="text"
+            name="mobile"
+            value={formData.mobile}
+            onChange={handleInputChange}
+            required
+          />
+
+          <label htmlFor="home">Home</label>
+          <input
+            id="home"
+            type="text"
+            name="home"
+            value={formData.home}
+            onChange={handleInputChange}
+            required
+          />
+
+          <label htmlFor="address">Address</label>
+          <input
+            id="address"
+            type="text"
+            name="address"
+            value={formData.address}
+            onChange={handleInputChange}
+            required
+          />
+
+          <label htmlFor="city">City</label>
+          <input
+            id="city"
+            type="text"
+            name="city"
+            value={formData.city}
+            onChange={handleInputChange}
+            required
+          />
+
+          <label htmlFor="country">Country</label>
+          <input
+            id="country"
+            type="text"
+            name="country"
+            value={formData.country}
+            onChange={handleInputChange}
+            required
+          />
+
+          <label htmlFor="postcode">Eircode</label>
+          <input
+            id="postcode"
+            type="text"
+            name="postcode"
+            value={formData.postcode}
+            onChange={handleInputChange}
+            pattern="^[A-Za-z0-9]{3} [A-Za-z0-9]{4}$"
+            maxLength="8"
+            title="Eircode must be in the format like D02 DX88"
+            required
+          />
+
+          <label htmlFor="password">Password</label>
+          <input
+            id="password"
+            type="password"
+            name="password"
+            value={formData.password}
+            onChange={handleInputChange}
+            required
+          />
+
+          <div style={{ marginTop: "30px" }}>
+            <input type="submit" value="Add" />
+            <input
+              style={{ marginLeft: "12px" }}
+              className="muted-button"
+              type="button"
+              value="Cancel"
+              onClick={() => setIsAdding(false)}
+            />
+          </div>
+        </form>
+      )}
     </div>
   );
 };

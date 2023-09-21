@@ -35,8 +35,6 @@ function BondsRequestTable({bondRequests}) {
           ))}
         </tbody>
       </table>
-      {/* {message && <div>{message}</div>}
-      {error && <div>{error}</div>} */}
     </div>
   );
 }

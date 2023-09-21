@@ -26,7 +26,7 @@ export default function Table({
         <tbody>
           {dataToDisplay.length > 0 ? (
             dataToDisplay.map((user, index) => (
-              <tr key={user.id}>
+              <tr key={index}>
                 <td>{index + 1}</td>
                 <td>{user.fullName}</td>
                 <td>{user.email}</td>
