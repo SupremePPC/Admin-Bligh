@@ -247,6 +247,54 @@ const TransactionDashboard = () => {
     setTransactions(filteredTransactions);
   };
 
+  const handleDelete = (userId) => {
+    setSelectedUserId(userId); // set the user ID you want to delete
+    setIsDeleteModalOpen(true); // open the delete confirmation modal
+  };
+
+  const confirmDelete = async () => {
+    setIsLoading(true);
+
+    try {
+      // Initialize the Cloud Function
+      const functionsInstance = getFunctions();
+      const deleteFunction = httpsCallable(
+        functionsInstance,
+        "deleteUserAccount"
+      );
+
+      // Call the Cloud Function to delete the user from Firestore and Authentication
+      const result = await deleteFunction({ userId: selectedUserId });
+
+      console.log(result.data);
+
+      // Update the local state
+      setUsers((users) => users.filter((user) => user.id !== selectedUserId));
+
+      // Close the modal and reset the selected user ID
+      setIsDeleteModalOpen(false);
+      setIsLoading(false);
+      setSelectedUserId(null);
+
+      Swal.fire({
+        icon: "success",
+        title: "Deleted!",
+        text: `Bond deleted successfully.`,
+        showConfirmButton: false,
+        timer: 2000,
+      });
+    } catch (error) {
+      console.error("Failed to delete bond:", error);
+      setIsLoading(false);
+      Swal.fire({
+        icon: "error",
+        title: "Error!",
+        text: `Error in deleting bond.`,
+        showConfirmButton: false,
+        timer: 2000,
+      });
+    }
+  };
   return (
     <div className="container">
       {!isAdding && !isEditPageOpen && (

@@ -161,7 +161,7 @@
   }
   
   .portfolio_dropdown {
-    background-color: #688fb7;
+    background-color: azure;
     border-radius: 0px 0px 8px 8px;
     padding-left: 1.5rem;
     padding-right: 1.5rem;
@@ -196,13 +196,13 @@
   .dropdown_row .bold_text {
     font-size: var(--font-fourteen);
     font-weight: 500;
-    color: var(--white);
+    color: var(--black);
   }
   
   .dropdown_row .reg_text {
     font-size: var(--font-fourteen);
     font-weight: 400;
-    color: var(--white);
+    color: var(--black);
   }
   
   .dropdown_btn {
@@ -223,47 +223,10 @@
   }
   
   @media screen and (max-width: 1024px) {
-    /* .bonds_page .section_body {
-      display: flex;
-      flex-wrap: wrap;
-      flex-direction: row;
-      gap: 1rem;
-    } */
-
-    /* .portfolio_col {
-      flex-direction: column;
-    } */
-  
+   
     .portfolio_card {
       width: 700px;
     }
-    
-    /* .col_details {
-      flex-direction: column;
-      gap: 1rem;
-      width: 100%;
-    } */
-  
-    /* .more_dets {
-      flex-direction: column;
-      gap: 0rem;
-    } */
-  
-    /* .coupon_dets {
-      width: 100%;
-      padding: 1rem;
-    } */
-  
-    /* .dropdown_col{
-      align-items: flex-start;
-      display: flex;
-      flex-direction: column;
-      width: 100%;
-    } */
-  
-    /* .dropdown_row{
-      width: 100%;
-    } */
   }
   
   @media screen and (max-width: 451px) {

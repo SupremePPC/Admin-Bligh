@@ -1,15 +1,19 @@
-import React, {useState} from 'react'
-import Edit from './Edit';
+import React, { useState } from "react";
 
-export default function List({ bonds, handleDelete, handleEditClick}) {
-    const [isDropdownVisible, setIsDropdownVisible] = useState(false);
- 
-  const toggleDropdown = () => {
-    setIsDropdownVisible(!isDropdownVisible);
+export default function List({ bonds, handleDelete, handleEditClick }) {
+  const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+  const [visibleDropdownIndex, setVisibleDropdownIndex] = useState(null);
+
+  const toggleDropdown = (index) => {
+    if (visibleDropdownIndex === index) {
+      setVisibleDropdownIndex(null); // if clicked again on the open dropdown, close it
+    } else {
+      setVisibleDropdownIndex(index); // open the clicked dropdown and close any other open dropdown
+    }
   };
 
   return (
-       <div className="bonds_page">
+    <div className="bonds_page">
       <div className="section_header">
         <h2>Bond - Investment Options</h2>
         <span>Click on the investment below to show more information</span>
@@ -34,11 +38,15 @@ export default function List({ bonds, handleDelete, handleEditClick}) {
       <div className="section_body">
         {bonds.length === 0 && <h5>NO BONDS FOUND.</h5>}
         {bonds.map((bond, index) => (
-          <div key={index} className="portfolio_card" onClick={toggleDropdown}>
+          <div
+            key={index}
+            className="portfolio_card"
+            onClick={() => toggleDropdown(index)}
+          >
             <div className="portfolio">
               <div className="portfolio_col">
                 <div className="portfolio_img">
-                  <img src={bond.img} alt="" />
+                  <img src={bond.image} alt="" />
                 </div>
                 <div className="col_details">
                   <div className="issuer_dets">
@@ -56,11 +64,7 @@ export default function List({ bonds, handleDelete, handleEditClick}) {
                     <div className="">
                       <div className="maturity_row">
                         <p className="bold_text">Maturity Date:</p>
-                        <span className="reg_text">
-                          {new Date(
-                            bond.maturityDate?.toDate()
-                          ).toLocaleDateString()}
-                        </span>
+                        <span className="reg_text">{bond.maturityDate}</span>
                       </div>
                       <div className="maturity_row">
                         <p className="bold_text">Minimum Amount:</p>
@@ -85,7 +89,7 @@ export default function List({ bonds, handleDelete, handleEditClick}) {
 
             <div
               className={`portfolio_dropdown ${
-                isDropdownVisible ? "show" : ""
+                visibleDropdownIndex === index ? "show" : ""
               }`}
             >
               <div className="dropdown_col">
@@ -110,12 +114,24 @@ export default function List({ bonds, handleDelete, handleEditClick}) {
                   <span className="reg_text">$ {bond.minimumAmount} </span>
                 </div>
               </div>
-              <button onClick={() => handleEditClick(bond)}>Edit Bond</button>
+              <div style={{ marginTop: "30px" }}>
+                <input
+                  type="submit"
+                  value="Delete Bond"
+                  onClick={() => handleDelete(bond.id)}
+                />
+                <input
+                  style={{ marginLeft: "12px" }}
+                  className="muted-button"
+                  type="button"
+                  value="Edit Bond"
+                  onClick={() => handleEditClick(bond)}
+                />
+              </div>
             </div>
           </div>
         ))}
-        
+      </div>
     </div>
-    </div>
-  )
+  );
 }
