@@ -248,29 +248,6 @@ export function deleteBankingDetails(uid, bankingDetailsId) {
 //BONDS REQUEST
 const ADMINDASH_COLLECTION = "adminDash"
 
-// Function to handle buying bonds
-// export async function handleBuyApproval(uid, bondData) {
-//   const userBondsPath = `users/${uid}/bondsHoldings`;
-//   const bondDocRef = doc(db, `${userBondsPath}/${bondData.id}`); // Assuming bondData.id is unique for each bond
-
-//   const bondDoc = await getDoc(bondDocRef);
-
-//   if (bondDoc.exists()) {
-//     // If bond already exists in user's holdings, update it
-//     const currentData = bondDoc.data();
-//     const newQuantity = currentData.quantity + bondData.quantity;
-//     const newCurrentValue = currentData.currentValue + bondData.currentValue;
-
-//     await updateDoc(bondDocRef, {
-//       quantity: newQuantity,
-//       currentValue: newCurrentValue,
-//     });
-//   } else {
-//     // If bond doesn't exist in user's holdings, add it
-//     await setDoc(bondDocRef, bondData);
-//   }
-// }
-
 // Function to handle selling bonds
 export async function handleSellApproval(uid, bondData) {
   const userBondsPath = `users/${uid}/bondsHoldings`;
@@ -369,33 +346,53 @@ export async function fetchRequestData(userId, requestId) {
 }
 
 export async function getBondRequests() {
-  // Get a reference to the adminDash collection
-  const adminDashRef = collection(db, ADMINDASH_COLLECTION);
-  const adminDashSnapshot = await getDocs(adminDashRef);
+  try {
+    // Get a reference to the adminDash collection
+    const adminDashRef = collection(db, ADMINDASH_COLLECTION);
+    const adminDashSnapshot = await getDocs(adminDashRef);
 
-  let allBondRequests = [];
+    if(adminDashSnapshot.empty) {
+      console.error("No documents found in adminDash collection");
+      return "No request found in admin collection";
+    }
 
-  // Iterate over each user and get their bond requests
-  for (const adminDoc of adminDashSnapshot.docs) {
-    const userId = adminDoc.id;
-    const bondRequestsRef = collection(db, ADMINDASH_COLLECTION, userId, "bondsRequest");
-    const bondRequestsSnapshot = await getDocs(bondRequestsRef);
+    let allBondRequests = [];
+    let foundBondsRequest = false; // flag to check whether any 'bondsRequest' sub-collection is found
 
-    const userBondRequests = bondRequestsSnapshot.docs.map((doc) => ({
-      ...doc.data(),
-      id: doc.id,
-      userId: userId,
-    }));
+    for (const adminDoc of adminDashSnapshot.docs) {
+      const userId = adminDoc.id;
+      
+      // Check if the user has a 'bondsRequest' collection
+      const bondRequestsRef = collection(db, ADMINDASH_COLLECTION, userId, "bondsRequest");
+      
+      // Check if there are any documents in the 'bondsRequest' collection
+      const bondRequestsSnapshot = await getDocs(bondRequestsRef);
+      if(bondRequestsSnapshot.empty) {
+        console.log(`No bondRequests found for user: ${userId}`);
+        continue; // skip to the next iteration if no bond requests are found for this user
+      }
 
-    allBondRequests = [...allBondRequests, ...userBondRequests];
+      foundBondsRequest = true; // set the flag to true as 'bondsRequest' sub-collection is found
+
+      // Map over the bond requests and add them to allBondRequests array
+      const userBondRequests = bondRequestsSnapshot.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+        userId: userId,
+      }));
+
+      allBondRequests = [...allBondRequests, ...userBondRequests];
+    }
+
+    if(!foundBondsRequest) return "No 'bonds request' found in any documents of adminDash collection";
+
+    if(allBondRequests.length === 0) return null;
+
+    return allBondRequests;
+  } catch (error) {
+    console.error("Error in getBondRequests: ", error);
+    return "Error in fetching bond requests";
   }
-
-  // If there are no bond requests at all, return null
-  if (allBondRequests.length === 0) {
-    return null;
-  }
-
-  return allBondRequests;
 }
 
 

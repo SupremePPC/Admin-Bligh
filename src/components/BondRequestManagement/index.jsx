@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { getBondRequests } from "../../firebaseConfig/firestore";
+import LoadingScreen from "../LoadingScreen"
+import Table from "./Table";
 
 const BondsRequestTable = () => {
   const [bondRequests, setBondRequests] = useState([]);
@@ -7,21 +9,40 @@ const BondsRequestTable = () => {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
-  const handleUpdateRequest = async (userId, requestId, newStatus) => {
+  const handleUpdateRequest = async (
+    userId,
+    requestId,
+    requestData,
+    newStatus
+  ) => {
     try {
+      setIsLoading(true);
+
       // Update the request status in Firestore
-      await updateRequestStatus(userId, requestId, newStatus);
-  
-      // Update UI
-      setMessage(`Request status updated to ${newStatus}`);
-  
+      await updateRequestStatusInFirestore(userId, requestId, newStatus);
+
+      if (newStatus === "approved") {
+        // If the request is approved, handle buying or selling approval
+        if (requestData.type === "buy") {
+          await handleBuyApproval(userId, requestData.bondData);
+        } else if (requestData.type === "sell") {
+          await handleSellApproval(userId, requestData.bondData);
+        }
+      }
+
+      // Delete the request from Firestore if it's declined or approved
+      await deleteRequestFromFirestore(userId, requestId);
+
       // Refresh the table data
       const allRequests = await getBondRequests();
       setBondRequests(allRequests);
-  
+      console.log(allRequests)
+      setMessage(`Request status updated to ${newStatus}`);
     } catch (err) {
       console.error("Error updating request:", err);
       setError("Failed to update request status");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -32,7 +53,7 @@ const BondsRequestTable = () => {
         const allRequests = await getBondRequests();
 
         setBondRequests(allRequests);
-        console.log(allRequests)
+        console.log(allRequests);
         setIsLoading(false);
       } catch (error) {
         console.error("Error fetching request:", error);
@@ -44,42 +65,17 @@ const BondsRequestTable = () => {
   }, []);
 
   return (
-    <div>
-      {isLoading ? (
-        <div>Loading...</div>
-      ) : (
-        <table>
-          <thead>
-            <tr>
-              <th>User ID</th>
-              <th>User Name</th>
-              <th>Amount</th>
-              <th>Status</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {bondRequests.map((request) => (
-              <tr key={request.id}>
-                <td>{request.userId}</td>
-                <td>{request.userName}</td>
-                <td>{request.amount}</td>
-                <td>{request.status}</td>
-                <td>
-                  <button onClick={() => handleUpdateRequest(request.userId, request.id, "Accepted")}>
-                    Accept
-                  </button>
-                  <button onClick={() => handleUpdateRequest(request.userId, request.id, "Declined")}>
-                    Decline
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+    <div className="container">
       {message && <div>{message}</div>}
       {error && <div>{error}</div>}
+      {isLoading ? (
+        <LoadingScreen />
+      ) : (
+        <Table
+          bondRequests={bondRequests}
+          handleUpdateRequest={handleUpdateRequest}
+        />
+      )}
     </div>
   );
 };

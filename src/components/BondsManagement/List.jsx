@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 
 export default function List({ bonds, handleDelete, handleEditClick }) {
-  const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   const [visibleDropdownIndex, setVisibleDropdownIndex] = useState(null);
 
   const toggleDropdown = (index) => {
@@ -77,7 +76,7 @@ export default function List({ bonds, handleDelete, handleEditClick }) {
                   <div className="coupon_dets">
                     <div className="coupon_wrap">
                       <div className="coupon_percent">
-                        <span className="number"> {bond.coupon} </span>
+                        <span className="number"> {bond.couponRate} </span>
                         <span className="percent">%</span>
                       </div>
                       <span className="reg_text">Coupon</span>

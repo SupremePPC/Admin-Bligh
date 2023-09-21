@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom'
 
 const Header = ({setIsAdding}) => {
   return (
@@ -8,9 +9,11 @@ const Header = ({setIsAdding}) => {
         <div className="addRow_btn">
           <button onClick={() => setIsAdding(true)}>Add Bond</button>
         </div>
+        <Link to="/dashboard/bond-requests">
         <button>
           View Bond requests
         </button>
+        </Link>
         </div>
     </header>
   );
