@@ -65,19 +65,6 @@ export function deleteuser(uid) {
 const USERS_COLLECTION = "users";
 const TRANSACTIONS_SUB_COLLECTION = "transactions";
 
-// export function addTransaction(uid, date, amount, type, status) {
-//   // Add a transaction to the user-specific transactions sub-collection
-//   return addDoc(
-//     collection(db, USERS_COLLECTION, uid, TRANSACTIONS_SUB_COLLECTION),
-//     {
-//       date,
-//       amount,
-//       type,
-//       status,
-//     }
-//   );
-// }
-
 export async function getAllTransactions() {
   // Get a reference to the USERS_COLLECTION
   const usersRef = collection(db, USERS_COLLECTION);
@@ -114,7 +101,12 @@ export async function getAllTransactions() {
 
 export async function addTransaction(userId, newTransaction) {
   try {
-    const transactionsRef = collection(db, USERS_COLLECTION, userId, TRANSACTIONS_SUB_COLLECTION);
+    const transactionsRef = collection(
+      db,
+      USERS_COLLECTION,
+      userId,
+      TRANSACTIONS_SUB_COLLECTION
+    );
     const docRef = await addDoc(transactionsRef, newTransaction);
 
     return { success: true, id: docRef.id };
@@ -122,7 +114,6 @@ export async function addTransaction(userId, newTransaction) {
     return { error: `Failed to add transaction: ${error.message}` };
   }
 }
-
 
 export async function editTransaction(userId, transactionId, updatedFields) {
   const transactionRef = doc(
@@ -251,29 +242,31 @@ export function deleteBankingDetails(uid, bankingDetailsId) {
   );
 }
 
-//BONDS
+//BONDS REQUEST
+const ADMINDASH_COLLECTION = "adminDash"
+
 // Function to handle buying bonds
-export async function handleBuyApproval(uid, bondData) {
-  const userBondsPath = `users/${uid}/bondsHoldings`;
-  const bondDocRef = doc(db, `${userBondsPath}/${bondData.id}`); // Assuming bondData.id is unique for each bond
+// export async function handleBuyApproval(uid, bondData) {
+//   const userBondsPath = `users/${uid}/bondsHoldings`;
+//   const bondDocRef = doc(db, `${userBondsPath}/${bondData.id}`); // Assuming bondData.id is unique for each bond
 
-  const bondDoc = await getDoc(bondDocRef);
+//   const bondDoc = await getDoc(bondDocRef);
 
-  if (bondDoc.exists()) {
-    // If bond already exists in user's holdings, update it
-    const currentData = bondDoc.data();
-    const newQuantity = currentData.quantity + bondData.quantity;
-    const newCurrentValue = currentData.currentValue + bondData.currentValue;
+//   if (bondDoc.exists()) {
+//     // If bond already exists in user's holdings, update it
+//     const currentData = bondDoc.data();
+//     const newQuantity = currentData.quantity + bondData.quantity;
+//     const newCurrentValue = currentData.currentValue + bondData.currentValue;
 
-    await updateDoc(bondDocRef, {
-      quantity: newQuantity,
-      currentValue: newCurrentValue,
-    });
-  } else {
-    // If bond doesn't exist in user's holdings, add it
-    await setDoc(bondDocRef, bondData);
-  }
-}
+//     await updateDoc(bondDocRef, {
+//       quantity: newQuantity,
+//       currentValue: newCurrentValue,
+//     });
+//   } else {
+//     // If bond doesn't exist in user's holdings, add it
+//     await setDoc(bondDocRef, bondData);
+//   }
+// }
 
 // Function to handle selling bonds
 export async function handleSellApproval(uid, bondData) {
@@ -303,6 +296,38 @@ export async function handleSellApproval(uid, bondData) {
   }
 }
 
+// Function to handle buying bonds
+export async function handleBuyApproval(uid, bondData) {
+  const userBondsPath = `users/${uid}/bondsHoldings`;
+  const bondDocRef = doc(db, `${userBondsPath}/${bondData.id}`); // Assuming bondData.id is unique for each bond
+
+  const bondDoc = await getDoc(bondDocRef);
+
+  // Calculate the quantity the user is buying
+  const minInvestmentAmount = bondData.minInvestmentAmount || 1; // Replace with the actual value
+  const newQuantity = Math.floor(bondData.amount / minInvestmentAmount);
+
+  if (bondDoc.exists()) {
+    // If bond already exists in user's holdings, update it
+    const currentData = bondDoc.data();
+
+    const updatedQuantity = currentData.quantity + newQuantity;
+    const updatedCurrentValue = currentData.currentValue + bondData.amount;
+
+    await updateDoc(bondDocRef, {
+      quantity: updatedQuantity,
+      currentValue: updatedCurrentValue,
+    });
+  } else {
+    // If bond doesn't exist in user's holdings, add it
+    await setDoc(bondDocRef, {
+      ...bondData,
+      quantity: newQuantity,
+      currentValue: bondData.amount,
+    });
+  }
+}
+
 // Function to update request status in the Firestore
 export async function updateRequestStatusInFirestore(
   userId,
@@ -311,7 +336,7 @@ export async function updateRequestStatusInFirestore(
 ) {
   const requestDocPath = doc(
     db,
-    `${ADMINUSER_COLLECTION}/${userId}/${BONDS_REQUEST_SUB_COLLECTION}/${requestId}`
+    `${ADMINDASH_COLLECTION}/${userId}/${BONDS_REQUEST_SUB_COLLECTION}/${requestId}`
   );
   await updateDoc(requestDocPath, { status: newStatus });
 }
@@ -326,7 +351,7 @@ export async function addBondToUserHoldings(userId, requestData) {
 export async function deleteRequestFromFirestore(userId, requestId) {
   const requestDocPath = doc(
     db,
-    `${ADMINUSER_COLLECTION}/${userId}/${BONDS_REQUEST_SUB_COLLECTION}/${requestId}`
+    `${ADMINDASH_COLLECTION}/${userId}/${BONDS_REQUEST_SUB_COLLECTION}/${requestId}`
   );
   await deleteDoc(requestDocPath);
 }
@@ -335,7 +360,92 @@ export async function deleteRequestFromFirestore(userId, requestId) {
 export async function fetchRequestData(userId, requestId) {
   const requestDocPath = doc(
     db,
-    `${ADMINUSER_COLLECTION}/${userId}/${BONDS_REQUEST_SUB_COLLECTION}/${requestId}`
+    `${ADMINDASH_COLLECTION}/${userId}/${BONDS_REQUEST_SUB_COLLECTION}/${requestId}`
   );
   return (await getDoc(requestDocPath)).data();
+}
+
+export async function getBondRequests() {
+  // Get a reference to the adminDash collection
+  const adminDashRef = collection(db, ADMINDASH_COLLECTION);
+  const adminDashSnapshot = await getDocs(adminDashRef);
+
+  let allBondRequests = [];
+
+  // Iterate over each user and get their bond requests
+  for (const adminDoc of adminDashSnapshot.docs) {
+    const userId = adminDoc.id;
+    const bondRequestsRef = collection(db, ADMINDASH_COLLECTION, userId, "bondsRequest");
+    const bondRequestsSnapshot = await getDocs(bondRequestsRef);
+
+    const userBondRequests = bondRequestsSnapshot.docs.map((doc) => ({
+      ...doc.data(),
+      id: doc.id,
+      userId: userId,
+    }));
+
+    allBondRequests = [...allBondRequests, ...userBondRequests];
+  }
+
+  // If there are no bond requests at all, return null
+  if (allBondRequests.length === 0) {
+    return null;
+  }
+
+  return allBondRequests;
+}
+
+
+//BONDS 
+
+//get all bonds
+export async function getAllBonds() {
+  // Get a reference to the 'bonds' collection
+  const bondsRef = collection(db, 'bonds');
+  const bondsSnapshot = await getDocs(bondsRef);
+
+  const allBonds = bondsSnapshot.docs.map(doc => ({
+    ...doc.data(),
+    id: doc.id,
+  }));
+
+  // If there are no bonds at all, return null
+  if (allBonds.length === 0) {
+    return null;
+  }
+
+  return allBonds;
+}
+
+//add new bonds
+export async function addNewBond(bondData) {
+  try {
+    const bondsRef = collection(db, 'bonds');
+    const newBondRef = await addDoc(bondsRef, bondData);
+    return { success: true, id: newBondRef.id };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+}
+
+//uodate existing bond
+export async function updateBond(bondId, updatedData) {
+  try {
+    const bondRef = doc(db, 'bonds', bondId);
+    await updateDoc(bondRef, updatedData);
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+}
+
+//delete
+export async function deleteBond(bondId) {
+  try {
+    const bondRef = doc(db, 'bonds', bondId);
+    await deleteDoc(bondRef);
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
 }

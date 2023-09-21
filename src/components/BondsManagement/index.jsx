@@ -1,84 +1,86 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2";
-import { getDocs, collection, doc, updateDoc, runBond } from "firebase/firestore";
+import {
+  getDocs,
+  collection,
+  doc,
+  updateDoc,
+  runBond,
+  getAllBonds
+} from "firebase/firestore";
+import List from "./List";
 import Header from "./Header";
-import Table from "./Table";
-import Modal from "../CustomsModal";
-import { db } from "../../firebaseConfig/firebase";
+import AddNewBond from "./Add";
 import LoadingScreen from "../LoadingScreen";
+import Edit from "./Edit";
 
-
-export default function BondsDashboard() {
+export default function BondsPage() {
   const [bonds, setBonds] = useState([]);
-  const [selectedBond, setSelectedBond] = useState(null);
-  const [isApproving, setIsApproving] = useState(false);
-  const [isDeclining, setIsDeclining] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-
+  const [isLoading, setIsLoading] = useState(true);
+  const [isEditPageOpen, setIsEditPageOpen] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
 
   useEffect(() => {
-    const fetchBonds = async () => {
+    const fetchData = async () => {
       try {
-        const usersRef = collection(db, "users");
-        const usersSnapshot = await getDocs(usersRef);
-        let allBonds = [];
         setIsLoading(true);
-
-        for (const userDoc of usersSnapshot.docs) {
-          const userName = userDoc.data().fullName;
-          const bondsRef = collection(
-            db,
-            "users",
-            userDoc.id,
-            "bonds"
-          );
-          const bondsSnapshot = await getDocs(bondsRef);
-          const userBonds = bondsSnapshot.docs.map(
-            (bondDoc) => ({
-              ...bondDoc.data(),
-              id: bondDoc.id,
-              userId: userDoc.id,
-              userName: userName,
-            })
-          );
-          allBonds = allBonds.concat(userBonds);
-        }
-
-        setBonds(allBonds);
-        setIsLoading(false);
+        const fetchedBonds = await getAllBonds();
+        setBonds(fetchedBonds);
       } catch (error) {
         console.error("Error fetching bonds:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    fetchBonds();
+    fetchData();
   }, []);
 
-  const showApprovalModal = (id) => {
-    const selected = bonds.find((bond) => bond.id === id);
-    setSelectedBond(selected);
-    setIsApproving(true);
+  const handleDelete = async (bondId) => {
+    try {
+      const result = await deleteBond(bondId);
+      if (result.success) {
+        // Remove the deleted bond from state
+        setBonds(bonds.filter((bond) => bond.id !== bondId));
+      }
+    } catch (error) {
+      console.error("Error deleting bond:", error);
+    }
   };
 
-  const showDeclineModal = (id) => {
-    const selected = bonds.find((bond) => bond.id === id);
-    setSelectedBond(selected);
-    setIsDeclining(true);
-  };
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="container">
-      {isLoading ? (
-        <LoadingScreen />
-      ) : (
-        <>
-          <Header />
-          <Table
-            bonds={bonds}
+      {!isAdding &&
+        !isEditPageOpen(
+          <>
+          <Header/>
+          {isLoading ? (
+            <LoadingScreen />
+          ) : (
+            <>
+            <List
+              handleDelete= {handleDelete}
+              bonds={bonds}
+              isEditPageOpen={isEditPageOpen}
             />
-            
-        </>
-      )}
+            </>
+          )}
+          </>
+        )}
+        {
+          isAdding && (
+            <AddNewBond/>
+          )
+        }
+        {
+          isEditPageOpen && (
+            <Edit/>
+          )
+        }
     </div>
-  )
+  );
 }
