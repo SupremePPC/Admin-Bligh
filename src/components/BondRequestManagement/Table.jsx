@@ -22,16 +22,16 @@ function Table({ bondRequests, handleUpdateRequest }) {
                 <th>User Name</th>
                 <th>Amount</th>
                 <th>Status</th>
-                <th>Request Type</th>
+                <th>Type</th>
                 <th colSpan={3} className="text-center">
                   Actions
                 </th>
               </tr>
             </thead>
             <tbody>
-              {bondRequests.map((request) => (
+              {bondRequests.map((request, index) => (
                 <>
-                  <tr key={request.id}>
+                  <tr key={index}>
                     {/* <td>{request.userId}</td> */}
                     <td>{request.userName}</td>
                     <td>${request.amountRequested}</td>

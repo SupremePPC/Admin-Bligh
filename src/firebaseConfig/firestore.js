@@ -27,7 +27,7 @@ import {
 import { db } from "./firebase";
 
 const ADMINUSER_COLLECTION = "adminUser";
-const USER_COLLECTION = "user";
+// const USER_COLLECTION = "user";
 
 export function addAdminUser(uid, fullName, email) {
   // Use the uid directly as the document ID
@@ -459,7 +459,7 @@ const NOTIFICATIONS_SUB_COLLECTION = 'notifications';
 
 export async function addNotification(userId, message, type = 'info') {
   try {
-    const notificationsRef = collection(db, USER_COLLECTION, userId, NOTIFICATIONS_SUB_COLLECTION);
+    const notificationsRef = collection(db, USERS_COLLECTION, userId, NOTIFICATIONS_SUB_COLLECTION);
     const notificationRef = await addDoc(notificationsRef, { message, type, timestamp: new Date() });
     return { success: true, id: notificationRef.id };
   } catch (error) {

@@ -29,30 +29,41 @@ const BondsRequestTable = () => {
 
       // Update the request status in Firestore
       await updateRequestStatusInFirestore(userId, requestId, newStatus);
+
       let message;
       if (newStatus === "Approved") {
-        message = 'Your bond request has been approved.';
         // If the request is approved, handle buying or selling approval
         if (requestData.typeOfRequest === "buy") {
           await handleBuyApproval(userId, requestData);
+          message = `Your bond request to buy $${requestData.amountRequested} worth of bonds has been approved.`;
+          // Add bond to user's holdings
+          await addBondToUserHoldings(userId, requestData);
         } else if (requestData.typeOfRequest === "sell") {
           await handleSellApproval(userId, requestData);
+          message = `Your bond request to sell $${requestData.amountRequested} worth of bonds has been approved.`;
+          // Add bond to user's holdings
+          await addBondToUserHoldings(userId, requestData);
         }
-        // Add bond to user's holdings
-        await addBondToUserHoldings(userId, requestData);
+      } else { // Assuming that newStatus here can only be "Approved" or "Declined"
+        // Handle declined request
+        if (requestData.typeOfRequest === "buy") {
+          message = `Your bond request to buy $${requestData.amountRequested} worth of bonds has been declined.`;
+        } else if (requestData.typeOfRequest === "sell") {
+          message = `Your bond request to sell $${requestData.amountRequested} worth of bonds has been declined.`;
+        }
       }
-      // Delete the request from Firestore if it's declined or approved
+
+      // Delete the request from Firestore regardless of whether it's declined or approved
       await deleteRequestFromFirestore(userId, requestId);
-      message = 'Your bond request has been declined.';
 
       // Refresh the table data
       const allRequests = await getBondRequests();
       setBondRequests(allRequests);
-  
+
       if (message) {
         await addNotification(userId, message, newStatus);
       }
-  
+
       Swal.fire({
         icon: "success",
         title: "Updated!",
@@ -72,7 +83,8 @@ const BondsRequestTable = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+};
+
 
   useEffect(() => {
     const fetchBondRequests = async () => {

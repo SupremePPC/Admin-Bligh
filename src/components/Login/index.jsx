@@ -56,8 +56,6 @@ const Login = () => {
       }, 4000);
     }
   };
-  
-   
 
   return (
     <section className="login_container">
