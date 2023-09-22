@@ -119,6 +119,7 @@ export default function List({ bonds, handleDelete, handleEditClick }) {
                   value="Delete Bond"
                   onClick={() => handleDelete(bond.id)}
                 />
+
                 <input
                   style={{ marginLeft: "12px" }}
                   className="muted-button"

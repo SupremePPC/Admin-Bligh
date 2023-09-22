@@ -383,6 +383,10 @@ img {
   position: relative;
 }
 
+.sort{
+  position: relative;
+}
+
 .sort .sort__button {
   display: flex;
   align-items: center;
@@ -419,7 +423,7 @@ img {
   visibility: visible;
   top: 3rem;
   z-index: 9;
-  right: 1rem;
+  /* right: 1rem; */
   transition: opacity 0.3s ease-in-out;
 
   background-color: #fafafa;

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Header from "./Header";
 import Table from "./Table";
-import "./style.css";
 import { app, db } from "../../firebaseConfig/firebase";
 import { collection, getDocs } from "firebase/firestore";
 import Modal from "../CustomsModal";
@@ -10,6 +9,7 @@ import Add from "./Add";
 import LoadingScreen from "../LoadingScreen";
 import Swal from "sweetalert2";
 import { getFunctions, httpsCallable } from "firebase/functions";
+import "./style.css";
 
 export default function RegisteredUsers() {
   const [users, setUsers] = useState([]);
@@ -41,29 +41,25 @@ export default function RegisteredUsers() {
     };
 
     fetchUsers();
-  }, []);
+    handleSearch();
+  }, [searchQuery]);
 
-  const handleSearch = async () => {
-    setIsLoading(true); // Assuming you have an isLoading state
-    try {
-      const functionsInstance = getFunctions(app, "europe-west2"); // Replace 'your-region' with your function's region if you've set one
-      const searchUsers = httpsCallable(functionsInstance, "searchUser"); // Make sure "searchUser" is deployed on Firebase
-      const results = await searchUsers({ searchTerm: searchQuery });
-      console.log(results);
-      setSearchResults(results.data);
-      setIsLoading(false);
-    } catch (error) {
-      console.error("Failed to search user:", error);
-      setIsLoading(false);
-      Swal.fire({
-        icon: "error",
-        title: "Error!",
-        text: `Error in searching user: ${error.message || "Unknown error"}`,
-        showConfirmButton: false,
-        timer: 2000,
-      });
+  const handleSearch = () => {
+    if (!searchQuery.trim()) {
+      // If searchQuery is empty, reset the search results to show all users
+      setSearchResults(users);
+      return;
     }
+    
+    // Convert the searchQuery to lowercase for case-insensitive comparison
+    const lowerCaseQuery = searchQuery.toLowerCase();
+  
+    const results = users.filter(user =>
+      user.fullName.toLowerCase().includes(lowerCaseQuery)
+    );
+    setSearchResults(results);
   };
+  
 
   const handleDelete = (userId) => {
     setSelectedUserId(userId); // set the user ID you want to delete

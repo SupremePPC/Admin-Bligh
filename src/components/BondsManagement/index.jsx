@@ -43,39 +43,18 @@ export default function BondsPage() {
     fetchBonds();
   }, []);
 
-  const handleDelete = async (bondId) => {
-    try {
-      await deleteBond(bondId);
-      setBonds(bonds.filter((bond) => bond.id !== bondId));
-    } catch (error) {
-      console.error("Error deleting bond:", error);
-    }
+  const handleDelete = (bondId) => {
+    setSelectedBondId(bondId); // set the bond ID you want to delete
+    setIsDeleteModalOpen(true); // open the delete confirmation modal
   };
+  
 
   const confirmDelete = async () => {
     setIsLoading(true);
-
     try {
-      // Initialize the Cloud Function
-      const functionsInstance = getFunctions();
-      const deleteFunction = httpsCallable(
-        functionsInstance,
-        "deleteBondAccount"
-      );
-
-      // Call the Cloud Function to delete the Bond from Firestore and Authentication
-      const result = await deleteFunction({ bondId: selectedBondId });
-
-      console.log(result.data);
-
-      // Update the local state
+      await deleteBond(selectedBondId);
       setBonds((bonds) => bonds.filter((bond) => bond.id !== selectedBondId));
-
-      // Close the modal and reset the selected Bond ID
-      setIsDeleteModalOpen(false);
-      setIsLoading(false);
-      setSelectedBondId(null);
-
+  
       Swal.fire({
         icon: "success",
         title: "Deleted!",
@@ -85,7 +64,7 @@ export default function BondsPage() {
       });
     } catch (error) {
       console.error("Failed to delete Bond:", error);
-      setIsLoading(false);
+  
       Swal.fire({
         icon: "error",
         title: "Error!",
@@ -93,8 +72,13 @@ export default function BondsPage() {
         showConfirmButton: false,
         timer: 2000,
       });
+    } finally {
+      setIsDeleteModalOpen(false);
+      setIsLoading(false);
+      setSelectedBondId(null); // Reset the selected bond ID
     }
   };
+  
 
   const showDeleteModal = (id) => {
     const selected = bonds.find((bond) => bond.id === id);
@@ -117,18 +101,18 @@ export default function BondsPage() {
                 handleEditClick={handleEditClick}
               />
               {isDeleteModalOpen && (
-                <Modal
-                  isOpen={isDeleteModalOpen}
-                  onClose={() => {
-                    setIsDeleteModalOpen(false);
-                    setSelectedBondId(null); // Reset the selected bond ID on modal close
-                  }}
-                  onPositiveAction={confirmDelete}
-                  title="Delete Bond"
-                  description="Are you sure you want to delete this bond?"
-                  positiveLabel="Delete"
-                  negativeLabel="Cancel"
-                />
+                 <Modal
+                 isOpen={isDeleteModalOpen}
+                 onClose={() => {
+                   setIsDeleteModalOpen(false);
+                   setSelectedBondId(null); // Reset the selected bond ID on modal close
+                 }}
+                 onPositiveAction={confirmDelete}
+                 title="Delete Bond"
+                 description="Are you sure you want to delete this bond?"
+                 positiveLabel="Delete"
+                 negativeLabel="Cancel"
+               />
               )}
             </>
           )}
