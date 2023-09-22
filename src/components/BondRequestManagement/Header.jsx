@@ -5,8 +5,8 @@ const Header = ({searchQuery, handleSearch, setSearchQuery}) => {
   return (
     <header>
       <h1 className="header_title">Bonds Requests</h1>
-      <div class="header__wrap">
-        <div class="addRow_btn">
+      <div className="header__wrap">
+        <div className="addRow_btn">
           {/* <button>Add User</button> */}
         </div>
         <div className="search__field">

@@ -18,6 +18,7 @@ import BondsDashboard from "./components/BondsManagement";
 import RegisteredUsers from "./components/RegisteredUsers";
 import UserOverview from "./components/UserOverview";
 import BondsRequestTable from "./components/BondRequestManagement";
+import NotificationPage from "./components/Notifications";
 
 function App() {
   const { loadingAuthState } = useAuth();
@@ -88,6 +89,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <DocumentDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="notifications"
+              element={
+                <ProtectedRoute>
+                  <NotificationPage />
                 </ProtectedRoute>
               }
             />

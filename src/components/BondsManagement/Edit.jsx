@@ -55,6 +55,7 @@ const Edit = ({ bondToEdit, setIsEditPageOpen, refreshBonds }) => {
         title: "Error!",
         text: `Error updating bond: ${error}`,
         showConfirmButton: true,
+        timer: 2000,
       });
     }
     setIsLoading(false);

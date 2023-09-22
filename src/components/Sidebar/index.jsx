@@ -11,6 +11,7 @@ import {
 import { CgMenuGridR } from "react-icons/cg";
 import { CiMoneyCheck1 } from "react-icons/ci";
 import { PiBankFill } from "react-icons/pi";
+import { IoNotificationsSharp } from "react-icons/io5";
 import { getAuth } from "firebase/auth";
 import Modal from "../CustomsModal";
 import "./style.css";
@@ -94,6 +95,19 @@ function Sidebar() {
             {!collapsed && "Docs Management"}
           </Link>
         </li>
+        
+        <li className="menu_list">
+          <Link
+            className={`menu_link ${
+              isActive("/dashboard/notifications") ? "active" : ""
+            }`}
+            to="/dashboard/notifications"
+          >
+            <IoNotificationsSharp />
+            {!collapsed && "Notifications"}
+          </Link>
+        </li>
+
         <li className="menu_list">
           <div
             className="menu_link"

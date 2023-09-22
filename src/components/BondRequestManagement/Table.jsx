@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { db } from "../../firebaseConfig/firebase";
 
 function Table({ bondRequests, handleUpdateRequest }) {
   const [viewDetailId, setViewDetailId] = useState(null);
@@ -12,8 +11,8 @@ function Table({ bondRequests, handleUpdateRequest }) {
 
   return (
     <div className="small-container">
-      {!bondRequests ? (
-        <h5>NO REQUEST FOUND.</h5>
+      {bondRequests.length === 0 ? (
+        <h5 style={{textAlign: 'center'}}>NO REQUEST FOUND.</h5>
       ) : (
         <>
           <table>

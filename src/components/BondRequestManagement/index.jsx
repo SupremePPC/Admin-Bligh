@@ -1,8 +1,12 @@
 import { useEffect, useState } from "react";
 import {
+  addBondToUserHoldings,
+  addNotification,
   deleteRequestFromFirestore,
   fetchRequestData,
   getBondRequests,
+  handleBuyApproval,
+  handleSellApproval,
   updateRequestStatusInFirestore,
 } from "../../firebaseConfig/firestore";
 import LoadingScreen from "../LoadingScreen";
@@ -25,8 +29,9 @@ const BondsRequestTable = () => {
 
       // Update the request status in Firestore
       await updateRequestStatusInFirestore(userId, requestId, newStatus);
-
+      let message;
       if (newStatus === "Approved") {
+        message = 'Your bond request has been approved.';
         // If the request is approved, handle buying or selling approval
         if (requestData.typeOfRequest === "buy") {
           await handleBuyApproval(userId, requestData);
@@ -38,10 +43,16 @@ const BondsRequestTable = () => {
       }
       // Delete the request from Firestore if it's declined or approved
       await deleteRequestFromFirestore(userId, requestId);
+      message = 'Your bond request has been declined.';
 
       // Refresh the table data
       const allRequests = await getBondRequests();
       setBondRequests(allRequests);
+  
+      if (message) {
+        await addNotification(userId, message, newStatus);
+      }
+  
       Swal.fire({
         icon: "success",
         title: "Updated!",
@@ -56,6 +67,7 @@ const BondsRequestTable = () => {
         title: "Error!",
         text: `Error updating request: ${err}`,
         showConfirmButton: true,
+        timer: 2000,
       });
     } finally {
       setIsLoading(false);
@@ -67,7 +79,10 @@ const BondsRequestTable = () => {
       try {
         setIsLoading(true);
         const allRequests = await getBondRequests();
-        if (allRequests) {
+  
+        if (allRequests.length === 0) {
+          setNoRequestsFound(true);
+        } else {
           const requestsWithUserDetails = await Promise.all(
             allRequests.map(async (request) => {
               const userDoc = await getDoc(doc(db, "users", request.userId));
@@ -77,20 +92,20 @@ const BondsRequestTable = () => {
           );
           setBondRequests(requestsWithUserDetails);
         }
-        setIsLoading(false);
       } catch (error) {
         console.error("Error fetching request:", error);
+      } finally {
         setIsLoading(false);
       }
     };
-
+  
     fetchBondRequests();
   }, []);
+  
 
   return (
     <div className="container">
-      {/* {message && <div>{message}</div>}
-      {error && <div>{error}</div>} */}
+
       {isLoading ? (
         <LoadingScreen />
       ) : (

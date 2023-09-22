@@ -251,34 +251,23 @@ const BONDS_REQUEST_SUB_COLLECTION = 'bondsRequest'
 
 export async function getBondRequests() {
   try {
-    // Get a reference to the adminDash collection
     const adminDashRef = collection(db, ADMINDASH_COLLECTION);
     const adminDashSnapshot = await getDocs(adminDashRef);
 
-    if(adminDashSnapshot.empty) {
-      console.error("No documents found in adminDash collection");
-      return "No request found in admin collection";
+    if (adminDashSnapshot.empty) {
+      console.warn("No documents found in adminDash collection");
+      return [];
     }
 
     let allBondRequests = [];
-    let foundBondsRequest = false; // flag to check whether any 'bondsRequest' sub-collection is found
 
     for (const adminDoc of adminDashSnapshot.docs) {
       const userId = adminDoc.id;
-      
-      // Check if the user has a 'bondsRequest' collection
       const bondRequestsRef = collection(db, ADMINDASH_COLLECTION, userId, "bondsRequest");
-      
-      // Check if there are any documents in the 'bondsRequest' collection
       const bondRequestsSnapshot = await getDocs(bondRequestsRef);
-      if(bondRequestsSnapshot.empty) {
-        // console.log(`No bondRequests found for user: ${userId}`);
-        continue; // skip to the next iteration if no bond requests are found for this user
-      }
 
-      foundBondsRequest = true; // set the flag to true as 'bondsRequest' sub-collection is found
+      if (bondRequestsSnapshot.empty) continue;
 
-      // Map over the bond requests and add them to allBondRequests array
       const userBondRequests = bondRequestsSnapshot.docs.map((doc) => ({
         ...doc.data(),
         id: doc.id,
@@ -288,14 +277,10 @@ export async function getBondRequests() {
       allBondRequests = [...allBondRequests, ...userBondRequests];
     }
 
-    if(!foundBondsRequest) return "No 'bonds request' found in any documents of adminDash collection";
-
-    if(allBondRequests.length === 0) return null;
-
     return allBondRequests;
   } catch (error) {
     console.error("Error in getBondRequests: ", error);
-    return "Error in fetching bond requests";
+    return [];
   }
 }
 
@@ -329,28 +314,44 @@ export async function handleSellApproval(uid, bondData) {
 
 // Function to handle buying bonds
 export async function handleBuyApproval(uid, bondData) {
+  // Check if bondData and its id are defined
+  if (!bondData || !bondData.id) {
+    console.error('Invalid bondData:', bondData);
+    return;
+  }
+  
   const userBondsPath = `users/${uid}/bondsHoldings`;
-  const bondDocRef = doc(db, `${userBondsPath}/${bondData.id}`); // Assuming bondData.id is unique for each bond
-
+  const bondDocRef = doc(db, `${userBondsPath}/${bondData.id}`);
+  
   const bondDoc = await getDoc(bondDocRef);
-
+  
   // Calculate the quantity the user is buying
-  const minInvestmentAmount = bondData.minInvestmentAmount || 1; // Replace with the actual value
+  const minInvestmentAmount = bondData.minInvestmentAmount || 1;
   const newQuantity = Math.floor(bondData.amount / minInvestmentAmount);
-
+  
   if (bondDoc.exists()) {
-    // If bond already exists in user's holdings, update it
     const currentData = bondDoc.data();
-
+    
+    // Check if all fields are defined
+    if (currentData.quantity === undefined || currentData.currentValue === undefined || bondData.amount === undefined) {
+      console.error('Undefined fields in currentData or bondData:', currentData, bondData);
+      return;
+    }
+    
     const updatedQuantity = currentData.quantity + newQuantity;
     const updatedCurrentValue = currentData.currentValue + bondData.amount;
-
+    
     await updateDoc(bondDocRef, {
       quantity: updatedQuantity,
       currentValue: updatedCurrentValue,
     });
   } else {
-    // If bond doesn't exist in user's holdings, add it
+    // Check if bondData.amount is defined
+    if (bondData.amount === undefined) {
+      console.error('Undefined amount in bondData:', bondData);
+      return;
+    }
+    
     await setDoc(bondDocRef, {
       ...bondData,
       quantity: newQuantity,
@@ -358,6 +359,7 @@ export async function handleBuyApproval(uid, bondData) {
     });
   }
 }
+
 
 // Function to update request status in the Firestore
 export async function updateRequestStatusInFirestore(
@@ -448,6 +450,20 @@ export async function deleteBond(bondId) {
     await deleteDoc(bondRef);
     return { success: true };
   } catch (error) {
+    return { success: false, error: error.message };
+  }
+}
+
+//NOTIFICATION
+const NOTIFICATIONS_SUB_COLLECTION = 'notifications';
+
+export async function addNotification(userId, message, type = 'info') {
+  try {
+    const notificationsRef = collection(db, USER_COLLECTION, userId, NOTIFICATIONS_SUB_COLLECTION);
+    const notificationRef = await addDoc(notificationsRef, { message, type, timestamp: new Date() });
+    return { success: true, id: notificationRef.id };
+  } catch (error) {
+    console.error('Error adding notification:', error);
     return { success: false, error: error.message };
   }
 }
