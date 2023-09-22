@@ -1,49 +1,62 @@
 import { useEffect, useState } from "react";
-import { getBondRequests } from "../../firebaseConfig/firestore";
+import {
+  deleteRequestFromFirestore,
+  fetchRequestData,
+  getBondRequests,
+  updateRequestStatusInFirestore,
+} from "../../firebaseConfig/firestore";
 import LoadingScreen from "../LoadingScreen";
 import Table from "./Table";
 import { db } from "../../firebaseConfig/firebase";
 import { getDoc, doc } from "firebase/firestore";
 import Header from "./Header";
+import Swal from "sweetalert2";
 
 const BondsRequestTable = () => {
   const [bondRequests, setBondRequests] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
 
-  const handleUpdateRequest = async (
-    userId,
-    requestId,
-    requestData,
-    newStatus
-  ) => {
+  const handleUpdateRequest = async (userId, requestId, newStatus) => {
     try {
       setIsLoading(true);
+
+      // Fetching the request data
+      const requestData = await fetchRequestData(userId, requestId);
 
       // Update the request status in Firestore
       await updateRequestStatusInFirestore(userId, requestId, newStatus);
 
-      if (newStatus === "approved") {
+      if (newStatus === "Approved") {
         // If the request is approved, handle buying or selling approval
-        if (requestData.type === "buy") {
-          await handleBuyApproval(userId, requestData.bondData);
-        } else if (requestData.type === "sell") {
-          await handleSellApproval(userId, requestData.bondData);
+        if (requestData.typeOfRequest === "buy") {
+          await handleBuyApproval(userId, requestData);
+        } else if (requestData.typeOfRequest === "sell") {
+          await handleSellApproval(userId, requestData);
         }
+        // Add bond to user's holdings
+        await addBondToUserHoldings(userId, requestData);
       }
-
       // Delete the request from Firestore if it's declined or approved
       await deleteRequestFromFirestore(userId, requestId);
 
       // Refresh the table data
       const allRequests = await getBondRequests();
       setBondRequests(allRequests);
-      console.log(allRequests);
-      setMessage(`Request status updated to ${newStatus}`);
+      Swal.fire({
+        icon: "success",
+        title: "Updated!",
+        text: `Request status has been updated to ${newStatus}.`,
+        showConfirmButton: false,
+        timer: 2000,
+      });
     } catch (err) {
       console.error("Error updating request:", err);
-      setError("Failed to update request status");
+      Swal.fire({
+        icon: "error",
+        title: "Error!",
+        text: `Error updating request: ${err}`,
+        showConfirmButton: true,
+      });
     } finally {
       setIsLoading(false);
     }
@@ -59,7 +72,6 @@ const BondsRequestTable = () => {
             allRequests.map(async (request) => {
               const userDoc = await getDoc(doc(db, "users", request.userId));
               const userDetails = userDoc.data();
-              console.log(userDetails);
               return { ...request, userName: userDetails.fullName };
             })
           );
@@ -77,17 +89,17 @@ const BondsRequestTable = () => {
 
   return (
     <div className="container">
-      {message && <div>{message}</div>}
-      {error && <div>{error}</div>}
+      {/* {message && <div>{message}</div>}
+      {error && <div>{error}</div>} */}
       {isLoading ? (
         <LoadingScreen />
       ) : (
         <>
-        <Header/>
-        <Table
-          bondRequests={bondRequests}
-          handleUpdateRequest={handleUpdateRequest}
-        />
+          <Header />
+          <Table
+            bondRequests={bondRequests}
+            handleUpdateRequest={handleUpdateRequest}
+          />
         </>
       )}
     </div>
