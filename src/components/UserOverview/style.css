@@ -1,0 +1,10 @@
+.userOverview_container .user_wrap{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1rem;
+    margin: 0;
+    gap: 0.5rem;
+    border: 1px solid wheat;
+    border-radius: 5px;
+}

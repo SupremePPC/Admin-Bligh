@@ -59,7 +59,6 @@ export default function RegisteredUsers() {
     );
     setSearchResults(results);
   };
-  
 
   const handleDelete = (userId) => {
     setSelectedUserId(userId); // set the user ID you want to delete

@@ -3,7 +3,6 @@ import { useParams } from "react-router-dom";
 import { doc, getDoc, collection, getDocs } from "firebase/firestore";
 import Swal from "sweetalert2";
 import { db } from "../../firebaseConfig/firebase";
-import { Link } from "react-router-dom";
 import AddTransaction from "./AddTransaction";
 // import AddNewBond from "../Bonds/AddBond";
 
@@ -172,9 +171,9 @@ const UserOverview = () => {
                 This user has no account or balance at the moment.
               </p>
             ) : (
-              <ul className="dropdown_col">
+              <ul className="user_wrap">
                 {accountTypes.map((item) => (
-                  <li key={item.id} className="dropdown_row">
+                  <li key={item.id} className="text_wrap">
                     <p className="bold_text">{item.type} :</p>
                     <span className="reg_text">$ {item.balance} </span>
                   </li>
@@ -223,7 +222,7 @@ const UserOverview = () => {
                 const formattedPurchase = `${day}/${month}/${year}`;
 
                 return (
-                  <div className="user_wrap">
+                  <div className="user_wrap" key={item.id}>
                     <div className="text_wrap">
                       <img
                         src={item.image}
@@ -322,9 +321,9 @@ const UserOverview = () => {
               </p>
             ) : (
               <>
-                <ul className="dropdown_col">
+                <ul className="user_wrap">
                   {transactions.map((transaction) => (
-                    <li className="dropdown_row" key={transaction.id}>
+                    <li className="text_wrap" key={transaction.id}>
                       <p className="bold_text">{transaction.type} :</p>
                       <span className="reg_text">$ {transaction.amount} </span>
                     </li>

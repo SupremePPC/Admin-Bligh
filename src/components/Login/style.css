@@ -26,8 +26,8 @@
 }
 
 .login_form .logo {
-  width: 4rem;
-  height: 4rem;
+  width: 30%;
+  margin-bottom: 1rem;
 }
 
 .login_container .header {
