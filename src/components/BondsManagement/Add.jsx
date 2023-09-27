@@ -59,7 +59,7 @@ const AddNewBond = ({ setIsAdding, refreshBond }) => {
       Swal.fire({
         icon: "success",
         title: "Added!",
-        text: `Bond add succesfully.`,
+        text: `Bond added succesfully.`,
         showConfirmButton: false,
         timer: 2000,
       });

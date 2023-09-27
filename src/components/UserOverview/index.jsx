@@ -4,7 +4,6 @@ import { doc, getDoc, collection, getDocs } from "firebase/firestore";
 import Swal from "sweetalert2";
 import { db } from "../../firebaseConfig/firebase";
 import AddTransaction from "./AddTransaction";
-// import AddNewBond from "../Bonds/AddBond";
 
 const UserOverview = () => {
   const user = useParams();

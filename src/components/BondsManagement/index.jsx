@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { getAllBonds, deleteBond } from "../../firebaseConfig/firestore";
-// import { db } from "../../firebaseConfig/firebase";
 import List from "./List";
 import Header from "./Header";
 import AddNewBond from "./Add";
 import LoadingScreen from "../LoadingScreen";
 import Edit from "./Edit";
-import "./style.css";
+import Swal from "sweetalert2";
 import Modal from "../CustomsModal";
+import "./style.css";
 
 export default function BondsPage() {
   const [bonds, setBonds] = useState([]);

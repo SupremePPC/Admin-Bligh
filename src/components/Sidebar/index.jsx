@@ -76,6 +76,17 @@ function Sidebar() {
         <li className="menu_list">
           <Link
             className={`menu_link ${
+              isActive("/dashboard/fixed-term-deposits") ? "active" : ""
+            }`}
+            to="/dashboard/fixed-term-deposits"
+          >
+            <CiMoneyCheck1 size={24} />
+            {!collapsed && "Fixed Term Deposits"}
+          </Link>
+        </li>
+        <li className="menu_list">
+          <Link
+            className={`menu_link ${
               isActive("/dashboard/banking-details") ? "active" : ""
             }`}
             to="/dashboard/banking-details"

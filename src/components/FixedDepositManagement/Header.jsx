@@ -1,0 +1,22 @@
+import React from 'react';
+import { Link } from 'react-router-dom'
+
+const Header = ({setIsAdding}) => {
+  return (
+    <header >
+      <h1 className='header_title'>Terms Dashboard</h1>
+      <div className="header__wrap">
+        <div className="addRow_btn">
+          <button onClick={() => setIsAdding(true)}>Add Term</button>
+        </div>
+        <Link to="/dashboard/bond-requests">
+        <button>
+          View Term requests
+        </button>
+        </Link>
+        </div>
+    </header>
+  );
+};
+
+export default Header;

@@ -454,6 +454,60 @@ export async function deleteBond(bondId) {
   }
 }
 
+//TERMS 
+const TERMS_COLLECTION = 'fixedTermDeposit'
+//get all terms
+export async function getAllTerms() {
+  // Get a reference to the 'terms' collection
+  const termsRef = collection(db, TERMS_COLLECTION);
+  const termsSnapshot = await getDocs(termsRef);
+
+  const allTerms = termsSnapshot.docs.map(doc => ({
+    ...doc.data(),
+    id: doc.id,
+  }));
+console.log(allTerms)
+  // If there are no terms at all, return null
+  if (allTerms.length === 0) {
+    return null;
+  }
+
+  return allTerms;
+}
+
+//add new terms
+export async function addNewTerm(termData) {
+  try {
+    const termsRef = collection(db, TERMS_COLLECTION);
+    const newTermRef = await addDoc(termsRef, termData);
+    return { success: true, id: newTermRef.id };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+}
+
+//uodate existing term
+export async function updateTerm(termId, updatedData) {
+  try {
+    const termRef = doc(db, TERMS_COLLECTION, termId);
+    await updateDoc(termRef, updatedData);
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+}
+
+//delete
+export async function deleteTerm(termId) {
+  try {
+    const termRef = doc(db, TERMS_COLLECTION, termId);
+    await deleteDoc(termRef);
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+}
+
 //NOTIFICATION
 const NOTIFICATIONS_SUB_COLLECTION = 'notifications';
 

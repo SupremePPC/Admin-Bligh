@@ -19,6 +19,7 @@ import RegisteredUsers from "./components/RegisteredUsers";
 import UserOverview from "./components/UserOverview";
 import BondsRequestTable from "./components/BondRequestManagement";
 import NotificationPage from "./components/Notifications";
+import TermsPage from "./components/FixedDepositManagement";
 
 function App() {
   const { loadingAuthState } = useAuth();
@@ -73,6 +74,22 @@ function App() {
               element={
                 <ProtectedRoute>
                   <BondsRequestTable />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="fixed-term-deposits"
+              element={
+                <ProtectedRoute>
+                  <TermsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="fixed-term-requests"
+              element={
+                <ProtectedRoute>
+                  <TermsPage />
                 </ProtectedRoute>
               }
             />
