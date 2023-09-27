@@ -9,7 +9,7 @@ const Header = ({setIsAdding}) => {
         <div className="addRow_btn">
           <button onClick={() => setIsAdding(true)}>Add Term</button>
         </div>
-        <Link to="/dashboard/bond-requests">
+        <Link to="/dashboard/fixed-terms-table">
         <button>
           View Term requests
         </button>

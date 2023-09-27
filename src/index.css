@@ -1112,6 +1112,7 @@ td {
   text-align: left;
   padding: 0.5rem;
   text-align: center;
+  text-transform: capitalize;
 }
 
 caption {

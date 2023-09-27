@@ -246,8 +246,8 @@ export function deleteBankingDetails(uid, bankingDetailsId) {
 }
 
 //BONDS REQUEST
-const ADMINDASH_COLLECTION = "adminDash"
-const BONDS_REQUEST_SUB_COLLECTION = 'bondsRequest'
+const ADMINDASH_COLLECTION = "adminDash";
+const BONDS_REQUEST_SUB_COLLECTION = "bondsRequest";
 
 export async function getBondRequests() {
   try {
@@ -263,7 +263,12 @@ export async function getBondRequests() {
 
     for (const adminDoc of adminDashSnapshot.docs) {
       const userId = adminDoc.id;
-      const bondRequestsRef = collection(db, ADMINDASH_COLLECTION, userId, "bondsRequest");
+      const bondRequestsRef = collection(
+        db,
+        ADMINDASH_COLLECTION,
+        userId,
+        "bondsRequest"
+      );
       const bondRequestsSnapshot = await getDocs(bondRequestsRef);
 
       if (bondRequestsSnapshot.empty) continue;
@@ -316,31 +321,39 @@ export async function handleSellApproval(uid, bondData) {
 export async function handleBuyApproval(uid, bondData) {
   // Check if bondData and its id are defined
   if (!bondData || !bondData.id) {
-    console.error('Invalid bondData:', bondData);
+    console.error("Invalid bondData:", bondData);
     return;
   }
-  
+
   const userBondsPath = `users/${uid}/bondsHoldings`;
   const bondDocRef = doc(db, `${userBondsPath}/${bondData.id}`);
-  
+
   const bondDoc = await getDoc(bondDocRef);
-  
+
   // Calculate the quantity the user is buying
   const minInvestmentAmount = bondData.minInvestmentAmount || 1;
   const newQuantity = Math.floor(bondData.amount / minInvestmentAmount);
-  
+
   if (bondDoc.exists()) {
     const currentData = bondDoc.data();
-    
+
     // Check if all fields are defined
-    if (currentData.quantity === undefined || currentData.currentValue === undefined || bondData.amount === undefined) {
-      console.error('Undefined fields in currentData or bondData:', currentData, bondData);
+    if (
+      currentData.quantity === undefined ||
+      currentData.currentValue === undefined ||
+      bondData.amount === undefined
+    ) {
+      console.error(
+        "Undefined fields in currentData or bondData:",
+        currentData,
+        bondData
+      );
       return;
     }
-    
+
     const updatedQuantity = currentData.quantity + newQuantity;
     const updatedCurrentValue = currentData.currentValue + bondData.amount;
-    
+
     await updateDoc(bondDocRef, {
       quantity: updatedQuantity,
       currentValue: updatedCurrentValue,
@@ -348,10 +361,10 @@ export async function handleBuyApproval(uid, bondData) {
   } else {
     // Check if bondData.amount is defined
     if (bondData.amount === undefined) {
-      console.error('Undefined amount in bondData:', bondData);
+      console.error("Undefined amount in bondData:", bondData);
       return;
     }
-    
+
     await setDoc(bondDocRef, {
       ...bondData,
       quantity: newQuantity,
@@ -359,7 +372,6 @@ export async function handleBuyApproval(uid, bondData) {
     });
   }
 }
-
 
 // Function to update request status in the Firestore
 export async function updateRequestStatusInFirestore(
@@ -398,17 +410,15 @@ export async function fetchRequestData(userId, requestId) {
   return (await getDoc(requestDocPath)).data();
 }
 
-
-
-//BONDS 
-const BONDS_COLLECTION = 'bonds'
+//BONDS
+const BONDS_COLLECTION = "bonds";
 //get all bonds
 export async function getAllBonds() {
   // Get a reference to the 'bonds' collection
   const bondsRef = collection(db, BONDS_COLLECTION);
   const bondsSnapshot = await getDocs(bondsRef);
 
-  const allBonds = bondsSnapshot.docs.map(doc => ({
+  const allBonds = bondsSnapshot.docs.map((doc) => ({
     ...doc.data(),
     id: doc.id,
   }));
@@ -424,7 +434,7 @@ export async function getAllBonds() {
 //add new bonds
 export async function addNewBond(bondData) {
   try {
-    const bondsRef = collection(db, 'bonds');
+    const bondsRef = collection(db, "bonds");
     const newBondRef = await addDoc(bondsRef, bondData);
     return { success: true, id: newBondRef.id };
   } catch (error) {
@@ -435,7 +445,7 @@ export async function addNewBond(bondData) {
 //uodate existing bond
 export async function updateBond(bondId, updatedData) {
   try {
-    const bondRef = doc(db, 'bonds', bondId);
+    const bondRef = doc(db, "bonds", bondId);
     await updateDoc(bondRef, updatedData);
     return { success: true };
   } catch (error) {
@@ -446,7 +456,7 @@ export async function updateBond(bondId, updatedData) {
 //delete
 export async function deleteBond(bondId) {
   try {
-    const bondRef = doc(db, 'bonds', bondId);
+    const bondRef = doc(db, "bonds", bondId);
     await deleteDoc(bondRef);
     return { success: true };
   } catch (error) {
@@ -454,19 +464,19 @@ export async function deleteBond(bondId) {
   }
 }
 
-//TERMS 
-const TERMS_COLLECTION = 'fixedTermDeposit'
+//TERMS
+const TERMS_COLLECTION = "fixedTermDeposit";
 //get all terms
 export async function getAllTerms() {
   // Get a reference to the 'terms' collection
   const termsRef = collection(db, TERMS_COLLECTION);
   const termsSnapshot = await getDocs(termsRef);
 
-  const allTerms = termsSnapshot.docs.map(doc => ({
+  const allTerms = termsSnapshot.docs.map((doc) => ({
     ...doc.data(),
     id: doc.id,
   }));
-console.log(allTerms)
+  console.log(allTerms);
   // If there are no terms at all, return null
   if (allTerms.length === 0) {
     return null;
@@ -509,15 +519,149 @@ export async function deleteTerm(termId) {
 }
 
 //NOTIFICATION
-const NOTIFICATIONS_SUB_COLLECTION = 'notifications';
+const NOTIFICATIONS_SUB_COLLECTION = "notifications";
 
-export async function addNotification(userId, message, type = 'info') {
+export async function addNotification(userId, message, type = "info") {
   try {
-    const notificationsRef = collection(db, USERS_COLLECTION, userId, NOTIFICATIONS_SUB_COLLECTION);
-    const notificationRef = await addDoc(notificationsRef, { message, type, timestamp: new Date() });
+    const notificationsRef = collection(
+      db,
+      USERS_COLLECTION,
+      userId,
+      NOTIFICATIONS_SUB_COLLECTION
+    );
+    const notificationRef = await addDoc(notificationsRef, {
+      message,
+      type,
+      timestamp: new Date(),
+    });
     return { success: true, id: notificationRef.id };
   } catch (error) {
-    console.error('Error adding notification:', error);
+    console.error("Error adding notification:", error);
     return { success: false, error: error.message };
   }
+}
+
+//TERMS REQUEST
+const TERMS_REQUEST_SUB_COLLECTION = "termDepositRequest";
+
+export async function getTermRequests() {
+  try {
+    const adminDashRef = collection(db, ADMINDASH_COLLECTION);
+    const adminDashSnapshot = await getDocs(adminDashRef);
+
+    if (adminDashSnapshot.empty) {
+      console.warn("No documents found in adminDash collection");
+      return [];
+    }
+
+    let allTermRequests = [];
+
+    for (const adminDoc of adminDashSnapshot.docs) {
+      const userId = adminDoc.id;
+      const termRequestsRef = collection(
+        db,
+        ADMINDASH_COLLECTION,
+        userId,
+        TERMS_REQUEST_SUB_COLLECTION
+      );
+      const termRequestsSnapshot = await getDocs(termRequestsRef);
+
+      if (termRequestsSnapshot.empty) continue;
+
+      const userTermRequests = termRequestsSnapshot.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+        userId: userId,
+      }));
+
+      allTermRequests = [...allTermRequests, ...userTermRequests];
+    }
+
+    return allTermRequests;
+  } catch (error) {
+    console.error("Error in getTermRequests: ", error);
+    return [];
+  }
+}
+
+// Function to handle withdraw terms
+export async function handleWithdrawalApproval(uid, termData) {
+  const userTermsPath = `users/${uid}/fixedTermDeposits`;
+  const termDocRef = doc(db, `${userTermsPath}/${termData.id}`); // Assuming termData.id is unique for each term
+
+  const termDoc = await getDoc(termDocRef);
+
+  if (termDoc.exists()) {
+    // If term exists in user's fixed term deposit, update it or delete it
+    const currentData = termDoc.data();
+    console.log(currentData);
+    if (currentData.amount > termData.amount) {
+      const newCurrentValue = currentData.amount - termData.amount;
+
+      await updateDoc(termDocRef, {
+        currentValue: newCurrentValue,
+      });
+    } else {
+      // If all units of this term are being sold, remove it from user's holdings
+      await deleteDoc(termDocRef);
+    }
+  } else {
+    console.error("Term does not exist in user's fixed term deposit");
+  }
+}
+
+// Function to handle deposit terms
+export async function handleDepositApproval(uid, termData) {
+  try {
+    // Check if termData and its id are defined
+    if (!termData || !termData.id || termData.amount === undefined) {
+      console.error("Invalid termData:", termData);
+      return;
+    }
+
+    const userTermsPath = `users/${uid}/fixedTermDeposits`;
+    const termDocRef = doc(db, `${userTermsPath}/${termData.id}`);
+    const termDoc = await getDoc(termDocRef);
+
+    // If termDoc doesn't exist, then this is the first document in the fixedTermDeposits collection
+    if (!termDoc.exists()) {
+      console.log('Document does not exist, creating the fixedTermDeposits subcollection and setting the document...');
+      await setDoc(termDocRef, { ...termData });
+      console.log('Operation successful');
+      return;
+    }
+
+    // If termDoc exists, then update the document
+    console.log('Document exists, updating...');
+    await updateDoc(termDocRef, { amount: termData.amount });
+    console.log('Operation successful');
+  } catch (error) {
+    console.error('Error in handleDepositApproval:', error);
+  }
+}
+
+
+// Function to update fixed term request status in the Firestore
+export async function updateFixedTermRequestStatus(
+  userId,
+  requestId,
+  newStatus
+) {
+  const requestDocPath = doc(
+    db,
+    `${ADMINDASH_COLLECTION}/${userId}/${TERMS_REQUEST_SUB_COLLECTION}/${requestId}`
+  );
+  await updateDoc(requestDocPath, { status: newStatus });
+}
+
+// Function to delete request from termsRequest sub-collection
+export async function deleteFixedTermRequestStatus(userId, requestId) {
+  const requestDocPath = doc(db, `${ADMINDASH_COLLECTION}/${userId}/${TERMS_REQUEST_SUB_COLLECTION}/${requestId}`);
+  await deleteDoc(requestDocPath);
+}
+
+// Function to add term to user's terms sub-collection
+export async function addTermToUserCollection(userId, termData) {
+  const userTermsHoldingsPath = collection(db, `users/${userId}/fixedTermDeposits`);
+  await addDoc(userTermsHoldingsPath, termData);
 }

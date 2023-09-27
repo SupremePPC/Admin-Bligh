@@ -10,15 +10,14 @@ function Table({ bondRequests, handleUpdateRequest }) {
   };
 
   return (
-    <div className="small-container">
+    <div className="contain-table">
       {bondRequests.length === 0 ? (
         <h5 style={{textAlign: 'center'}}>NO REQUEST FOUND.</h5>
       ) : (
         <>
-          <table>
+          <table className="striped-table">
             <thead>
               <tr>
-                {/* <th>User ID</th> */}
                 <th>User Name</th>
                 <th>Amount</th>
                 <th>Status</th>
@@ -32,7 +31,6 @@ function Table({ bondRequests, handleUpdateRequest }) {
               {bondRequests.map((request, index) => (
                 <>
                   <tr key={index}>
-                    {/* <td>{request.userId}</td> */}
                     <td>{request.userName}</td>
                     <td>${request.amountRequested}</td>
                     <td>{request.requestStatus}</td>
@@ -52,6 +50,7 @@ function Table({ bondRequests, handleUpdateRequest }) {
                     </td>
                     <td className="text-left">
                       <button
+                      className="button muted-button"
                         onClick={() =>
                           handleUpdateRequest(
                             request.userId,
