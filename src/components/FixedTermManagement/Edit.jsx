@@ -17,27 +17,8 @@ const Edit = ({ termToEdit, setIsEditPageOpen, refreshTerms }) => {
     });
   };
 
-  const validateForm = () => {
-    let isValid = true;
-    const newErrors = {};
-
-    if (!formData.isin) {
-      newErrors.isin = "ISIN is required";
-      isValid = false;
-    }
-
-    if (!formData.issuerName) {
-      newErrors.issuerName = "Issuer Name is required";
-      isValid = false;
-    }
-
-    setErrors(newErrors);
-    return isValid;
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!validateForm()) return;
     setIsLoading(true);
     try {
       await updateTerm(formData.id, formData);

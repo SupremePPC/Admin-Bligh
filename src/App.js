@@ -19,7 +19,7 @@ import RegisteredUsers from "./components/RegisteredUsers";
 import UserOverview from "./components/UserOverview";
 import BondsRequestTable from "./components/BondRequestManagement";
 import NotificationPage from "./components/Notifications";
-import TermsPage from "./components/FixedDepositManagement";
+import TermsPage from "./components/FixedTermManagement";
 
 function App() {
   const { loadingAuthState } = useAuth();
