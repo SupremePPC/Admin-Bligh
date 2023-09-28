@@ -19,7 +19,6 @@ import {
   doc,
   getDoc,
   getDocs,
-  where,
   query,
   setDoc,
   updateDoc,

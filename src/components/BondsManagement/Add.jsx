@@ -32,27 +32,8 @@ const AddNewBond = ({ setIsAdding, refreshBond }) => {
     });
   };
 
-  // const validateForm = () => {
-  //   let isValid = true;
-  //   const newErrors = {};
-
-  //   if (!formData.isin) {
-  //     newErrors.isin = "ISIN is required";
-  //     isValid = false;
-  //   }
-
-  //   if (!formData.issuerName) {
-  //     newErrors.issuerName = "Issuer Name is required";
-  //     isValid = false;
-  //   }
-
-  //   setErrors(newErrors);
-  //   return isValid;
-  // };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // if (!validateForm()) return;
     setIsLoading(true);
     try {
       await addNewBond(formData);
@@ -185,7 +166,7 @@ const AddNewBond = ({ setIsAdding, refreshBond }) => {
             type="number"
             name="couponRate"
             onChange={handleChange}
-            min={0}
+           
             value={formData.couponRate}
           />
           <label htmlFor="couponFrequency">Coupon Frequency:</label>

@@ -56,13 +56,13 @@ const TermsRequestTable = () => {
         // If the request is approved, handle deposit or withdrawal approval
         if (requestObject.type === "deposit") {
             await handleDepositApproval(userId, requestObject);
-            message = `Your fixed term deposit request to deposit €${requestObject.amount} to ${requestObject.bankName} with ${requestObject.term} term and ${requestObject.coupon}% coupon has been approved.`;
+            message = `Your fixed term deposit request to deposit €${requestObject.principalAmount} to ${requestObject.bankName} with ${requestObject.term} term and ${requestObject.coupon}% coupon has been approved.`;
             // Add term deposit to user's holdings or perform necessary actions
             await addTermToUserCollection(userId, requestObject, newStatus);
             console.log(userId, requestObject.type, message, newStatus)
         } else if (requestObject.type === "withdraw") {
             await handleWithdrawalApproval(userId, requestObject);
-            message = `Your fixed term deposit request to withdraw €${requestObject.amount} has been approved.`;
+            message = `Your fixed term deposit request to withdraw €${requestObject.principalAmount} has been approved.`;
             // Perform necessary actions for withdrawal
             await handleWithdrawalActions(userId, requestObject);
         }
@@ -70,9 +70,9 @@ const TermsRequestTable = () => {
         const requestObject = requestData[0]; // Accessing the object inside the array
         // Handle declined request
         if (requestObject.type === "deposit") {
-            message = `Your fixed term deposit request to deposit €${requestObject.amount} has been declined.`;
+            message = `Your fixed term deposit request to deposit €${requestObject.principalAmount} has been declined.`;
         } else if (requestObject.type === "withdraw") {
-            message = `Your fixed term deposit request to withdraw €${requestObject.amount} has been declined.`;
+            message = `Your fixed term deposit request to withdraw €${requestObject.principalAmount} has been declined.`;
         }
     }    
   

@@ -25,7 +25,7 @@ function Table({ termRequests, handleUpdateRequest }) {
                 <tr key={index}>
                   <td>{request.userName}</td>
                   <td>{request.bankName}</td>
-                  <td>${request.amount}</td>
+                  <td>€{request.principalAmount}</td>
                   <td>{request.status}</td>
                   <td>{request.type}</td>
                   <td className="text-right">
