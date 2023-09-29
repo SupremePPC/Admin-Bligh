@@ -3,7 +3,18 @@ import { useParams } from "react-router-dom";
 import { doc, getDoc, collection, getDocs } from "firebase/firestore";
 import Swal from "sweetalert2";
 import { db } from "../../firebaseConfig/firebase";
-import AddTransaction from "./AddTransaction";
+import AddBankingDetails from "../BankingDetails/Add";
+import EditBankingDetails from "../BankingDetails/Edit";
+// import AddTransaction from "./AddTransaction";
+// import AddNewBond from "../Bonds/AddBond";
+// import AddTransaction from "./AddTransaction";
+// import AddNewTerm from "../FixedTermManagement/Add";
+// import AddToAccount from "../AddToAccount";
+// import AddDocument from "../DocumentManagement/Add"
+// import EditTransaction from "../TransactionManagement/Edit";
+// import EditDocument from "../DocumentManagement/Edit"
+
+import EditUser from "../RegisteredUsers/Edit";
 
 const UserOverview = () => {
   const user = useParams();
@@ -14,21 +25,42 @@ const UserOverview = () => {
   const [bondsRequest, setBondsRequest] = useState([]);
   const [docs, setDocs] = useState([]);
   const [transactions, setTransactions] = useState([]);
+  const [fixedTerm, setFixedTerm] = useState([]);
+  const [document, setDocument] = useState([]);
   const [selectedUserForAdd, setSelectedUserForAdd] = useState(null);
-  const [isAddTransactionOpen, setIsAddTransactionOpen] = useState(false);
-  const [isAddBondOpen, setIsAddBondOpen] = useState(false);
-  const [isAddAccountOpen, setIsAddAccountOpen] = useState(false);
 
-  const handleAddTransaction = () => {
-    setIsAddTransactionOpen(true);
+  // const [isAddTransactionOpen, setIsAddTransactionOpen] = useState(false);
+  // const [isAddBondOpen, setIsAddBondOpen] = useState(false);
+  // const [isAddAccountOpen, setIsAddAccountOpen] = useState(false);
+  // const [isAddNewTermOpen, setIsAddNewTermOpen] = useState(false);
+  // const [isUserDetailsOpen, setIsUserDetailsOpen] = useState(false);
+  // const [isAddNewDocumentOpen, setIsAddNewDocumentOpen] = useState(false);
+  // const [isEditUserDetails, setIsEditUserDetails] = useState(false);
+
+  const [modalState, setModalState] = useState({
+    isAddTransactionOpen: false,
+    isAddBondOpen: false,
+    isAddAccountOpen: false,
+    isAddBankingDetails: false,
+    isEditBankingDetails: false,
+    isUserDetailsOpen: false,
+    isAddTransactionOpen: false,
+    isEditUserDetailsOpen: false,
+    isAddNewTermOpen: false,
+  });
+
+  const handleOpenModal = (modalType) => {
+    setModalState({
+      ...modalState,
+      [modalType]: true,
+    });
   };
 
-  const handleAddBond = () => {
-    setIsAddBondOpen(true);
-  };
-
-  const handleAddAccount = () => {
-    setIsAddAccountOpen(true);
+  const handleCloseModal = (modalType) => {
+    setModalState({
+      ...modalState,
+      [modalType]: false,
+    });
   };
 
   const fetchSubCollection = async (subCollectionName, setFunction) => {
@@ -69,6 +101,7 @@ const UserOverview = () => {
       fetchSubCollection("bondsRequest", setBondsRequest);
       fetchSubCollection("docs", setDocs);
       fetchSubCollection("transactions", setTransactions);
+      // console.log(bankingDetails, bankingDetails[0].id);
     } else {
       Swal.fire({
         icon: "error",
@@ -85,85 +118,109 @@ const UserOverview = () => {
 
   return (
     <div className="container">
-      {!isAddTransactionOpen && !isAddBondOpen && !isAddAccountOpen && (
-        <div className="userOverview_container">
-          {/* <h1>Overview {user ? user.userId : "User ID Missing"} </h1> */}
-          {userDetails && (
-            <div className="user_details">
-              <h2>Overview of {userDetails.fullName}'s account</h2>
-              <div className="text_wrap">
-                <p className="bold_text">Title :</p>
-                <span className="reg_text">{userDetails.title}</span>
-              </div>
-              <div className="text_wrap">
-                <p className="bold_text">Email :</p>
-                <span className="reg_text">{userDetails.email}</span>
-              </div>
-              <div className="text_wrap">
-                <p className="bold_text">Address :</p>
-                <span className="reg_text">{userDetails.address}</span>
-              </div>
-              <div className="text_wrap">
-                <p className="bold_text">City :</p>
-                <span className="reg_text">{userDetails.city}</span>
-              </div>
-              <div className="text_wrap">
-                <p className="bold_text">Country :</p>
-                <span className="reg_text">{userDetails.country}</span>
-              </div>
-              <div className="text_wrap">
-                <p className="bold_text">Home Phone :</p>
-                <span className="reg_text">{userDetails.homePhone}</span>
-              </div>
-              <div className="text_wrap">
-                <p className="bold_text">Mobile Phone :</p>
-                <span className="reg_text">{userDetails.mobilePhone}</span>
-              </div>
-              <div className="text_wrap">
-                <p className="bold_text">Postcode :</p>
-                <span className="reg_text">{userDetails.postcode}</span>
-              </div>
-            </div>
-          )}
-
-          <div className="user_details">
-            <h3>Banking Details</h3>
-            {bankingDetails.length === 0 ? (
-              <p className="bold_text">
-                This user hasn't added any banking details yet.
-              </p>
-            ) : (
-              bankingDetails.map((item) => (
-                <div className="user_wrap">
-                  <div className="text_wrap">
-                    <p className="bold_text"> Bank Name :</p>
-                    <span className="reg_text">{item.bankName}</span>
-                  </div>
-                  <div className="text_wrap">
-                    <p className="bold_text"> IBAN :</p>
-                    <span className="reg_text">{item.iban}</span>
-                  </div>
-                  <div className="text_wrap">
-                    <p className="bold_text">Swift Code:</p>
-                    <span className="reg_text">{item.swiftCode}</span>
-                  </div>
-                  <div className="text_wrap">
-                    <p className="bold_text"> Branch:</p>
-                    <span className="reg_text">{item.branch}</span>
-                  </div>
-                  <div className="text_wrap">
-                    <p className="bold_text">Account Name: </p>
-                    <span className="reg_text">{item.accountName}</span>
-                  </div>
+      {!modalState.isAddTransactionOpen &&
+        !modalState.isAddBondOpen &&
+        !modalState.isAddAccountOpen &&
+        !modalState.isEditUserDetailsOpen &&
+        !modalState.isAddBankingDetails &&
+        !modalState.isEditBankingDetails && (
+          <div className="userOverview_container">
+            {/* User Details */}
+            {userDetails && (
+              <div className="user_details">
+                <h2>Overview of {userDetails.fullName}'s account</h2>
+                <div className="text_wrap">
+                  <p className="bold_text">Title :</p>
+                  <span className="reg_text">{userDetails.title}</span>
                 </div>
-              ))
+                <div className="text_wrap">
+                  <p className="bold_text">Email :</p>
+                  <span className="reg_text">{userDetails.email}</span>
+                </div>
+                <div className="text_wrap">
+                  <p className="bold_text">Address :</p>
+                  <span className="reg_text">{userDetails.address}</span>
+                </div>
+                <div className="text_wrap">
+                  <p className="bold_text">City :</p>
+                  <span className="reg_text">{userDetails.city}</span>
+                </div>
+                <div className="text_wrap">
+                  <p className="bold_text">Country :</p>
+                  <span className="reg_text">{userDetails.country}</span>
+                </div>
+                <div className="text_wrap">
+                  <p className="bold_text">Home Phone :</p>
+                  <span className="reg_text">{userDetails.homePhone}</span>
+                </div>
+                <div className="text_wrap">
+                  <p className="bold_text">Mobile Phone :</p>
+                  <span className="reg_text">{userDetails.mobilePhone}</span>
+                </div>
+                <div className="text_wrap">
+                  <p className="bold_text">Postcode :</p>
+                  <span className="reg_text">{userDetails.postcode}</span>
+                </div>
+                <div className="dropdown_btn">
+                  <button
+                    onClick={() => handleOpenModal("isEditUserDetailsOpen")}
+                  >
+                    Edit User Details
+                  </button>
+                </div>
+              </div>
             )}
-            <div className="dropdown_btn">
-              <button onClick={handleAddAccount}>Add Banking details</button>
-            </div>
-          </div>
 
-          <div className="user_details">
+            {/* Banking Details */}
+            <div className="user_details">
+              <h3>Banking Details</h3>
+              {bankingDetails.length === 0 ? (
+                <>
+                  <p className="bold_text">
+                    This user hasn't added any banking details yet.
+                  </p>
+                  <div className="dropdown_btn">
+                    <button
+                      onClick={() => handleOpenModal("isAddBankingDetails")}
+                    >
+                      Add Banking Details
+                    </button>
+                  </div>
+                </>
+              ) : (
+                bankingDetails.map((item, index) => (
+                  <div className="user_wrap" key={index}>
+                    <div className="text_wrap">
+                      <p className="bold_text"> Bank Name :</p>
+                      <span className="reg_text">{item.bankName}</span>
+                    </div>
+                    <div className="text_wrap">
+                      <p className="bold_text"> IBAN :</p>
+                      <span className="reg_text">{item.iban}</span>
+                    </div>
+                    <div className="text_wrap">
+                      <p className="bold_text">Swift Code:</p>
+                      <span className="reg_text">{item.swiftCode}</span>
+                    </div>
+                    <div className="text_wrap">
+                      <p className="bold_text"> Branch:</p>
+                      <span className="reg_text">{item.branch}</span>
+                    </div>
+                    <div className="text_wrap">
+                      <p className="bold_text">Account Name: </p>
+                      <span className="reg_text">{item.accountName}</span>
+                    </div>
+                  </div>
+                ))
+              )}
+              <div className="dropdown_btn">
+                <button onClick={() => handleOpenModal("isEditBankingDetails")}>
+                  Edit Banking Details
+                </button>
+              </div>
+            </div>
+
+            {/*<div className="user_details">
             <h3>Account Types and Balance</h3>
             {accountTypes.length === 0 ? (
               <p className="bold_text">
@@ -171,8 +228,8 @@ const UserOverview = () => {
               </p>
             ) : (
               <ul className="user_wrap">
-                {accountTypes.map((item) => (
-                  <li key={item.id} className="text_wrap">
+                {accountTypes.map((item, index) => (
+                  <li key={index} className="text_wrap">
                     <p className="bold_text">{item.type} :</p>
                     <span className="reg_text">$ {item.balance} </span>
                   </li>
@@ -292,7 +349,12 @@ const UserOverview = () => {
           <div className="user_details">
             <h3>Document</h3>
             {docs.length === 0 ? (
-              <p className="bold_text">No document has been added yet.</p>
+              <>
+                <p className="bold_text">No document has been added yet.</p>
+                <div className="dropdown_btn">
+                  <button onClick={handleAddBond}>Add Document</button>
+                </div>
+              </>
             ) : (
               docs.map((item) => (
                 <div className="user_wrap" key={item.id}>
@@ -306,6 +368,9 @@ const UserOverview = () => {
                     <a className="bold_text" href={item.downloadURL}>
                       <u>Download URL</u>
                     </a>
+                  </div>
+                  <div className="dropdown_btn">
+                    <button onClick={handleAddBond}>Edit Document</button>
                   </div>
                 </div>
               ))
@@ -333,10 +398,38 @@ const UserOverview = () => {
             <div className="dropdown_btn">
               <button onClick={handleAddTransaction}>Add Transaction</button>
             </div>
+          </div> */}
           </div>
-        </div>
+        )}
+      {modalState.isAddBankingDetails && (
+        <AddBankingDetails
+          onClose={() => {
+            handleCloseModal("isAddBankingDetails");
+            setSelectedUserForAdd(null);
+          }}
+          userId={user}
+        />
       )}
-      {isAddTransactionOpen && (
+      {modalState.isEditUserDetailsOpen && (
+        <EditUser
+          onClose={() => {
+            handleCloseModal("isEditUserDetailsOpen");
+          }}
+          user={userDetails}
+        />
+      )}
+      {modalState.isEditBankingDetails && (
+        <EditBankingDetails
+          onClose={() => {
+            handleCloseModal("isEditBankingDetails");
+            setSelectedUserForAdd(null);
+          }}
+          userId={user}
+          bankingDetailsId={bankingDetails[0].id}
+          bankingDetails={bankingDetails[0]}
+        />
+      )}
+      {/* {isAddTransactionOpen && (
         <AddTransaction
           onClose={() => {
             setIsAddTransactionOpen(false);
@@ -354,22 +447,44 @@ const UserOverview = () => {
             setIsAddBondOpen(false);
             setSelectedUserForAdd(null);
           }}
-          bonds={Bonds}
+          bonds={bonds}
           setBonds={setBonds}
           userId={user}
         />
       )}
       {isAddAccountOpen && (
-        <Add
+        <AddToAccount
           onClose={() => {
             setIsAddAccountOpen(false);
             setSelectedUserForAdd(null);
           }}
-          accounts={Accounts}
+          accounts={accounts}
           setAccounts={setAccounts}
           userId={user}
         />
       )}
+      {isAddNewTermOpen && (
+        <AddNewTerm
+          onClose={() => {
+            setIsAddNewTermOpen(false);
+            setSelectedUserForAdd(null);
+          }}
+          fixedTerm={fixedTerm}
+          setFixedTerm={setFixedTerm}
+          userId={user}
+        />
+      )}
+      {isAddNewDocumentOpen && (
+        <AddDocument
+          onClose={() => {
+            setIsAddNewDocumentOpen(false);
+            setSelectedUserForAdd(null);
+          }}
+          document={document}
+          setDocument={setDocument}
+          userId={user}
+        />
+      )} */}
     </div>
   );
 };

@@ -69,7 +69,7 @@ const Edit = ({ userId, bankingDetailsId, bankingDetails, onClose }) => {
   return (
     <div className="small-container">
       <form onSubmit={handleUpdate}>
-        <h1>Edit Employee</h1>
+        <h1>Edit Banking Details</h1>
         <label htmlFor="accountName">Account Name</label>
         <input
           id="accountName"

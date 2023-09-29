@@ -68,7 +68,7 @@ const BankingDetails = () => {
   return (
     <div className="container">
       
-      {!isEditing && (
+      {!isEditing (
           <>
           <Header />
           {isLoading ? (
@@ -93,6 +93,7 @@ const BankingDetails = () => {
           
         />
       )}
+      
     </div>
   );
 };
