@@ -84,12 +84,12 @@ const Edit = ({ termToEdit, setIsEditPageOpen, refreshTerms }) => {
             value={formData.minAmount}
             required
           />
-          <label htmlFor="couponRate">Interest Rate:</label>
+          <label htmlFor="interestRate">Interest Rate:</label>
           <input
             type="number"
-            name="coupon"
+            name="interestRate"
             onChange={handleChange}
-            value={formData.coupon}
+            value={formData.interestRate}
             required
           />
           <div style={{ marginTop: "30px" }}>

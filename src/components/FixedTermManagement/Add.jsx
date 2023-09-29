@@ -10,7 +10,7 @@ const AddNewTerm = ({ setIsAdding, refreshTerm }) => {
     logo: "",
     bankName: "",
     minAmount: 0,
-    coupon: 0,
+    interestRate: 0,
     term: "",
   });
 
@@ -24,27 +24,8 @@ const AddNewTerm = ({ setIsAdding, refreshTerm }) => {
     });
   };
 
-  // const validateForm = () => {
-  //   let isValid = true;
-  //   const newErrors = {};
-
-  //   if (!formData.isin) {
-  //     newErrors.isin = "ISIN is required";
-  //     isValid = false;
-  //   }
-
-  //   if (!formData.issuerName) {
-  //     newErrors.issuerName = "Issuer Name is required";
-  //     isValid = false;
-  //   }
-
-  //   setErrors(newErrors);
-  //   return isValid;
-  // };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // if (!validateForm()) return;
     setIsLoading(true);
     try {
       await addNewTerm(formData);
@@ -59,7 +40,7 @@ const AddNewTerm = ({ setIsAdding, refreshTerm }) => {
         logo: "",
         bankName: "",
         minAmount: 0,
-        coupon: 0,
+        interestRate: 0,
         term: "",
       });
       setIsAdding(false);
@@ -117,12 +98,12 @@ const AddNewTerm = ({ setIsAdding, refreshTerm }) => {
             value={formData.minAmount}
             required
           />
-          <label htmlFor="couponRate">Interest Rate:</label>
+          <label htmlFor="interestRate">Interest Rate:</label>
           <input
             type="number"
-            name="coupon"
+            name="interestRate"
             onChange={handleChange}
-            value={formData.coupon}
+            value={formData.interestRate}
             required
           />
           <div style={{ marginTop: "30px" }}>

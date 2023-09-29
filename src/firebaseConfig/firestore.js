@@ -24,6 +24,7 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { db } from "./firebase";
+import { ref, deleteObject, getStorage } from 'firebase/storage';
 
 const ADMINUSER_COLLECTION = "adminUser";
 // const USER_COLLECTION = "user";
@@ -409,6 +410,38 @@ export async function fetchRequestData(userId, requestId) {
   return (await getDoc(requestDocPath)).data();
 }
 
+//DOCUMENTS
+export const fetchDocument = async () => {
+  const usersCollection = collection(db, "users");
+  const userDocs = await getDocs(usersCollection);
+  const allDocuments = [];
+  for (const userDoc of userDocs.docs) {
+      const user = userDoc.data();
+      const docCollection = collection(userDoc.ref, "docs");
+      const docDocs = await getDocs(docCollection);
+      docDocs.docs.forEach((docDoc) => {
+          allDocuments.push({
+              userId: userDoc.id,
+              ...docDoc.data(),
+              fullName: user.fullName,
+              docId: docDoc.id,
+          });
+      });
+  }
+  return allDocuments;
+}
+
+export const deleteDocument = async (userId, docId, docURL) => {
+  const storage = getStorage();
+  // Delete from Firebase Storage
+  const storageRef = ref(storage, docURL);
+  await deleteObject(storageRef);
+
+  // Delete the reference in Firestore
+  const docRef = doc(db, "users", userId, "doc", docId);
+  await deleteDoc(docRef);
+}
+
 //BONDS
 const BONDS_COLLECTION = "bonds";
 //get all bonds
@@ -591,19 +624,8 @@ export async function handleWithdrawalApproval(uid, termData) {
   const termDoc = await getDoc(termDocRef);
 
   if (termDoc.exists()) {
-    // If term exists in user's fixed term deposit, update it or delete it
-    const currentData = termDoc.data();
-    console.log(currentData);
-    if (currentData.amount > termData.amount) {
-      const newCurrentValue = currentData.amount - termData.amount;
-
-      await updateDoc(termDocRef, {
-        currentValue: newCurrentValue,
-      });
-    } else {
-      // If all units of this term are being sold, remove it from user's holdings
-      await deleteDoc(termDocRef);
-    }
+    await deleteDoc(termDocRef);
+    
   } else {
     console.error("Term does not exist in user's fixed term deposit");
   }
@@ -613,7 +635,7 @@ export async function handleWithdrawalApproval(uid, termData) {
 export async function handleDepositApproval(uid, termData) {
   try {
     // Check if termData and its id are defined
-    if (!termData || !termData.id || termData.amount === undefined) {
+    if (!termData || !termData.id || termData.principalAmount === undefined) {
       console.error("Invalid termData:", termData);
       return;
     }

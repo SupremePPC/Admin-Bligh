@@ -13,11 +13,6 @@ export default function List({ fixedTerms, handleDelete, handleEditClick }) {
 
   return (
     <div className="fixedTermsContainer">
-      <div className="headerSection">
-        <h2>Fixed Term Deposits</h2>
-        <span>Click on the terms below to show more information</span>
-        <div className="headerSvgWrapper">{/* SVG remains the same */}</div>
-      </div>
       <div className="contentSection">
         {fixedTerms.length === 0 && <h5>No Fixed Term Deposits Found.</h5>}
         {fixedTerms.map((fixedTerm, index) => (
@@ -55,7 +50,7 @@ export default function List({ fixedTerms, handleDelete, handleEditClick }) {
                       <div className="interestRate">
                         <span className="interestNumber">
                           {" "}
-                          {fixedTerm.coupon}{" "}
+                          {fixedTerm.interestAmount}{" "}
                         </span>
                         <span className="percentageSymbol">%</span>
                       </div>

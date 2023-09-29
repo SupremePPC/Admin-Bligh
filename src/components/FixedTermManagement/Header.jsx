@@ -1,20 +1,18 @@
-import React from 'react';
-import { Link } from 'react-router-dom'
+import React from "react";
+import { Link } from "react-router-dom";
 
-const Header = ({setIsAdding}) => {
+const Header = ({ setIsAdding }) => {
   return (
-    <header >
-      <h1 className='header_title'>Terms Dashboard</h1>
+    <header>
+      <h1 className="header_title">Fixed Term Deposits Dashboard</h1>
       <div className="header__wrap">
         <div className="addRow_btn">
           <button onClick={() => setIsAdding(true)}>Add Term</button>
         </div>
         <Link to="/dashboard/fixed-terms-table">
-        <button>
-          View Term requests
-        </button>
+          <button>View Term requests</button>
         </Link>
-        </div>
+      </div>
     </header>
   );
 };

@@ -1,7 +1,7 @@
 import React from "react";
 import { BsDownload } from "react-icons/bs";
 
-const Table = ({ users, handleView, handleDelete, handleDownload }) => {
+const Table = ({ users, handleDelete }) => {
   return (
     <div className="contain-table">
       <table className="striped-table">
