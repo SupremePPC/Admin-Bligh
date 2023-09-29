@@ -50,7 +50,7 @@ export default function List({ fixedTerms, handleDelete, handleEditClick }) {
                       <div className="interestRate">
                         <span className="interestNumber">
                           {" "}
-                          {fixedTerm.interestAmount}{" "}
+                          {fixedTerm.interestRate}{" "}
                         </span>
                         <span className="percentageSymbol">%</span>
                       </div>

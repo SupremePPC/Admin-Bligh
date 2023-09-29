@@ -34,12 +34,7 @@ const Table = ({ users, handleDelete }) => {
                   </a>
                 </td>
                 <td className="text-left">
-                  <button
-                    onClick={() => handleDelete(user.docId)}
-                    className="button muted-button reject_btn"
-                  >
-                    Delete
-                  </button>
+                <button onClick={() => handleDelete(user.userId, user.docId, user.fileDescription)} className="button muted-button reject_btn">Delete</button>
                 </td>
                 <td>
                   <a 
@@ -54,7 +49,7 @@ const Table = ({ users, handleDelete }) => {
             ))
           ) : (
             <tr>
-              <td colSpan={7}>No users</td>
+              <td colSpan={7}>No documents available.</td>
             </tr>
           )}
         </tbody>

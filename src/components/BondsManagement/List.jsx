@@ -13,27 +13,6 @@ export default function List({ bonds, handleDelete, handleEditClick }) {
 
   return (
     <div className="bonds_page">
-      <div className="section_header">
-        <h2>Bond - Investment Options</h2>
-        <span>Click on the investment below to show more information</span>
-        <div>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="180"
-            height="9"
-            viewBox="0 0 230 9"
-          >
-            <rect
-              id="Rectangle_28"
-              data-name="Rectangle 28"
-              width="230"
-              height="9"
-              rx="4.5"
-              fill="#688fb7"
-            ></rect>
-          </svg>
-        </div>
-      </div>
       <div className="section_body">
         {bonds.length === 0 && <h5>NO BONDS FOUND.</h5>}
         {bonds.map((bond, index) => (
@@ -87,7 +66,7 @@ export default function List({ bonds, handleDelete, handleEditClick }) {
             </div>
 
             <div
-              className={`portfolio_dropdown ${
+              className={`bonds_dropdown ${
                 visibleDropdownIndex === index ? "show" : ""
               }`}
             >

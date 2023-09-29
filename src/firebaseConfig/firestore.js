@@ -431,16 +431,21 @@ export const fetchDocument = async () => {
   return allDocuments;
 }
 
-export const deleteDocument = async (userId, docId, docURL) => {
-  const storage = getStorage();
-  // Delete from Firebase Storage
-  const storageRef = ref(storage, docURL);
-  await deleteObject(storageRef);
 
-  // Delete the reference in Firestore
-  const docRef = doc(db, "users", userId, "doc", docId);
-  await deleteDoc(docRef);
+export const deleteDocument = async (userId, docId, fileName) => {
+  const storage = getStorage();
+  const storageRef = ref(storage, `${userId}/${fileName}`); // Construct the reference correctly
+  
+  try {
+    await deleteObject(storageRef);
+    const docRef = doc(db, "users", userId, "docs", docId);
+    await deleteDoc(docRef);
+  } catch (error) {
+    console.error('Error during deletion:', error);
+    throw error;
+  }
 }
+
 
 //BONDS
 const BONDS_COLLECTION = "bonds";

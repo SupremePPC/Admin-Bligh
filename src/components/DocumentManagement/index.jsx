@@ -29,45 +29,58 @@ const DocumentDashboard = () => {
     fetchDocuments();
   }, []);
 
-const handleDelete = async (userId, docId, docURL) => {
+  const handleDelete = async (userId, docId, fileDescription) => {
+    console.log(userId, fileDescription, docId)
+    setIsLoading(true);
     try {
-        await deleteDocument(userId, docId, docURL);
-        setUsers((prevUsers) => prevUsers.filter((user) => user.docId !== docId));
+      await deleteDocument(userId, docId, fileDescription);
+    setUsers((prevUsers) => prevUsers.filter((user) => user.docId !== docId));
+    Swal.fire({
+      icon: "success",
+      title: "Delete Document",
+      text: "Document deleted successfully.",
+      timer: 3000,
+      showConfirmButton: false,
+    });
     } catch (error) {
-        console.error('Error during deletion:', error);
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: error.message,
+        timer: 3000,
+        showConfirmButton: false,
+      });
+      console.error("Error during deletion:", error);
     }
-};
+    setIsLoading(false);
+  };
 
-// ...
-
-const handleView = (docURL) => {
+  const handleView = (docURL) => {
     window.open(docURL, "_blank");
-};
+  };
 
-const handleDownload = (docURL, docName) => {
+  const handleDownload = (docURL, docName) => {
     const a = document.createElement("a");
     a.href = docURL;
     a.download = docName;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-};
+  };
 
   return (
     <div className="container">
       <Header />
-      {
-        isLoading ? (
-          <LoadingScreen />
-        ) : (
-          <Table
-            users={users}
-            handleView={handleView}
-            handleDelete={handleDelete}
-            handleDownload={handleDownload}
-          />
-        )
-      }
+      {isLoading ? (
+        <LoadingScreen />
+      ) : (
+        <Table
+          users={users}
+          handleView={handleView}
+          handleDelete={handleDelete}
+          handleDownload={handleDownload}
+        />
+      )}
     </div>
   );
 };
