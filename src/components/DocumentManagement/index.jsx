@@ -30,7 +30,6 @@ const DocumentDashboard = () => {
   }, []);
 
   const handleDelete = async (userId, docId, fileDescription) => {
-    console.log(userId, fileDescription, docId)
     setIsLoading(true);
     try {
       await deleteDocument(userId, docId, fileDescription);
