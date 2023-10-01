@@ -118,7 +118,7 @@ export default function BondsPage() {
           )}
         </>
       )}
-      {isAdding && <AddNewBond setIsAdding={setIsAdding} />}
+      {isAdding && <AddNewBond setIsAdding={setIsAdding} refreshBond={fetchBonds} />}
       {isEditPageOpen && (
         <Edit bondToEdit={selectedBond} setIsEditPageOpen={setIsEditPageOpen} refreshBonds={fetchBonds} />
       )}

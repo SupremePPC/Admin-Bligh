@@ -19,6 +19,7 @@ const AddNewBond = ({ setIsAdding, refreshBond }) => {
     purchaseDate: "",
     quantity: 0,
     sector: "",
+    ticker: "",
     type: "",
   });
 
@@ -130,6 +131,13 @@ const AddNewBond = ({ setIsAdding, refreshBond }) => {
             name="sector"
             onChange={handleChange}
             value={formData.sector}
+          />
+          <label htmlFor="sector">Ticker:</label>
+          <input
+            type="text"
+            name="ticker"
+            onChange={handleChange}
+            value={formData.ticker}
           />
           <label htmlFor="maturityDate">Maturity Date:</label>
           <input
