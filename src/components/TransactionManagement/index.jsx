@@ -8,9 +8,11 @@ import {
 import Header from "./Header";
 import Table from "./Table";
 import Modal from "../CustomsModal";
+import AddTransaction from "./Add";
 import { db } from "../../firebaseConfig/firebase";
 import LoadingScreen from "../LoadingScreen";
 import { getAllTransactions } from "../../firebaseConfig/firestore";
+import EditTransaction from "./Edit";
 
 const TransactionDashboard = () => {
   const [transactions, setTransactions] = useState([]);
@@ -348,15 +350,15 @@ const TransactionDashboard = () => {
           )}
         </>
       )}
-      {/* {isAdding && (
+      {isAdding && (
         <AddTransaction
           onClose={() => setIsAdding(false)}
           setIsAdding={setIsAdding}
           setTransactions={setTransactions}
         />
-      )} */}
+      )}
       {isEditPageOpen && (
-        <Edit
+        <EditTransaction
           transaction={transactionForEdit}
           onClose={() => {
             setIsEditPageOpen(false);

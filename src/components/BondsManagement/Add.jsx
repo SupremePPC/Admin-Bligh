@@ -118,26 +118,12 @@ const AddNewBond = ({ setIsAdding, refreshBond }) => {
             onChange={handleChange}
             value={formData.quantity}
           />
-          <label htmlFor="purchaseDate">Purchase Date:</label>
-          <input
-            type="date"
-            name="purchaseDate"
-            onChange={handleChange}
-            value={formData.purchaseDate}
-          />
           <label htmlFor="sector">Sector:</label>
           <input
             type="text"
             name="sector"
             onChange={handleChange}
             value={formData.sector}
-          />
-          <label htmlFor="sector">Ticker:</label>
-          <input
-            type="text"
-            name="ticker"
-            onChange={handleChange}
-            value={formData.ticker}
           />
           <label htmlFor="maturityDate">Maturity Date:</label>
           <input

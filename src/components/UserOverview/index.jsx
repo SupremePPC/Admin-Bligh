@@ -118,11 +118,12 @@ const UserOverview = () => {
 
   return (
     <div className="container">
-      {!modalState.isAddTransactionOpen &&
+      {
         !modalState.isAddBondOpen &&
         !modalState.isAddAccountOpen &&
-        !modalState.isEditUserDetailsOpen &&
         !modalState.isAddBankingDetails &&
+        !modalState.isAddTransactionOpen &&
+        !modalState.isEditUserDetailsOpen &&
         !modalState.isEditBankingDetails && (
           <div className="userOverview_container">
             {/* User Details */}
@@ -220,32 +221,83 @@ const UserOverview = () => {
               </div>
             </div>
 
-            {/*<div className="user_details">
-            <h3>Account Types and Balance</h3>
-            {accountTypes.length === 0 ? (
-              <p className="bold_text">
-                This user has no account or balance at the moment.
-              </p>
-            ) : (
-              <ul className="user_wrap">
-                {accountTypes.map((item, index) => (
-                  <li key={index} className="text_wrap">
-                    <p className="bold_text">{item.type} :</p>
-                    <span className="reg_text">$ {item.balance} </span>
-                  </li>
-                ))}
-              </ul>
-            )}
-            <div className="text_wrap">
-              <p className="bold_text">Total Balance :</p>
-              <span className="reg_text">$ {totalBalance}</span>
+            {/* Account types and balances*/}
+            <div className="user_details">
+              <h3>Account Types and Balance</h3>
+              {accountTypes.length === 0 ? (
+                <p className="bold_text">
+                  This user has no account or balance at the moment.
+                </p>
+              ) : (
+                <ul className="user_wrap">
+                  {accountTypes.map((item, index) => (
+                    <li key={index} className="text_wrap">
+                      <p className="bold_text">{item.type} :</p>
+                      <span className="reg_text">$ {item.balance} </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <div className="text_wrap">
+                <p className="bold_text">Total Balance :</p>
+                <span className="reg_text">$ {totalBalance}</span>
+              </div>
+              {/* <div className="dropdown_btn">
+              <button onClick={() => handleOpenModal("isAddAccountOpen")}>Add to Account</button>
+            </div> */}
             </div>
-            <div className="dropdown_btn">
-              <button onClick={handleAddAccount}>Add to Account</button>
-            </div>
-          </div>
 
-          <div className="user_details">
+            <div className="user_details">
+    <h3>Transaction List</h3>
+    {transactions.length === 0 ? (
+        <p className="bold_text">
+            No Transaction has been carried out yet.
+        </p>
+    ) : (
+        <table className="transaction_table">
+            <thead>
+                <tr>
+                    <th className="bold_text">Deposits</th>
+                    <th className="bold_text">Withdrawals</th>
+                </tr>
+            </thead>
+            <tbody>
+                {(() => {
+                    const deposits = transactions.filter(t => t.type === "Deposit");
+                    const withdrawals = transactions.filter(t => t.type === "Withdrawal");
+                    const maxLength = Math.max(deposits.length, withdrawals.length);
+                    const rows = [];
+
+                    for (let i = 0; i < maxLength; i++) {
+                        rows.push(
+                            <tr key={i}>
+                                <td>
+                                    {deposits[i] && (
+                                        <>
+                                            <span className="reg_text">$ {deposits[i].amount}</span>
+                                        </>
+                                    )}
+                                </td>
+                                <td>
+                                    {withdrawals[i] && (
+                                        <>
+                                             <span className="bold_text">{new Date(withdrawals[i].date).toLocaleDateString()}: </span>
+                                            <span className="reg_text">$ {withdrawals[i].amount}</span>
+                                        </>
+                                    )}
+                                </td>
+                            </tr>
+                        );
+                    }
+
+                    return rows;
+                })()}
+            </tbody>
+        </table>
+    )}
+</div>
+
+            {/* <div className="user_details">
             <h3>Bonds Holdings</h3>
             {bondsHoldings.length === 0 ? (
               <p className="bold_text">
@@ -375,29 +427,6 @@ const UserOverview = () => {
                 </div>
               ))
             )}
-          </div>
-
-          <div className="user_details">
-            <h3>Transaction List</h3>
-            {transactions.length === 0 ? (
-              <p className="bold_text">
-                No Transaction has been carried out yet.
-              </p>
-            ) : (
-              <>
-                <ul className="user_wrap">
-                  {transactions.map((transaction) => (
-                    <li className="text_wrap" key={transaction.id}>
-                      <p className="bold_text">{transaction.type} :</p>
-                      <span className="reg_text">$ {transaction.amount} </span>
-                    </li>
-                  ))}
-                </ul>
-              </>
-            )}
-            <div className="dropdown_btn">
-              <button onClick={handleAddTransaction}>Add Transaction</button>
-            </div>
           </div> */}
           </div>
         )}

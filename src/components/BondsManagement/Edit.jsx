@@ -105,13 +105,6 @@ const Edit = ({ bondToEdit, setIsEditPageOpen, refreshBonds }) => {
           onChange={handleChange}
           value={formData.quantity}
         />
-        <label htmlFor="purchaseDate">Purchase Date:</label>
-        <input
-          type="date"
-          name="purchaseDate"
-          onChange={handleChange}
-          value={formData.purchaseDate}
-        />
         <label htmlFor="sector">Sector:</label>
         <input
           type="text"

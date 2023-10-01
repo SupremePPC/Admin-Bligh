@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Swal from 'sweetalert2';
 
-const EditTransaction = ({ transactions, selectedTransactions, setTransactions, setIsEditing }) => {
+const AddTransaction = ({ transactions, selectedTransactions, setTransactions, setIsAdding }) => {
   const id = selectedEmployee.id;
 
   const [fullName, setFullName] = useState(selectedTransactions.fullName);
@@ -42,7 +42,7 @@ const EditTransaction = ({ transactions, selectedTransactions, setTransactions, 
           t.id === transactionId ? { ...t, ...updatedTransaction } : t
         );
         setTransactions(updatedTransactions);
-        setIsEditing(false);
+        setIsAdding(false);
         Swal.fire({
           icon: 'success',
           title: 'Updated!',
@@ -67,7 +67,7 @@ const EditTransaction = ({ transactions, selectedTransactions, setTransactions, 
   return (
     <div className="small-container">
       <form onSubmit={handleUpdate}>
-        <h1>Edit Transaction</h1>
+        <h1>Add Transaction</h1>
         <label htmlFor="fullName">Full Name</label>
         <input
           id="fullName"
@@ -129,7 +129,7 @@ const EditTransaction = ({ transactions, selectedTransactions, setTransactions, 
             className="muted-button"
             type="button"
             value="Cancel"
-            onClick={() => setIsEditing(false)}
+            onClick={() => setIsAdding(false)}
           />
         </div>
       </form>
@@ -137,4 +137,4 @@ const EditTransaction = ({ transactions, selectedTransactions, setTransactions, 
   );
 };
 
-export default EditTransaction;
+export default AddTransaction;
