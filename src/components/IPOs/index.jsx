@@ -1,4 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import LoadingScreen from "../LoadingScreen";
+import List from "./List";
+import Modal from "../CustomsModal";
+import Edit from "../BondsManagement/Edit";
+import Add from "../RegisteredUsers/Add";
+import Header from "./Header";
 
 export default function IPOs() {
   const [ipos, setIpos] = useState([]);
@@ -8,7 +14,6 @@ export default function IPOs() {
   const [selectedIpo, setSelectedIpo] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedIpoId, setSelectedIpoId] = useState(null);
-  const [isDeleting, setIsDeleting] = useState(false);
 
   // Function to handle edit button click
   const handleEditClick = (ipos) => {
@@ -104,7 +109,7 @@ export default function IPOs() {
         </>
       )}
       {isAdding && (
-        <AddNewIpo setIsAdding={setIsAdding} refreshIpos={fetchIpos} />
+        <Add setIsAdding={setIsAdding} refreshIpos={fetchIpos} />
       )}
       {isEditPageOpen && (
         <Edit

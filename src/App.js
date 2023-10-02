@@ -21,6 +21,7 @@ import NotificationPage from "./components/Notifications";
 import TermsPage from "./components/FixedTermManagement";
 import "./App.css";
 import TermsRequestTable from "./components/TermRequestManagement";
+import IPOs from "./components/IPOs";
 
 function App() {
   const { loadingAuthState } = useAuth();
@@ -51,6 +52,22 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <UserRequestDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="transactions"
+                element={
+                  <ProtectedRoute>
+                    <TransactionDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="ipos"
+                element={
+                  <ProtectedRoute>
+                    <IPOs />
                   </ProtectedRoute>
                 }
               />
