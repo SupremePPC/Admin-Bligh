@@ -157,7 +157,7 @@ const Edit = ({ bondToEdit, setIsEditPageOpen, refreshBonds }) => {
           value={formData.couponFrequency}
         />
         <div style={{ marginTop: "30px" }}>
-          <input type="submit" value="Edit" />
+          <input type="submit" value="Save" />
           <input
             style={{ marginLeft: "12px" }}
             className="muted-button"

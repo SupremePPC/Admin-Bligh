@@ -96,7 +96,7 @@ const Edit = ({ employees, selectedEmployee, setEmployees, setIsEditing }) => {
           onChange={e => setDate(e.target.value)}
         />
         <div style={{ marginTop: '30px' }}>
-          <input type="submit" value="Update" />
+          <input type="submit" value="Save" />
           <input
             style={{ marginLeft: '12px' }}
             className="muted-button"

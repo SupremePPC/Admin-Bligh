@@ -111,7 +111,7 @@ const Edit = ({ userId, bankingDetailsId, bankingDetails, onClose }) => {
           onChange={e => setSwiftCode(e.target.value)}
         />
         <div style={{ marginTop: '30px' }}>
-          <input type="submit" value="Update" />
+          <input type="submit" value="Save" />
           <input
             style={{ marginLeft: '12px' }}
             className="muted-button"
