@@ -691,3 +691,6 @@ export async function addTermToUserCollection(userId, termData) {
   const userTermsHoldingsPath = collection(db, `users/${userId}/fixedTermDeposits`);
   await addDoc(userTermsHoldingsPath, termData);
 }
+
+
+//IPOS

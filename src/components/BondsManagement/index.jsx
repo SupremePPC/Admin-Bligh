@@ -17,7 +17,8 @@ export default function BondsPage() {
   const [selectedBond, setSelectedBond] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedBondId, setSelectedBondId] = useState(null);
-  const [isDeleting, setIsDeleting] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false);
+ 
   // Function to handle edit button click
   const handleEditClick = (bond) => {
     setSelectedBond(bond); // Set the selected bond
@@ -47,7 +48,6 @@ export default function BondsPage() {
     setSelectedBondId(bondId); // set the bond ID you want to delete
     setIsDeleteModalOpen(true); // open the delete confirmation modal
   };
-  
 
   const confirmDelete = async () => {
     setIsLoading(true);
@@ -78,13 +78,7 @@ export default function BondsPage() {
       setSelectedBondId(null); // Reset the selected bond ID
     }
   };
-  
 
-  const showDeleteModal = (id) => {
-    const selected = bonds.find((bond) => bond.id === id);
-    selectedBond(selected);
-    setIsDeleting(true);
-  };
   return (
     <div className="container">
       {!isAdding && !isEditPageOpen && (
