@@ -170,7 +170,7 @@ const Edit = ({ user, onClose }) => {
         />
 
         <div style={{ marginTop: "30px" }}>
-          <input type="submit" value="Update" />
+          <input type="submit" value="Save" />
           <input
             style={{ marginLeft: "12px" }}
             className="muted-button"

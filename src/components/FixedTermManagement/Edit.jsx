@@ -93,7 +93,7 @@ const Edit = ({ termToEdit, setIsEditPageOpen, refreshTerms }) => {
             required
           />
           <div style={{ marginTop: "30px" }}>
-          <input type="submit" value="Edit" />
+          <input type="submit" value="Save" />
           <input
             style={{ marginLeft: "12px" }}
             className="muted-button"

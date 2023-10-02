@@ -5,16 +5,11 @@ import Swal from "sweetalert2";
 import { db } from "../../firebaseConfig/firebase";
 import AddBankingDetails from "../BankingDetails/Add";
 import EditBankingDetails from "../BankingDetails/Edit";
-// import AddTransaction from "./AddTransaction";
-// import AddNewBond from "../Bonds/AddBond";
-// import AddTransaction from "./AddTransaction";
-// import AddNewTerm from "../FixedTermManagement/Add";
-// import AddToAccount from "../AddToAccount";
-// import AddDocument from "../DocumentManagement/Add"
-// import EditTransaction from "../TransactionManagement/Edit";
-// import EditDocument from "../DocumentManagement/Edit"
 
 import EditUser from "../RegisteredUsers/Edit";
+import AddTransaction from "../TransactionManagement/Add";
+import AddBond from "../BondRequestManagement/Add";
+import EditTransaction from "../TransactionManagement/Edit";
 
 const UserOverview = () => {
   const user = useParams();
@@ -28,7 +23,7 @@ const UserOverview = () => {
   const [fixedTerm, setFixedTerm] = useState([]);
   const [document, setDocument] = useState([]);
   const [selectedUserForAdd, setSelectedUserForAdd] = useState(null);
-
+  
   // const [isAddTransactionOpen, setIsAddTransactionOpen] = useState(false);
   // const [isAddBondOpen, setIsAddBondOpen] = useState(false);
   // const [isAddAccountOpen, setIsAddAccountOpen] = useState(false);
@@ -43,6 +38,7 @@ const UserOverview = () => {
     isAddAccountOpen: false,
     isAddBankingDetails: false,
     isEditBankingDetails: false,
+    isEditTransactionOpen: false,
     isUserDetailsOpen: false,
     isAddTransactionOpen: false,
     isEditUserDetailsOpen: false,
@@ -118,12 +114,13 @@ const UserOverview = () => {
 
   return (
     <div className="container">
-      {
-        !modalState.isAddBondOpen &&
+      {!modalState.isAddBondOpen &&
         !modalState.isAddAccountOpen &&
         !modalState.isAddBankingDetails &&
         !modalState.isAddTransactionOpen &&
+        !modalState.isAddBondOpen &&
         !modalState.isEditUserDetailsOpen &&
+        !modalState.isEditTransactionOpen &&
         !modalState.isEditBankingDetails && (
           <div className="userOverview_container">
             {/* User Details */}
@@ -233,71 +230,84 @@ const UserOverview = () => {
                   {accountTypes.map((item, index) => (
                     <li key={index} className="text_wrap">
                       <p className="bold_text">{item.type} :</p>
-                      <span className="reg_text">$ {item.balance} </span>
+                      <span className="reg_text">€ {item.balance} </span>
                     </li>
                   ))}
                 </ul>
               )}
               <div className="text_wrap">
                 <p className="bold_text">Total Balance :</p>
-                <span className="reg_text">$ {totalBalance}</span>
+                <span className="reg_text">€ {totalBalance}</span>
               </div>
               {/* <div className="dropdown_btn">
               <button onClick={() => handleOpenModal("isAddAccountOpen")}>Add to Account</button>
             </div> */}
             </div>
 
+            {/* Transactions List */}
             <div className="user_details">
-    <h3>Transaction List</h3>
-    {transactions.length === 0 ? (
-        <p className="bold_text">
-            No Transaction has been carried out yet.
-        </p>
-    ) : (
-        <table className="transaction_table">
-            <thead>
-                <tr>
-                    <th className="bold_text">Deposits</th>
-                    <th className="bold_text">Withdrawals</th>
-                </tr>
-            </thead>
-            <tbody>
-                {(() => {
-                    const deposits = transactions.filter(t => t.type === "Deposit");
-                    const withdrawals = transactions.filter(t => t.type === "Withdrawal");
-                    const maxLength = Math.max(deposits.length, withdrawals.length);
-                    const rows = [];
+              <h3>Transaction List</h3>
+              {transactions.length === 0 ? (
+                <p className="bold_text">
+                  No Transaction has been carried out yet.
+                </p>
+              ) : (
+                <table className="transaction_table">
+                  <thead>
+                    <tr>
+                      <th className="bold_text">Deposit amount</th>
+                      <th className="bold_text">Withdrawal amount</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(() => {
+                      const deposits = transactions.filter(
+                        (t) => t.type === "Deposit"
+                      );
+                      const withdrawals = transactions.filter(
+                        (t) => t.type === "Withdrawal"
+                      );
+                      const maxLength = Math.max(
+                        deposits.length,
+                        withdrawals.length
+                      );
+                      const rows = [];
 
-                    for (let i = 0; i < maxLength; i++) {
+                      for (let i = 0; i < maxLength; i++) {
                         rows.push(
-                            <tr key={i}>
-                                <td>
-                                    {deposits[i] && (
-                                        <>
-                                            <span className="reg_text">$ {deposits[i].amount}</span>
-                                        </>
-                                    )}
-                                </td>
-                                <td>
-                                    {withdrawals[i] && (
-                                        <>
-                                             <span className="bold_text">{new Date(withdrawals[i].date).toLocaleDateString()}: </span>
-                                            <span className="reg_text">$ {withdrawals[i].amount}</span>
-                                        </>
-                                    )}
-                                </td>
-                            </tr>
+                          <tr key={i}>
+                            <td>
+                              {deposits[i] && (
+                                <span className="reg_text">
+                                  € {deposits[i].amount}
+                                </span>
+                              )}
+                            </td>
+                            <td>
+                              {withdrawals[i] && (
+                                <span className="reg_text">
+                                  € {withdrawals[i].amount}
+                                </span>
+                              )}
+                            </td>
+                          </tr>
                         );
-                    }
+                      }
 
-                    return rows;
-                })()}
-            </tbody>
-        </table>
-    )}
-</div>
+                      return rows;
+                    })()}
+                  </tbody>
+                </table>
+              )}
+               <div className="dropdown_btn">
+                <button onClick={() => handleOpenModal("isAddTransactionOpen")}>
+                  Add Transaction
+                </button>
+              </div>
+            </div>
 
-            {/* <div className="user_details">
+                    {/* Bonds List */}
+             <div className="user_details">
             <h3>Bonds Holdings</h3>
             {bondsHoldings.length === 0 ? (
               <p className="bold_text">
@@ -394,11 +404,11 @@ const UserOverview = () => {
               })
             )}
             <div className="dropdown_btn">
-              <button onClick={handleAddBond}>Add Bond</button>
+              <button onClick={() => handleOpenModal("isAddBondOpen")}>Add Bond</button>
             </div>
           </div>
 
-          <div className="user_details">
+         {/* <div className="user_details">
             <h3>Document</h3>
             {docs.length === 0 ? (
               <>
@@ -458,22 +468,34 @@ const UserOverview = () => {
           bankingDetails={bankingDetails[0]}
         />
       )}
-      {/* {isAddTransactionOpen && (
+     {modalState.isAddTransactionOpen && (
         <AddTransaction
           onClose={() => {
-            setIsAddTransactionOpen(false);
+            handleCloseModal("isAddTransactionOpen");
             setSelectedUserForAdd(null);
           }}
-          transactions={transactions}
           setTransactions={setTransactions}
+          setIsAdding={setIsAdding}
           userId={user}
-          totalBalance={totalBalance}
         />
       )}
-      {isAddBondOpen && (
-        <AddNewBond
+     {modalState.isEditTransactionOpen && (
+        <EditTransaction
           onClose={() => {
-            setIsAddBondOpen(false);
+            handleCloseModal("isEditTransactionOpen");
+            setSelectedUserForAdd(null);
+          }}
+          transactionId={transactions[0].id}
+          selectedTransactions={transactions[0]}
+          setTransactions={setTransactions}
+          setIsEditing={setIsEditing}
+          userId={user}
+        />
+      )}
+      {modalState.isAddBondOpen && (
+        <AddBond
+          onClose={() => {
+            handleOpenModal("isAddBondOpen")
             setSelectedUserForAdd(null);
           }}
           bonds={bonds}
@@ -481,7 +503,7 @@ const UserOverview = () => {
           userId={user}
         />
       )}
-      {isAddAccountOpen && (
+      {/*{isAddAccountOpen && (
         <AddToAccount
           onClose={() => {
             setIsAddAccountOpen(false);

@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
 import Swal from 'sweetalert2';
+import { addTransaction } from '../../firebaseConfig/firestore';
 
-const AddTransaction = ({ transactions, selectedTransactions, setTransactions, setIsAdding }) => {
-  const id = selectedEmployee.id;
-
-  const [fullName, setFullName] = useState(selectedTransactions.fullName);
-  const [amount, setAmount] = useState(selectedTransactions.amount);
-  const [accountType, setAccountType] = useState(selectedTransactions.email);
-  const [type, setType] = useState(selectedTransactions.salary);
-  const [status, setStatus] = useState(selectedTransactions.status);
-  const [date, setDate] = useState(selectedTransactions.date);
+const AddTransaction = ({ setTransactions, setIsAdding, userId, onClose}) => {
+  const [fullName, setFullName] = useState("");
+  const [amount, setAmount] = useState("");
+  const [accountType, setAccountType] = useState("");
+  const [type, setType] = useState("");
+  const [status, setStatus] = useState("");
+  const [date, setDate] = useState("");
 
   const handleUpdate = async (e) => {
     e.preventDefault();
@@ -23,7 +22,7 @@ const AddTransaction = ({ transactions, selectedTransactions, setTransactions, s
       });
     }
   
-    const updatedTransaction = {
+    const newTransaction = {
       fullName,
       amount,
       accountType,
@@ -33,32 +32,26 @@ const AddTransaction = ({ transactions, selectedTransactions, setTransactions, s
     };
   
     try {
-      const userId = "someUserId"; // You'll need to identify the specific user ID
-      const transactionId = "someTransactionId"; // You'll need to identify the specific transaction ID
-      const result = await editTransaction(userId, transactionId, updatedTransaction);
+      const result = await addTransaction(userId, newTransaction);
       if (result.success) {
-        // Update local state as well
-        const updatedTransactions = transactions.map(t => 
-          t.id === transactionId ? { ...t, ...updatedTransaction } : t
-        );
-        setTransactions(updatedTransactions);
+        setTransactions(prevTransactions => [...prevTransactions, { ...newTrans, id: result.id }]);
         setIsAdding(false);
         Swal.fire({
           icon: 'success',
           title: 'Updated!',
-          text: `Transaction for ${fullName} has been updated.`,
+          text: `Transaction for ${fullName} has been added.`,
           showConfirmButton: false,
           timer: 2000,
         });
       } else {
-        throw new Error("Failed to update the transaction");
+        throw new Error("Failed to add transaction");
       }
     } catch (error) {
       console.error(error);
       Swal.fire({
         icon: 'error',
         title: 'Error!',
-        text: `Error updating transaction: ${error}`,
+        text: `Error adding transaction: ${error}`,
         showConfirmButton: true,
       });
     }
@@ -129,7 +122,7 @@ const AddTransaction = ({ transactions, selectedTransactions, setTransactions, s
             className="muted-button"
             type="button"
             value="Cancel"
-            onClick={() => setIsAdding(false)}
+            onClick={onClose}
           />
         </div>
       </form>

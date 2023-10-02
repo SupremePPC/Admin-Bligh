@@ -297,6 +297,7 @@ const TransactionDashboard = () => {
       });
     }
   };
+
   return (
     <div className="container">
       {!isAdding && !isEditPageOpen && (
@@ -355,6 +356,7 @@ const TransactionDashboard = () => {
           onClose={() => setIsAdding(false)}
           setIsAdding={setIsAdding}
           setTransactions={setTransactions}
+
         />
       )}
       {isEditPageOpen && (
@@ -369,4 +371,5 @@ const TransactionDashboard = () => {
     </div>
   );
 };
+
 export default TransactionDashboard;

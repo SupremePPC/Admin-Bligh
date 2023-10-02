@@ -1,29 +1,48 @@
-import React, { useState } from 'react';
-import Swal from 'sweetalert2';
+import React, { useState } from "react";
+import Swal from "sweetalert2";
+import { editTransaction } from "../../firebaseConfig/firestore";
 
-const EditTransaction = ({ transactions, selectedTransactions, setTransactions, setIsEditing }) => {
-  const id = selectedEmployee.id;
+const EditTransaction = ({
+  transactions,
+  selectedTransactions,
+  setTransactions,
+  setIsEditing,
+  // transactionId,
+  // userId,
+  onClose
+}) => {
 
-  const [fullName, setFullName] = useState(selectedTransactions.fullName);
-  const [amount, setAmount] = useState(selectedTransactions.amount);
-  const [accountType, setAccountType] = useState(selectedTransactions.email);
-  const [type, setType] = useState(selectedTransactions.salary);
-  const [status, setStatus] = useState(selectedTransactions.status);
-  const [date, setDate] = useState(selectedTransactions.date);
+  const {
+    id: transactionId,
+    userId,
+    fullName: initFullName,
+    amount: initAmount,
+    accountType: initAccountType,
+    type: initType,
+    status: initStatus,
+    date: initDate,
+  } = selectedTransactions;
+
+  const [fullName, setFullName] = useState(initFullName);
+  const [amount, setAmount] = useState(initAmount);
+  const [accountType, setAccountType] = useState(initAccountType);
+  const [type, setType] = useState(initType);
+  const [status, setStatus] = useState(initStatus);
+  const [date, setDate] = useState(initDate);
 
   const handleUpdate = async (e) => {
     e.preventDefault();
-  
+
     if (!fullName || !amount || !accountType || !type || !status || !date) {
       return Swal.fire({
-        icon: 'error',
-        title: 'Error!',
-        text: 'All fields are required.',
+        icon: "error",
+        title: "Error!",
+        text: "All fields are required.",
         showConfirmButton: true,
       });
     }
-  
-    const updatedTransaction = {
+
+       const updatedTransaction = {
       fullName,
       amount,
       accountType,
@@ -31,13 +50,11 @@ const EditTransaction = ({ transactions, selectedTransactions, setTransactions, 
       status,
       date,
     };
-  
+
     try {
-      const userId = "someUserId"; // You'll need to identify the specific user ID
-      const transactionId = "someTransactionId"; // You'll need to identify the specific transaction ID
       const result = await editTransaction(userId, transactionId, updatedTransaction);
+      
       if (result.success) {
-        // Update local state as well
         const updatedTransactions = transactions.map(t => 
           t.id === transactionId ? { ...t, ...updatedTransaction } : t
         );
@@ -56,14 +73,14 @@ const EditTransaction = ({ transactions, selectedTransactions, setTransactions, 
     } catch (error) {
       console.error(error);
       Swal.fire({
-        icon: 'error',
-        title: 'Error!',
+        icon: "error",
+        title: "Error!",
         text: `Error updating transaction: ${error}`,
         showConfirmButton: true,
       });
     }
   };
-  
+
   return (
     <div className="small-container">
       <form onSubmit={handleUpdate}>
@@ -123,13 +140,13 @@ const EditTransaction = ({ transactions, selectedTransactions, setTransactions, 
           onChange={(e) => setDate(e.target.value)}
         />
         <div style={{ marginTop: "30px" }}>
-          <input type="submit" value="Add" />
+          <input type="submit" value="Save" />
           <input
             style={{ marginLeft: "12px" }}
             className="muted-button"
             type="button"
             value="Cancel"
-            onClick={() => setIsEditing(false)}
+            onClick={onClose}
           />
         </div>
       </form>

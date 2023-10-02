@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function Add() {
+export default function AddBond () {
   return (
     <div>Add</div>
   )

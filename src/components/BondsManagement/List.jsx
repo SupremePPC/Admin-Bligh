@@ -80,10 +80,6 @@ export default function List({ bonds, handleDelete, handleEditClick }) {
                   <span className="reg_text"> {bond.isin} </span>
                 </div>
                 <div className="dropdown_row">
-                  <p className="bold_text">Ticker :</p>
-                  <span className="reg_text"> {bond.ticker} </span>
-                </div>
-                <div className="dropdown_row">
                   <p className="bold_text">Coupon Frequency :</p>
                   <span className="reg_text"> {bond.couponFrequency} </span>
                 </div>
