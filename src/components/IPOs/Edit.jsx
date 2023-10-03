@@ -27,7 +27,7 @@ const Edit = ({ ipoToEdit, setIsEditPageOpen, refreshIpos }) => {
       Swal.fire({
         icon: "success",
         title: "Updated!",
-        text: `Bond has been updated.`,
+        text: `IPOs has been updated.`,
         showConfirmButton: false,
         timer: 2000,
       });
@@ -36,7 +36,7 @@ const Edit = ({ ipoToEdit, setIsEditPageOpen, refreshIpos }) => {
       Swal.fire({
         icon: "error",
         title: "Error!",
-        text: `Error updating bond: ${error}`,
+        text: `Error updating IPOs: ${error}`,
         showConfirmButton: true,
         timer: 2000,
       });
@@ -83,7 +83,7 @@ const Edit = ({ ipoToEdit, setIsEditPageOpen, refreshIpos }) => {
         />
         <label htmlFor="expectedate">Expected Date:</label>
         <input
-          type="date"
+          type="text"
           name="expectedate"
           onChange={handleChange}
           value={formData.expectedate}

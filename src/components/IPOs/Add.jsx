@@ -4,7 +4,7 @@ import Swal from "sweetalert2";
 import { addNewIpos } from "../../firebaseConfig/firestore";
 import LoadingScreen from "../LoadingScreen";
 
-const AddNewIpos = ({ setIsAdding, refreshBond }) => {
+const AddNewIpos = ({ setIsAdding, refreshIpos }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -36,7 +36,7 @@ const AddNewIpos = ({ setIsAdding, refreshBond }) => {
       Swal.fire({
         icon: "success",
         title: "Added!",
-        text: `Bond added succesfully.`,
+        text: `IPOs added succesfully.`,
         showConfirmButton: false,
         timer: 2000,
       });
@@ -51,13 +51,14 @@ const AddNewIpos = ({ setIsAdding, refreshBond }) => {
         preSharePrice: 0,
         sharePrice: 0,
       });
+      refreshIpos();
       setIsAdding(false);
     } catch (error) {
       console.error(error);
       Swal.fire({
         icon: "error",
         title: "Error!",
-        text: `Error adding bond: ${error}`,
+        text: `Error adding IPOs: ${error}`,
         showConfirmButton: true,
       });
     }
@@ -102,7 +103,7 @@ const AddNewIpos = ({ setIsAdding, refreshBond }) => {
           />
           <label htmlFor="expectedate">Expected Date:</label>
           <input
-            type="date"
+            type="text"
             name="expectedate"
             onChange={handleChange}
             value={formData.expectedate}
@@ -144,7 +145,7 @@ const AddNewIpos = ({ setIsAdding, refreshBond }) => {
               type="button"
               value="Cancel"
               onClick={() => {
-                setIsEditPageOpen(false);
+                setIsAdding(false);
                 refreshIpos();
               }}
             />

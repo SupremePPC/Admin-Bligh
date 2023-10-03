@@ -128,6 +128,7 @@
   border: 1px solid #fff;
   color: var(--white);
   width: 200px;
+  height: 3rem;
   padding: 10px 0rem;
   font-size: var(--font-sixteen);
   font-weight: 600;
