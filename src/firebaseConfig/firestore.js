@@ -694,3 +694,59 @@ export async function addTermToUserCollection(userId, termData) {
 
 
 //IPOS
+const IPOS_COLLECTION = "ipos"
+
+//getIPOS
+export const getAllIpos = async () => {
+  const iposQuery = query(
+    collection(db, IPOS_COLLECTION)
+    // orderBy("date")
+  );
+  const querySnapshot = await getDocs(iposQuery);
+
+  if (querySnapshot.empty) {
+    return null; // Return null if no ipos are found
+  }
+
+  return querySnapshot.docs.map((doc) => ({
+    ...doc.data(),
+    id: doc.id,
+  }));
+};
+
+//Update
+export const updateIpo = async (ipoId, updatedData) => {
+  try {
+    const ipoRef = doc(db, IPOS_COLLECTION, ipoId);
+    await updateDoc(ipoRef, updatedData);
+    console.log('IPO Updated Successfully');
+  } catch (error) {
+    console.error("Error updating IPO: ", error);
+    throw error;
+  }
+};
+
+//Add New
+export const addNewIpos = async (ipoData) => {
+  try {
+    const iposCollectionRef = collection(db, IPOS_COLLECTION);
+    const docRef = await addDoc(iposCollectionRef, ipoData);
+    console.log('IPO Added Successfully with ID: ', docRef.id);
+    return docRef.id;
+  } catch (error) {
+    console.error("Error adding IPO: ", error);
+    throw error;
+  }
+};
+
+//Delete
+export const deleteIpos = async (ipoId) => {
+  try {
+    const ipoRef = doc(db, IPOS_COLLECTION, ipoId);
+    await deleteDoc(ipoRef);
+    console.log('IPO Deleted Successfully');
+  } catch (error) {
+    console.error("Error deleting IPO: ", error);
+    throw error;
+  }
+};

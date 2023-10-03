@@ -2,9 +2,11 @@ import React, { useState, useEffect } from "react";
 import LoadingScreen from "../LoadingScreen";
 import List from "./List";
 import Modal from "../CustomsModal";
-import Edit from "../BondsManagement/Edit";
-import Add from "../RegisteredUsers/Add";
 import Header from "./Header";
+import { getAllIpos } from "../../firebaseConfig/firestore";
+import Edit from "./Edit";
+import "./style.css";
+import AddNewIpos from "./Add";
 
 export default function IPOs() {
   const [ipos, setIpos] = useState([]);
@@ -16,11 +18,12 @@ export default function IPOs() {
   const [selectedIpoId, setSelectedIpoId] = useState(null);
 
   // Function to handle edit button click
-  const handleEditClick = (ipos) => {
-    setSelectedIpo(ipos); // Set the selected ipos
-    setIsEditPageOpen(true); // Open the Edit component
+  const handleEditClick = (ipo) => {
+    console.log(ipo); // Log the IPO data to verify it's correct
+    setSelectedIpo(ipo);
+    setIsEditPageOpen(true);
   };
-
+  
   const fetchIpos = async () => {
     try {
       setIsLoading(true);
@@ -28,7 +31,7 @@ export default function IPOs() {
       if (!fetchedIpos) {
         console.error("No bonds found");
       }
-      setBonds(fetchedIpos);
+      setIpos(fetchedIpos);
     } catch (error) {
       console.error("Error fetching ipos:", error);
     } finally {
@@ -95,7 +98,7 @@ export default function IPOs() {
                   isOpen={isDeleteModalOpen}
                   onClose={() => {
                     setIsDeleteModalOpen(false);
-                    setSelectedBondId(null); // Reset the selected bond ID on modal close
+                    selectedIpoId(null); // Reset the selected bond ID on modal close
                   }}
                   onPositiveAction={confirmDelete}
                   title="Delete Bond"
@@ -109,7 +112,7 @@ export default function IPOs() {
         </>
       )}
       {isAdding && (
-        <Add setIsAdding={setIsAdding} refreshIpos={fetchIpos} />
+        <AddNewIpos setIsAdding={setIsAdding} refreshIpos={fetchIpos} />
       )}
       {isEditPageOpen && (
         <Edit

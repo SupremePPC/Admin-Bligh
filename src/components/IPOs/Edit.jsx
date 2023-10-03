@@ -1,13 +1,15 @@
 import React, { useState } from "react";
 import "firebase/firestore";
 import Swal from "sweetalert2";
-import { updateBond } from "../../firebaseConfig/firestore";
+import { updateIpo } from "../../firebaseConfig/firestore";
 import LoadingScreen from "../LoadingScreen";
 
-const Edit = ({ bondToEdit, setIsEditPageOpen, refreshBonds }) => {
-  const [formData, setFormData] = useState(bondToEdit);
+const Edit = ({ ipoToEdit, setIsEditPageOpen, refreshIpos }) => {
+  const [formData, setFormData] = useState(ipoToEdit || {});
+
   const [errors, setErrors] = useState({});
-  const [isLoaing, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -17,30 +19,11 @@ const Edit = ({ bondToEdit, setIsEditPageOpen, refreshBonds }) => {
     });
   };
 
-  const validateForm = () => {
-    let isValid = true;
-    const newErrors = {};
-
-    if (!formData.isin) {
-      newErrors.isin = "ISIN is required";
-      isValid = false;
-    }
-
-    if (!formData.issuerName) {
-      newErrors.issuerName = "Issuer Name is required";
-      isValid = false;
-    }
-
-    setErrors(newErrors);
-    return isValid;
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!validateForm()) return;
     setIsLoading(true);
     try {
-      await updateBond(formData.id, formData);
+      await updateIpo(formData.id, formData);
       Swal.fire({
         icon: "success",
         title: "Updated!",
@@ -64,97 +47,75 @@ const Edit = ({ bondToEdit, setIsEditPageOpen, refreshBonds }) => {
   return (
     <div className="small-container">
       {
-        isLoaing ? (
+        isLoading ? (
           <LoadingScreen/>
         ): (
       <form onSubmit={handleSubmit}>
-        <h1>Edit Bond</h1>
-        <label htmlFor="image">Issuer Logo:</label>
+        <h1>Edit IPO</h1>
+        <label htmlFor="logo"> Logo:</label>
         <input
           type="url"
-          name="image"
+          name="logo"
           onChange={handleChange}
-          value={formData.image}
+          value={formData.logo}
         />
-        <label htmlFor="issuerName">Issuer Name:</label>
+        <label htmlFor="name">Name:</label>
         <input
           type="text"
-          name="issuerName"
+          name="name"
           onChange={handleChange}
-          value={formData.issuerName}
+          value={formData.name}
         />
-        <label htmlFor="type">Type:</label>
+        <label htmlFor="description">Description:</label>
         <input
           type="text"
-          name="type"
+          name="description"
           onChange={handleChange}
-          value={formData.type}
+          value={formData.description}
         />
-        <label htmlFor="isin">ISIN:</label>
-        <input
-          type="text"
-          name="isin"
-          onChange={handleChange}
-          value={formData.isin}
-        />
-        <label htmlFor="quantity">Quantity:</label>
+        <label htmlFor="expListingPrice">Expected Listing Price:</label>
         <input
           type="number"
           min={0}
-          name="quantity"
+          name="expListingPrice"
           onChange={handleChange}
-          value={formData.quantity}
+          value={formData.expListingPrice}
         />
-        <label htmlFor="sector">Sector:</label>
-        <input
-          type="text"
-          name="sector"
-          onChange={handleChange}
-          value={formData.sector}
-        />
-        <label htmlFor="maturityDate">Maturity Date:</label>
+        <label htmlFor="expectedate">Expected Date:</label>
         <input
           type="date"
-          name="maturityDate"
+          name="expectedate"
           onChange={handleChange}
-          value={formData.maturityDate}
+          value={formData.expectedate}
         />
-        <label htmlFor="minimumAmount">Minimum Amount:</label>
+        <label htmlFor="minInvestment">Minimum Investment:</label>
         <input
           type="number"
           min={0}
-          name="minimumAmount"
+          name="minInvestment"
           onChange={handleChange}
-          value={formData.minimumAmount}
+          value={formData.minInvestment}
         />
-        <label htmlFor="currentValue">Current Value:</label>
+        <label htmlFor="preAllocation">Pre Allocation:</label>
+        <input
+          type="text"
+          name="preAllocation"
+          onChange={handleChange}
+          value={formData.preAllocation}
+        />
+        <label htmlFor="preSharePrice">Pre Share Price:</label>
         <input
           type="number"
-          min={0}
-          name="currentValue"
+          name="preSharePrice"
           onChange={handleChange}
-          value={formData.currentValue}
+          value={formData.preSharePrice}
         />
-        <label htmlFor="companyWebsite">Company Website:</label>
-        <input
-          type="url"
-          name="companyWebsite"
-          onChange={handleChange}
-          value={formData.companyWebsite}
-        />
-        <label htmlFor="couponRate">Coupon Rate:</label>
+        <label htmlFor="sharePrice">Share Price:</label>
         <input
           type="number"
-          name="couponRate"
+          name="sharePrice"
           onChange={handleChange}
-          value={formData.couponRate}
-        />
-        <label htmlFor="couponFrequency">Coupon Frequency:</label>
-        <input
-          type="number"
-          name="couponFrequency"
-          onChange={handleChange}
-          value={formData.couponFrequency}
+          value={formData.sharePrice}
         />
         <div style={{ marginTop: "30px" }}>
           <input type="submit" value="Save" />
@@ -165,12 +126,12 @@ const Edit = ({ bondToEdit, setIsEditPageOpen, refreshBonds }) => {
             value="Cancel"
             onClick={() => {
               setIsEditPageOpen(false);
-              refreshBonds();
+              refreshIpos();
             }}
           />
         </div>
         {errors.isin && <div>{errors.isin}</div>}
-        {errors.issuerName && <div>{errors.issuerName}</div>}
+        {errors.name && <div>{errors.name}</div>}
       </form>
 
         )

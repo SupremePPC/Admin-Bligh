@@ -1,26 +1,21 @@
 import React, { useState } from "react";
 import "firebase/firestore";
 import Swal from "sweetalert2";
-import { addNewBond } from "../../firebaseConfig/firestore";
+import { addNewIpos } from "../../firebaseConfig/firestore";
 import LoadingScreen from "../LoadingScreen";
 
-const AddNewBond = ({ setIsAdding, refreshBond }) => {
+const AddNewIpos = ({ setIsAdding, refreshBond }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
-    companyWebsite: "",
-    couponFrequency: 0,
-    couponRate: 0,
-    currentValue: 0,
-    image: "",
-    isin: "",
-    issuerName: "",
-    maturityDate: "",
-    minimumAmount: 0,
-    purchaseDate: "",
-    quantity: 0,
-    sector: "",
-    ticker: "",
-    type: "",
+    name: "",
+    logo: "",
+    description: "",
+    expListingPrice: 0,
+    expectedate: "",
+    minInvestment: 0,
+    preAllocation: "",
+    preSharePrice: 0,
+    sharePrice: 0,
   });
 
   const [errors, setErrors] = useState({});
@@ -37,7 +32,7 @@ const AddNewBond = ({ setIsAdding, refreshBond }) => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      await addNewBond(formData);
+      await addNewIpos(formData);
       Swal.fire({
         icon: "success",
         title: "Added!",
@@ -46,19 +41,15 @@ const AddNewBond = ({ setIsAdding, refreshBond }) => {
         timer: 2000,
       });
       setFormData({
-        companyWebsite: "",
-        couponFrequency: 0,
-        couponRate: 0,
-        currentValue: 0,
-        image: "",
-        isin: "",
-        issuerName: "",
-        maturityDate: "",
-        minimumAmount: 0,
-        purchaseDate: "",
-        quantity: 0,
-        sector: "",
-        type: "",
+        name: "",
+        logo: "",
+        description: "",
+        expListingPrice: 0,
+        expectedate: "",
+        minInvestment: 0,
+        preAllocation: "",
+        preSharePrice: 0,
+        sharePrice: 0,
       });
       setIsAdding(false);
     } catch (error) {
@@ -79,109 +70,82 @@ const AddNewBond = ({ setIsAdding, refreshBond }) => {
         <LoadingScreen />
       ) : (
         <form onSubmit={handleSubmit}>
-          <h1>Add New Bond</h1>
-          <label htmlFor="image">Issuer Logo:</label>
+          <h1>Add New IPOs</h1>
+          <label htmlFor="logo"> Logo:</label>
           <input
             type="url"
-            name="image"
+            name="logo"
             onChange={handleChange}
-            value={formData.image}
-            title="Must be a url"
-            required
+            value={formData.logo}
           />
-          <label htmlFor="issuerName">Issuer Name:</label>
+          <label htmlFor="name">Name:</label>
           <input
             type="text"
-            name="issuerName"
+            name="name"
             onChange={handleChange}
-            value={formData.issuerName}
+            value={formData.name}
           />
-          <label htmlFor="type">Type:</label>
+          <label htmlFor="description">Description:</label>
           <input
             type="text"
-            name="type"
+            name="description"
             onChange={handleChange}
-            value={formData.type}
+            value={formData.description}
           />
-          <label htmlFor="isin">ISIN:</label>
-          <input
-            type="text"
-            name="isin"
-            onChange={handleChange}
-            value={formData.isin}
-          />
-          <label htmlFor="quantity">Quantity:</label>
+          <label htmlFor="expListingPrice">Expected Listing Price:</label>
           <input
             type="number"
             min={0}
-            name="quantity"
+            name="expListingPrice"
             onChange={handleChange}
-            value={formData.quantity}
+            value={formData.expListingPrice}
           />
-          <label htmlFor="sector">Sector:</label>
-          <input
-            type="text"
-            name="sector"
-            onChange={handleChange}
-            value={formData.sector}
-          />
-          <label htmlFor="maturityDate">Maturity Date:</label>
+          <label htmlFor="expectedate">Expected Date:</label>
           <input
             type="date"
-            name="maturityDate"
+            name="expectedate"
             onChange={handleChange}
-            value={formData.maturityDate}
+            value={formData.expectedate}
           />
-          <label htmlFor="minimumAmount">Minimum Amount:</label>
+          <label htmlFor="minInvestment">Minimum Investment:</label>
           <input
             type="number"
             min={0}
-            name="minimumAmount"
+            name="minInvestment"
             onChange={handleChange}
-            value={formData.minimumAmount}
+            value={formData.minInvestment}
           />
-          <label htmlFor="currentValue">Current Value:</label>
+          <label htmlFor="preAllocation">Pre Allocation:</label>
+          <input
+            type="text"
+            name="preAllocation"
+            onChange={handleChange}
+            value={formData.preAllocation}
+          />
+          <label htmlFor="preSharePrice">Pre Share Price:</label>
           <input
             type="number"
-            min={0}
-            name="currentValue"
+            name="preSharePrice"
             onChange={handleChange}
-            value={formData.currentValue}
+            value={formData.preSharePrice}
           />
-          <label htmlFor="companyWebsite">Company Website:</label>
-          <input
-            type="url"
-            name="companyWebsite"
-            onChange={handleChange}
-            value={formData.companyWebsite}
-          />
-          <label htmlFor="couponRate">Coupon Rate:</label>
+          <label htmlFor="sharePrice">Share Price:</label>
           <input
             type="number"
-            name="couponRate"
+            name="sharePrice"
             onChange={handleChange}
-           
-            value={formData.couponRate}
+            value={formData.sharePrice}
           />
-          <label htmlFor="couponFrequency">Coupon Frequency:</label>
-          <input
-            type="number"
-            name="couponFrequency"
-            onChange={handleChange}
-            min={0}
-            value={formData.couponFrequency}
-          />
-
           <div style={{ marginTop: "30px" }}>
-            <input type="submit" value="Add" />
+            <input type="submit" value="Save" />
             <input
               style={{ marginLeft: "12px" }}
               className="muted-button"
               type="button"
               value="Cancel"
               onClick={() => {
-                setIsAdding(false);
-                refreshBond();
+                setIsEditPageOpen(false);
+                refreshIpos();
               }}
             />
           </div>
@@ -193,4 +157,4 @@ const AddNewBond = ({ setIsAdding, refreshBond }) => {
   );
 };
 
-export default AddNewBond;
+export default AddNewIpos;
