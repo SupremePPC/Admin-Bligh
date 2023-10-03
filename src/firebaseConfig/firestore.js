@@ -750,3 +750,53 @@ export const deleteIpos = async (ipoId) => {
     throw error;
   }
 };
+
+//IPOrequest
+const IPOS_REQUESTS_COLLECTION = "ipoInvestmentRequests";
+
+// 1. Add IPO details to a sub-collection in the user's document
+export const addIposToUserCollection = async (userId, ipoData) => {
+  const userIpoCollectionRef = collection(db, USERS_COLLECTION, userId, "ipos");
+  await addDoc(userIpoCollectionRef, ipoData);
+};
+
+// 3. Delete the IPO request status from the user's request collection
+export const deleteIposRequestStatus = async (userId, requestId) => {
+  const requestRef = doc(db, IPOS_REQUESTS_COLLECTION, requestId);
+  await deleteDoc(requestRef);
+};
+
+// 4. Fetch all the IPO requests
+export const getIposRequests = async () => {
+  const iposQuery = query(collection(db, IPOS_REQUESTS_COLLECTION));
+  const querySnapshot = await getDocs(iposQuery);
+
+  if (querySnapshot.empty) {
+    return null; // Return null if no IPO requests are found
+  }
+
+  return querySnapshot.docs.map((doc) => ({
+    ...doc.data(),
+    id: doc.id
+  }));
+};
+
+// 5. Handle the IPO approval logic
+export const handleIpoApproval = async (userId, requestId) => {
+  const requestRef = doc(db, IPOS_REQUESTS_COLLECTION, requestId);
+  await updateDoc(requestRef, {
+    status: "Approved",
+    timestamp: Timestamp.now()
+  });
+  // Note: Add any other logic here as required for IPO approval
+};
+
+// 6. Handle the IPO decline logic
+export const handleIpoDecline = async (userId, requestId) => {
+  const requestRef = doc(db, IPOS_REQUESTS_COLLECTION, requestId);
+  await updateDoc(requestRef, {
+    status: "Declined",
+    timestamp: Timestamp.now()
+  });
+  // Note: Add any other logic here as required for IPO decline
+};

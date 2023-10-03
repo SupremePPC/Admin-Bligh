@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 
 const Header = ({setIsAdding}) => {
   return (
-    <header >
+    <header>
       <h1 className='header_title'>IPOs Dashboard</h1>
       <div className="header__wrap">
         <div className="addRow_btn">

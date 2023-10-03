@@ -45,7 +45,7 @@ function Sidebar() {
             }`}
             to="/dashboard/user-requests"
           >
-            <BsPerson />
+            <BsPerson  size={18} />
             {!collapsed && "User Requests"}
           </Link>
         </li>
@@ -67,7 +67,7 @@ function Sidebar() {
             }`}
             to="/dashboard/bonds"
           >
-            <BsCardChecklist  size={20} />
+            <BsCardChecklist  size={18} />
             {!collapsed && "Bonds Request"}
           </Link>
         </li>
