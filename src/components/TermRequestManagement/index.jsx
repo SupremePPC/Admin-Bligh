@@ -4,14 +4,12 @@ import {
   addNotification,
   deleteFixedTermRequestStatus,
   getTermRequests,
-  updateRequestStatusInFirestore,
   handleDepositApproval,
   handleWithdrawalApproval,
-  updateFixedTermRequestStatus,
-} from "../../../../admin-app/src/firebaseConfig/firestore";
-import LoadingScreen from "../../../../admin-app/src/components/LoadingScreen";
+} from "../../firebaseConfig/firestore";
+import LoadingScreen from "../../components/LoadingScreen";
 import Table from "./Table";
-import { db } from "../../../../admin-app/src/firebaseConfig/firebase";
+import { db } from "../../firebaseConfig/firebase";
 import { getDoc, doc } from "firebase/firestore";
 import Header from "./Header";
 import Swal from "sweetalert2";
