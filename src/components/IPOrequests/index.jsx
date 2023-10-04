@@ -3,7 +3,7 @@ import {
 //   addIposToUserCollection,
 getSpecificIpoRequest,
   deleteDocument,
-//   deleteIposRequestStatus,
+  deleteIposRequestStatus,
   getIposRequests,
   handleIpoApproval,
   handleIpoDecline,
@@ -44,22 +44,15 @@ const IposRequestPage = () => {
   }, []);
 
   const handleUpdateRequest = async (userId, requestId, newStatus) => {
-    console.log(userId, requestId, newStatus)
     try {
       setIsLoading(true);
       // Fetch the full request data from Firestore using requestId
       const requestData = await getSpecificIpoRequest(requestId, userId);
-  
       if (newStatus === "Approved") {
-        await handleIpoApproval(userId, requestData);
+        await handleIpoApproval(userId, requestId, requestData);
       } else if (newStatus === "Declined") {
         await handleIpoDecline(userId, requestId);
       }
-      
-      // Reload IPO Requests
-      const allRequests = await getIposRequests();
-      setIpoRequests(allRequests);
-      
       Swal.fire({
         icon: "success",
         title: "Updated!",
@@ -67,7 +60,13 @@ const IposRequestPage = () => {
         showConfirmButton: false,
         timer: 2000,
       });
-  
+      await deleteIposRequestStatus (userId, requestId);
+      
+      // Reload IPO Requests
+      const allRequests = await getIposRequests();
+      setIpoRequests(allRequests);
+      
+      
     } catch (err) {
       console.error("Error updating request:", err);
       Swal.fire({

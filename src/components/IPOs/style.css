@@ -137,6 +137,10 @@
 
 
 @media screen and (min-width: 1005px) {
+  .iposPage_Wrapper .contentBody {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
   .ipoCard{
     width: 48%;
   }

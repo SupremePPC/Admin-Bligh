@@ -764,8 +764,8 @@ export const addIposToUserCollection = async (userId, ipoData) => {
 };
 
 // 3. Delete the IPO request status from the user's request collection
-export const deleteIposRequestStatus = async (requestId) => {
-  const requestRef = doc(db, IPOS_REQUESTS_COLLECTION, requestId);
+export const deleteIposRequestStatus = async (uid, requestId) => {
+  const requestRef = doc(db, ADMINDASH_COLLECTION, uid, IPOS_REQUESTS_COLLECTION, requestId);
   await deleteDoc(requestRef);
 };
 
@@ -811,41 +811,39 @@ export async function getIposRequests() {
 }
 
 // 5. Handle the IPO approval logic
-export const handleIpoApproval = async (uid, requestId) => {
+export const handleIpoApproval = async (uid, requestId, requestData) => {
   try {
-    if (!requestId || requestId.amountInvested === undefined) {
+    if (!requestId || requestData.amountInvested === undefined) {
       console.error("Invalid requestId:", requestId);
-      console.log(requestId, requestId.amountInvested)
       return;
     }
 
     // Move to `ipos` sub-collection
-    const userIposPath = `${USERS_COLLECTION}/${uid}/${IPOS_COLLECTION}`;
+    const userIposPath = USERS_COLLECTION/uid/IPOS_COLLECTION;
     const iposDocRef = doc(db, `${userIposPath}/${requestId.id}`);
     await setDoc(iposDocRef, { ...requestId, status: "Approved" }); // set the status to Approved
 
     // Add Notification
-    const userNotificationPath = collection(db, USERS_COLLECTION, uid, NOTIFICATIONS_SUB_COLLECTION);
-await addDoc(userNotificationPath, {
-  message: "Your IPO request has been approved.",
-  type: "Approved",
-});
-
-
-    // Delete from AdminDash
-    const requestRef = doc(db, ADMINDASH_COLLECTION, uid, IPOS_REQUESTS_COLLECTION, requestId.id);
-    await deleteDoc(requestRef);
+    const userNotificationPath = collection(
+      db,
+      USERS_COLLECTION,
+      uid,
+      NOTIFICATIONS_SUB_COLLECTION
+    );
+    await addDoc(userNotificationPath, {
+      message: "Your IPO request has been approved.",
+      type: "Approved",
+    });
 
   } catch (error) {
     console.error("Error in Approval:", error);
   }
 };
 
-
 // 6. Handle the IPO decline logic
-export const handleIpoDecline = async (uid, requestId) => {
+export const handleIpoDecline = async (uid, requestId,) => {
   try {
-    if (!requestId || !requestId.id) {
+    if (!requestId) {
       console.error("Invalid requestId:", requestId);
       return;
     }
@@ -854,21 +852,23 @@ export const handleIpoDecline = async (uid, requestId) => {
     const userNotificationPath = `${USERS_COLLECTION}/${uid}/${NOTIFICATIONS_SUB_COLLECTION}`;
     await addDoc(userNotificationPath, {
       message: "Your IPO request has been declined.",
-      timestamp: Timestamp.now(),
+      // timestamp: Timestamp.now(),
       type: "Decline",
     });
-
-    // Delete from AdminDash
-    const requestRef = doc(db, ADMINDASH_COLLECTION, uid, IPOS_REQUESTS_COLLECTION, requestId.id);
     await deleteDoc(requestRef);
-
   } catch (error) {
     console.error("Error in Decline:", error);
   }
 };
 
 export const getSpecificIpoRequest = async (requestId, uid) => {
-  const requestRef = doc(db, ADMINDASH_COLLECTION, uid, IPOS_REQUESTS_COLLECTION, requestId);
+  const requestRef = doc(
+    db,
+    ADMINDASH_COLLECTION,
+    uid,
+    IPOS_REQUESTS_COLLECTION,
+    requestId
+  );
   const requestSnapshot = await getDoc(requestRef);
   return requestSnapshot.data();
 };
