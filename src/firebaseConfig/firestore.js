@@ -24,7 +24,7 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { db } from "./firebase";
-import { ref, deleteObject, getStorage } from 'firebase/storage';
+import { ref, deleteObject, getStorage } from "firebase/storage";
 
 const ADMINUSER_COLLECTION = "adminUser";
 // const USER_COLLECTION = "user";
@@ -416,36 +416,34 @@ export const fetchDocument = async () => {
   const userDocs = await getDocs(usersCollection);
   const allDocuments = [];
   for (const userDoc of userDocs.docs) {
-      const user = userDoc.data();
-      const docCollection = collection(userDoc.ref, "docs");
-      const docDocs = await getDocs(docCollection);
-      docDocs.docs.forEach((docDoc) => {
-          allDocuments.push({
-              userId: userDoc.id,
-              ...docDoc.data(),
-              fullName: user.fullName,
-              docId: docDoc.id,
-          });
+    const user = userDoc.data();
+    const docCollection = collection(userDoc.ref, "docs");
+    const docDocs = await getDocs(docCollection);
+    docDocs.docs.forEach((docDoc) => {
+      allDocuments.push({
+        userId: userDoc.id,
+        ...docDoc.data(),
+        fullName: user.fullName,
+        docId: docDoc.id,
       });
+    });
   }
   return allDocuments;
-}
-
+};
 
 export const deleteDocument = async (userId, docId, fileName) => {
   const storage = getStorage();
   const storageRef = ref(storage, `${userId}/${fileName}`); // Construct the reference correctly
-  
+
   try {
     await deleteObject(storageRef);
     const docRef = doc(db, "users", userId, "docs", docId);
     await deleteDoc(docRef);
   } catch (error) {
-    console.error('Error during deletion:', error);
+    console.error("Error during deletion:", error);
     throw error;
   }
-}
-
+};
 
 //BONDS
 const BONDS_COLLECTION = "bonds";
@@ -630,7 +628,6 @@ export async function handleWithdrawalApproval(uid, termData) {
 
   if (termDoc.exists()) {
     await deleteDoc(termDocRef);
-    
   } else {
     console.error("Term does not exist in user's fixed term deposit");
   }
@@ -651,21 +648,22 @@ export async function handleDepositApproval(uid, termData) {
 
     // If termDoc doesn't exist, then this is the first document in the fixedTermDeposits collection
     if (!termDoc.exists()) {
-      console.log('Document does not exist, creating the fixedTermDeposits subcollection and setting the document...');
+      console.log(
+        "Document does not exist, creating the fixedTermDeposits subcollection and setting the document..."
+      );
       await setDoc(termDocRef, { ...termData });
-      console.log('Operation successful');
+      console.log("Operation successful");
       return;
     }
 
     // If termDoc exists, then update the document
-    console.log('Document exists, updating...');
+    console.log("Document exists, updating...");
     await updateDoc(termDocRef, { amount: termData.amount });
-    console.log('Operation successful');
+    console.log("Operation successful");
   } catch (error) {
-    console.error('Error in handleDepositApproval:', error);
+    console.error("Error in handleDepositApproval:", error);
   }
 }
-
 
 // Function to update fixed term request status in the Firestore
 export async function updateFixedTermRequestStatus(
@@ -682,19 +680,24 @@ export async function updateFixedTermRequestStatus(
 
 // Function to delete request from termsRequest sub-collection
 export async function deleteFixedTermRequestStatus(userId, requestId) {
-  const requestDocPath = doc(db, `${ADMINDASH_COLLECTION}/${userId}/${TERMS_REQUEST_SUB_COLLECTION}/${requestId}`);
+  const requestDocPath = doc(
+    db,
+    `${ADMINDASH_COLLECTION}/${userId}/${TERMS_REQUEST_SUB_COLLECTION}/${requestId}`
+  );
   await deleteDoc(requestDocPath);
 }
 
 // Function to add term to user's terms sub-collection
 export async function addTermToUserCollection(userId, termData) {
-  const userTermsHoldingsPath = collection(db, `users/${userId}/fixedTermDeposits`);
+  const userTermsHoldingsPath = collection(
+    db,
+    `users/${userId}/fixedTermDeposits`
+  );
   await addDoc(userTermsHoldingsPath, termData);
 }
 
-
 //IPOS
-const IPOS_COLLECTION = "ipos"
+const IPOS_COLLECTION = "ipos";
 
 //getIPOS
 export const getAllIpos = async () => {
@@ -719,7 +722,7 @@ export const updateIpo = async (ipoId, updatedData) => {
   try {
     const ipoRef = doc(db, IPOS_COLLECTION, ipoId);
     await updateDoc(ipoRef, updatedData);
-    console.log('IPO Updated Successfully');
+    console.log("IPO Updated Successfully");
   } catch (error) {
     console.error("Error updating IPO: ", error);
     throw error;
@@ -731,7 +734,7 @@ export const addNewIpos = async (ipoData) => {
   try {
     const iposCollectionRef = collection(db, IPOS_COLLECTION);
     const docRef = await addDoc(iposCollectionRef, ipoData);
-    console.log('IPO Added Successfully with ID: ', docRef.id);
+    console.log("IPO Added Successfully with ID: ", docRef.id);
     return docRef.id;
   } catch (error) {
     console.error("Error adding IPO: ", error);
@@ -744,7 +747,7 @@ export const deleteIpos = async (ipoId) => {
   try {
     const ipoRef = doc(db, IPOS_COLLECTION, ipoId);
     await deleteDoc(ipoRef);
-    console.log('IPO Deleted Successfully');
+    console.log("IPO Deleted Successfully");
   } catch (error) {
     console.error("Error deleting IPO: ", error);
     throw error;
@@ -761,42 +764,111 @@ export const addIposToUserCollection = async (userId, ipoData) => {
 };
 
 // 3. Delete the IPO request status from the user's request collection
-export const deleteIposRequestStatus = async (userId, requestId) => {
+export const deleteIposRequestStatus = async (requestId) => {
   const requestRef = doc(db, IPOS_REQUESTS_COLLECTION, requestId);
   await deleteDoc(requestRef);
 };
 
 // 4. Fetch all the IPO requests
-export const getIposRequests = async () => {
-  const iposQuery = query(collection(db, IPOS_REQUESTS_COLLECTION));
-  const querySnapshot = await getDocs(iposQuery);
+export async function getIposRequests() {
+  try {
+    const adminDashRef = collection(db, ADMINDASH_COLLECTION);
+    const adminDashSnapshot = await getDocs(adminDashRef);
 
-  if (querySnapshot.empty) {
-    return null; // Return null if no IPO requests are found
+    if (adminDashSnapshot.empty) {
+      console.warn("No documents found in adminDash collection");
+      return [];
+    }
+
+    let allIposRequests = [];
+
+    for (const adminDoc of adminDashSnapshot.docs) {
+      const userId = adminDoc.id;
+      const iposRequestsRef = collection(
+        db,
+        ADMINDASH_COLLECTION,
+        userId,
+        IPOS_REQUESTS_COLLECTION
+      );
+      const iposRequestsSnapshot = await getDocs(iposRequestsRef);
+
+      if (iposRequestsSnapshot.empty) continue;
+
+      const userIposRequests = iposRequestsSnapshot.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+        userId: userId,
+      }));
+
+      allIposRequests = [...allIposRequests, ...userIposRequests];
+    }
+
+    return allIposRequests;
+  } catch (error) {
+    console.error("Error in getIposRequests: ", error);
+    return [];
   }
-
-  return querySnapshot.docs.map((doc) => ({
-    ...doc.data(),
-    id: doc.id
-  }));
-};
+}
 
 // 5. Handle the IPO approval logic
-export const handleIpoApproval = async (userId, requestId) => {
-  const requestRef = doc(db, IPOS_REQUESTS_COLLECTION, requestId);
-  await updateDoc(requestRef, {
-    status: "Approved",
-    timestamp: Timestamp.now()
-  });
-  // Note: Add any other logic here as required for IPO approval
+export const handleIpoApproval = async (uid, requestId) => {
+  try {
+    if (!requestId || requestId.amountInvested === undefined) {
+      console.error("Invalid requestId:", requestId);
+      console.log(requestId, requestId.amountInvested)
+      return;
+    }
+
+    // Move to `ipos` sub-collection
+    const userIposPath = `${USERS_COLLECTION}/${uid}/${IPOS_COLLECTION}`;
+    const iposDocRef = doc(db, `${userIposPath}/${requestId.id}`);
+    await setDoc(iposDocRef, { ...requestId, status: "Approved" }); // set the status to Approved
+
+    // Add Notification
+    const userNotificationPath = collection(db, USERS_COLLECTION, uid, NOTIFICATIONS_SUB_COLLECTION);
+await addDoc(userNotificationPath, {
+  message: "Your IPO request has been approved.",
+  type: "Approved",
+});
+
+
+    // Delete from AdminDash
+    const requestRef = doc(db, ADMINDASH_COLLECTION, uid, IPOS_REQUESTS_COLLECTION, requestId.id);
+    await deleteDoc(requestRef);
+
+  } catch (error) {
+    console.error("Error in Approval:", error);
+  }
 };
 
+
 // 6. Handle the IPO decline logic
-export const handleIpoDecline = async (userId, requestId) => {
-  const requestRef = doc(db, IPOS_REQUESTS_COLLECTION, requestId);
-  await updateDoc(requestRef, {
-    status: "Declined",
-    timestamp: Timestamp.now()
-  });
-  // Note: Add any other logic here as required for IPO decline
+export const handleIpoDecline = async (uid, requestId) => {
+  try {
+    if (!requestId || !requestId.id) {
+      console.error("Invalid requestId:", requestId);
+      return;
+    }
+
+    // Add Notification
+    const userNotificationPath = `${USERS_COLLECTION}/${uid}/${NOTIFICATIONS_SUB_COLLECTION}`;
+    await addDoc(userNotificationPath, {
+      message: "Your IPO request has been declined.",
+      timestamp: Timestamp.now(),
+      type: "Decline",
+    });
+
+    // Delete from AdminDash
+    const requestRef = doc(db, ADMINDASH_COLLECTION, uid, IPOS_REQUESTS_COLLECTION, requestId.id);
+    await deleteDoc(requestRef);
+
+  } catch (error) {
+    console.error("Error in Decline:", error);
+  }
+};
+
+export const getSpecificIpoRequest = async (requestId, uid) => {
+  const requestRef = doc(db, ADMINDASH_COLLECTION, uid, IPOS_REQUESTS_COLLECTION, requestId);
+  const requestSnapshot = await getDoc(requestRef);
+  return requestSnapshot.data();
 };

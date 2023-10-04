@@ -201,11 +201,18 @@
   justify-content: flex-end;
 }
 
-@media screen and (min-width: 900px) {
+
+@media screen and (min-width: 768px) {
   .fixedTermsContainer .contentSection {
     flex-direction: row;
     flex-wrap: wrap;
   }
+  .termCard {
+    width: 45%;
+  }
+}
+
+@media screen and (min-width: 900px) {
   .termCard {
     width: 48%;
   }

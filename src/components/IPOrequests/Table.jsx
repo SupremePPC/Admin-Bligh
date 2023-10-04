@@ -12,7 +12,7 @@ function Table({ ipoRequests, handleUpdateRequest }) {
   return (
     <div className="contain-table">
       {ipoRequests.length === 0 ? (
-        <h5 style={{textAlign: 'center'}}>NO REQUEST FOUND.</h5>
+        <h5 style={{ textAlign: "center" }}>NO REQUEST FOUND.</h5>
       ) : (
         <>
           <table className="striped-table">
@@ -21,20 +21,18 @@ function Table({ ipoRequests, handleUpdateRequest }) {
                 <th>User Name</th>
                 <th>Amount</th>
                 <th>Status</th>
-                <th>Type</th>
                 <th colSpan={3} className="text-center">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody>
-              {bondRequests.map((request, index) => (
-                <>
-                  <tr key={index}>
+            <>
+              {ipoRequests.map((request, index) => (
+                <tbody key={index}>
+                  <tr>
                     <td>{request.userName}</td>
-                    <td>${request.amountRequested}</td>
-                    <td>{request.requestStatus}</td>
-                    <td>{request.typeOfRequest}</td>
+                    <td>${request.amountInvested}</td>
+                    <td>{request.status}</td>
                     <td className="text-right">
                       <button
                         onClick={() =>
@@ -50,7 +48,7 @@ function Table({ ipoRequests, handleUpdateRequest }) {
                     </td>
                     <td className="text-left">
                       <button
-                      className="button muted-button"
+                        className="button muted-button"
                         onClick={() =>
                           handleUpdateRequest(
                             request.userId,
@@ -80,53 +78,33 @@ function Table({ ipoRequests, handleUpdateRequest }) {
                       <td colSpan={5}>
                         <div className="dropdown_col">
                           <div className="dropdown_row">
-                            <p className="bold_text">Issuer Name :</p>
-                            <span className="reg_text">
-                              {" "}
-                              {request.issuerName}{" "}
-                            </span>
-                          </div>
-                          <div className="dropdown_row">
-                            <p className="bold_text">Sector :</p>
-                            <span className="reg_text"> {request.sector} </span>
-                          </div>
-                          <div className="dropdown_row">
-                            <p className="bold_text">Company Website :</p>
-                            <span className="reg_text">
-                              {" "}
-                              {request.companyWebsite}{" "}
-                            </span>
-                          </div>
-                          <div className="dropdown_row">
-                            <p className="bold_text">ISIN :</p>
-                            <span className="reg_text"> {request.isin} </span>
-                          </div>
-                          <div className="dropdown_row">
-                            <p className="bold_text">Ticker :</p>
-                            <span className="reg_text"> {request.ticker} </span>
-                          </div>
-                          <div className="dropdown_row">
-                            <p className="bold_text">Coupon Frequency :</p>
-                            <span className="reg_text">
-                              {" "}
-                              {request.couponFrequency}{" "}
-                            </span>
-                          </div>
-                          <div className="dropdown_row">
                             <p className="bold_text">
-                              Minimum Investment Amount :
+                              Expected Listing Price :
                             </p>
                             <span className="reg_text">
-                              $ {request.minimumAmount}{" "}
+                              € {request.expListingPrice}{" "}
+                            </span>
+                          </div>
+                          <div className="dropdown_row">
+                            <p className="bold_text">Expected Date :</p>
+                            <span className="reg_text">
+                              {" "}
+                              {request.expectedDate}{" "}
+                            </span>
+                          </div>
+                          <div className="dropdown_row">
+                            <p className="bold_text">Share Price :</p>
+                            <span className="reg_text">
+                              € {request.sharePrice}{" "}
                             </span>
                           </div>
                         </div>
                       </td>
                     </tr>
                   )}
-                </>
+                </tbody>
               ))}
-            </tbody>
+            </>
           </table>
         </>
       )}

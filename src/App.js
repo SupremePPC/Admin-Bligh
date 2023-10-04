@@ -19,10 +19,10 @@ import UserOverview from "./components/UserOverview";
 import BondsRequestTable from "./components/BondRequestManagement";
 import NotificationPage from "./components/Notifications";
 import TermsPage from "./components/FixedTermManagement";
-import "./App.css";
-import TermsRequestTable from "./components/TermRequestManagement";
 import IPOs from "./components/IPOs";
-import IposRequestPage from "./components/IPOrequest";
+import TermsRequestTable from "./components/TermRequestManagement";
+import IposRequestPage from "./components/IPOrequests";
+import "./App.css";
 
 function App() {
   const { loadingAuthState } = useAuth();

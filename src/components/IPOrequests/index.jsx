@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import {
 //   addIposToUserCollection,
-  addNotification,
+getSpecificIpoRequest,
+  deleteDocument,
 //   deleteIposRequestStatus,
   getIposRequests,
   handleIpoApproval,
   handleIpoDecline,
 } from "../../firebaseConfig/firestore";
-import LoadingScreen from "../../components/LoadingScreen";
+import LoadingScreen from "../LoadingScreen";
 import Table from "./Table";
 import { db } from "../../firebaseConfig/firebase";
 import { getDoc, doc } from "firebase/firestore";
@@ -31,6 +32,7 @@ const IposRequestPage = () => {
           })
         );
         setIpoRequests(requestsWithUserDetails);
+        // console.log(`ipoRequests: ${ipoRequests}`)
       } catch (error) {
         console.error("Error fetching request:", error);
       } finally {
@@ -42,16 +44,19 @@ const IposRequestPage = () => {
   }, []);
 
   const handleUpdateRequest = async (userId, requestId, newStatus) => {
+    console.log(userId, requestId, newStatus)
     try {
       setIsLoading(true);
-
+      // Fetch the full request data from Firestore using requestId
+      const requestData = await getSpecificIpoRequest(requestId, userId);
+  
       if (newStatus === "Approved") {
-        await handleIpoApproval(userId, requestId);
+        await handleIpoApproval(userId, requestData);
       } else if (newStatus === "Declined") {
         await handleIpoDecline(userId, requestId);
       }
       
-      // Refresh the table data
+      // Reload IPO Requests
       const allRequests = await getIposRequests();
       setIpoRequests(allRequests);
       
@@ -62,6 +67,7 @@ const IposRequestPage = () => {
         showConfirmButton: false,
         timer: 2000,
       });
+  
     } catch (err) {
       console.error("Error updating request:", err);
       Swal.fire({
@@ -74,6 +80,7 @@ const IposRequestPage = () => {
       setIsLoading(false);
     }
   };
+  
  
   return (
     <div className="container">
