@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { doc, getDoc, collection, getDocs } from "firebase/firestore";
-import Swal from "sweetalert2";
 import { db } from "../../firebaseConfig/firebase";
 import AddBankingDetails from "../BankingDetails/Add";
 import EditBankingDetails from "../BankingDetails/Edit";
 
 import EditUser from "../RegisteredUsers/Edit";
-import AddTransaction from "../TransactionManagement/Add";
-import AddBond from "../BondRequestManagement/Add";
+import AddTransaction from "../TransactionManagement/AddTransaction";
 import EditTransaction from "../TransactionManagement/Edit";
+import AddBond from "../BondRequestManagement/Add";
+import Swal from "sweetalert2";
+import "./style.css"
 
 const UserOverview = () => {
   const user = useParams();
@@ -23,7 +24,7 @@ const UserOverview = () => {
   const [fixedTerm, setFixedTerm] = useState([]);
   const [document, setDocument] = useState([]);
   const [selectedUserForAdd, setSelectedUserForAdd] = useState(null);
-  
+
   // const [isAddTransactionOpen, setIsAddTransactionOpen] = useState(false);
   // const [isAddBondOpen, setIsAddBondOpen] = useState(false);
   // const [isAddAccountOpen, setIsAddAccountOpen] = useState(false);
@@ -95,8 +96,9 @@ const UserOverview = () => {
       fetchSubCollection("bankingDetails", setBankingDetails);
       fetchSubCollection("bondsHoldings", setBondsHoldings);
       fetchSubCollection("bondsRequest", setBondsRequest);
-      fetchSubCollection("docs", setDocs);
       fetchSubCollection("transactions", setTransactions);
+      fetchSubCollection("fixedTermDeposits", setFixedTerm);
+      fetchSubCollection("docs", setDocs);
       // console.log(bankingDetails, bankingDetails[0].id);
     } else {
       Swal.fire({
@@ -112,6 +114,44 @@ const UserOverview = () => {
     0
   );
 
+  const calculateMaturityAmount = (principal, interestRate, term) => {
+    // Parse principal and interestRate to float numbers
+    const principalNumber = parseFloat(principal);
+    const interestRateNumber = parseFloat(interestRate);
+
+    // Parse the term string to extract the number and the unit
+    const termParts = term.split(" ");
+    if (termParts.length !== 2) {
+      console.error("Invalid term format:", term); // Log error for invalid term
+      return "Invalid Input"; // Return error message for invalid term
+    }
+
+    let termNumber = parseFloat(termParts[0]);
+    const termUnit = termParts[1];
+
+    // If the term is in months, convert it to years
+    if (termUnit.startsWith("Month")) {
+      termNumber = termNumber / 12;
+    } else if (!termUnit.startsWith("Year")) {
+      console.error("Invalid term unit:", termUnit); // Log error for invalid termUnit
+      return "Invalid Input"; // Return error message for invalid termUnit
+    }
+
+    // Check for invalid inputs
+    if (
+      isNaN(principalNumber) ||
+      isNaN(interestRateNumber) ||
+      isNaN(termNumber)
+    ) {
+      return "Invalid Input"; // Return error message for NaN values
+    }
+
+    // Calculate the maturity amount
+    const maturityAmount =
+      principalNumber * (1 + (interestRateNumber / 100) * termNumber);
+    return maturityAmount.toFixed(2);
+  };
+
   return (
     <div className="container">
       {!modalState.isAddBondOpen &&
@@ -121,7 +161,8 @@ const UserOverview = () => {
         !modalState.isAddBondOpen &&
         !modalState.isEditUserDetailsOpen &&
         !modalState.isEditTransactionOpen &&
-        !modalState.isEditBankingDetails && (
+        !modalState.isEditBankingDetails &&
+        !modalState.isAddNewTermOpen && (
           <div className="userOverview_container">
             {/* User Details */}
             {userDetails && (
@@ -299,116 +340,207 @@ const UserOverview = () => {
                   </tbody>
                 </table>
               )}
-               <div className="dropdown_btn">
+              <div className="dropdown_btn">
                 <button onClick={() => handleOpenModal("isAddTransactionOpen")}>
                   Add Transaction
                 </button>
               </div>
             </div>
 
-                    {/* Bonds List */}
-             <div className="user_details">
-            <h3>Bonds Holdings</h3>
-            {bondsHoldings.length === 0 ? (
-              <p className="bold_text">
-                This user holds no bonds at the moment.
-              </p>
-            ) : (
-              bondsHoldings.map((item) => {
-                const maturityObject = item.maturityDate?.toDate
-                  ? item.maturityDate.toDate()
-                  : new Date(item.maturityDate);
-                const maturityDay = String(maturityObject.getDate()).padStart(
-                  2,
-                  "0"
-                );
-                const maturityMonth = String(
-                  maturityObject.getMonth() + 1
-                ).padStart(2, "0");
-                const maturityYear = maturityObject.getFullYear();
-                const formattedMaturity = `${maturityDay}/${maturityMonth}/${maturityYear}`;
+            {/* Bonds List */}
+            <div className="user_details">
+              <h3>Bonds Holdings</h3>
+              {bondsHoldings.length === 0 ? (
+                <p className="bold_text">
+                  This user holds no bonds at the moment.
+                </p>
+              ) : (
+                bondsHoldings.map((item) => {
+                  const maturityObject = item.maturityDate?.toDate
+                    ? item.maturityDate.toDate()
+                    : new Date(item.maturityDate);
+                  const maturityDay = String(maturityObject.getDate()).padStart(
+                    2,
+                    "0"
+                  );
+                  const maturityMonth = String(
+                    maturityObject.getMonth() + 1
+                  ).padStart(2, "0");
+                  const maturityYear = maturityObject.getFullYear();
+                  const formattedMaturity = `${maturityDay}/${maturityMonth}/${maturityYear}`;
 
-                const purchaseObject = item.purchaseDate?.toDate
-                  ? item.purchaseDate.toDate()
-                  : new Date(item.purchaseDate);
-                const day = String(purchaseObject.getDate()).padStart(2, "0");
-                const month = String(purchaseObject.getMonth() + 1).padStart(
-                  2,
-                  "0"
-                );
-                const year = purchaseObject.getFullYear();
-                const formattedPurchase = `${day}/${month}/${year}`;
+                  const purchaseObject = item.purchaseDate?.toDate
+                    ? item.purchaseDate.toDate()
+                    : new Date(item.purchaseDate);
+                  const day = String(purchaseObject.getDate()).padStart(2, "0");
+                  const month = String(purchaseObject.getMonth() + 1).padStart(
+                    2,
+                    "0"
+                  );
+                  const year = purchaseObject.getFullYear();
+                  const formattedPurchase = `${day}/${month}/${year}`;
 
-                return (
-                  <div className="user_wrap" key={item.id}>
-                    <div className="text_wrap">
-                      <img
-                        src={item.image}
-                        alt="Bond image"
-                        style={{ width: "100px" }}
-                      />
-                    </div>
-                    <div className="text_wrap">
-                      <p className="bold_text">Issuer Name:</p>
-                      <span className="reg_text">{item.issuerName}</span>
-                    </div>
-                    <div className="text_wrap">
-                      <p className="bold_text">Company Website:</p>
-                      <span className="reg_text">{item.companyWebsite}</span>
-                    </div>
-                    <div className="text_wrap">
-                      <p className="bold_text">Coupon Frequency:</p>
-                      <span className="reg_text">{item.couponFrequency}</span>
-                    </div>
-                    <div className="text_wrap">
-                      <p className="bold_text">Coupon Rate:</p>
-                      <span className="reg_text">{item.couponRate}%</span>
-                    </div>
-                    <div className="text_wrap">
-                      <p className="bold_text">Current Value:</p>
-                      <span className="reg_text">$ {item.currentValue}</span>
-                    </div>
-                    <div className="text_wrap">
-                      <p className="bold_text">ISIN:</p>
-                      <span className="reg_text">{item.isin}</span>
-                    </div>
+                  return (
+                    <div className="user_wrap" key={item.id}>
+                      <div className="text_wrap">
+                        <img
+                          src={item.image}
+                          alt="Bond image"
+                          style={{ width: "100px" }}
+                        />
+                      </div>
+                      <div className="text_wrap">
+                        <p className="bold_text">Issuer Name:</p>
+                        <span className="reg_text">{item.issuerName}</span>
+                      </div>
+                      <div className="text_wrap">
+                        <p className="bold_text">Company Website:</p>
+                        <span className="reg_text">{item.companyWebsite}</span>
+                      </div>
+                      <div className="text_wrap">
+                        <p className="bold_text">Coupon Frequency:</p>
+                        <span className="reg_text">{item.couponFrequency}</span>
+                      </div>
+                      <div className="text_wrap">
+                        <p className="bold_text">Coupon Rate:</p>
+                        <span className="reg_text">{item.couponRate}%</span>
+                      </div>
+                      <div className="text_wrap">
+                        <p className="bold_text">Current Value:</p>
+                        <span className="reg_text">$ {item.currentValue}</span>
+                      </div>
+                      <div className="text_wrap">
+                        <p className="bold_text">ISIN:</p>
+                        <span className="reg_text">{item.isin}</span>
+                      </div>
 
-                    <div className="text_wrap">
-                      <p className="bold_text">Minimum Amount:</p>
-                      <span className="reg_text">$ {item.minimumAmount}</span>
-                    </div>
+                      <div className="text_wrap">
+                        <p className="bold_text">Minimum Amount:</p>
+                        <span className="reg_text">$ {item.minimumAmount}</span>
+                      </div>
 
-                    <div className="text_wrap">
-                      <p className="bold_text">Maturity Date:</p>
-                      <span className="reg_text">{formattedMaturity}</span>
-                    </div>
-                    <div className="text_wrap">
-                      <p className="bold_text">Purchase Date:</p>
-                      <span className="reg_text">{formattedPurchase}</span>
-                    </div>
-                    <div className="text_wrap">
-                      <p className="bold_text">Quantity:</p>
-                      <span className="reg_text">{item.quantity}</span>
-                    </div>
-                    <div className="text_wrap">
-                      <p className="bold_text">Sector:</p>
-                      <span className="reg_text">{item.sector}</span>
-                    </div>
+                      <div className="text_wrap">
+                        <p className="bold_text">Maturity Date:</p>
+                        <span className="reg_text">{formattedMaturity}</span>
+                      </div>
+                      <div className="text_wrap">
+                        <p className="bold_text">Purchase Date:</p>
+                        <span className="reg_text">{formattedPurchase}</span>
+                      </div>
+                      <div className="text_wrap">
+                        <p className="bold_text">Quantity:</p>
+                        <span className="reg_text">{item.quantity}</span>
+                      </div>
+                      <div className="text_wrap">
+                        <p className="bold_text">Sector:</p>
+                        <span className="reg_text">{item.sector}</span>
+                      </div>
 
-                    <div className="text_wrap">
-                      <p className="bold_text">Type:</p>
-                      <span className="reg_text">{item.type}</span>
+                      <div className="text_wrap">
+                        <p className="bold_text">Type:</p>
+                        <span className="reg_text">{item.type}</span>
+                      </div>
                     </div>
-                  </div>
-                );
-              })
-            )}
-            <div className="dropdown_btn">
-              <button onClick={() => handleOpenModal("isAddBondOpen")}>Add Bond</button>
+                  );
+                })
+              )}
+              <div className="dropdown_btn">
+                <button onClick={() => handleOpenModal("isAddBondOpen")}>
+                  Add Bond
+                </button>
+              </div>
             </div>
-          </div>
 
-         {/* <div className="user_details">
+            {/* Fixed Term Table */}
+            <div className="user_details">
+              <h3>Fixed Term Deposits</h3>
+              <table className="term_table">
+                {fixedTerm.length > 0 ? (
+                  <>
+                    <thead>
+                      <tr>
+                        <th title="Unique identifier or name.">
+                          Term Deposit Name
+                        </th>
+                        <th title="The initial amount deposited.">
+                          Principal Amount
+                        </th>
+                        <th title="The date when the term deposit will mature.">
+                          Maturity Date
+                        </th>
+                        <th title="The rate at which interest is earned.">
+                          Interest Rate
+                        </th>
+                        <th title="The amount receivable upon maturity.">
+                          Maturity Amount
+                        </th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    {fixedTerm.map((term, index) => (
+                      <tbody key={index}>
+                        <tr>
+                          <td>
+                            <div className="button_grid">
+                              <img src={term.logo} alt="logo" />
+                              <p>{term.bankName}</p>
+                            </div>
+                          </td>
+                          <td>€ {term.principalAmount}</td>
+                          <td>{term.term}</td>
+                          <td>{term.interestRate} %</td>
+                          <td>
+                            €{" "}
+                            {calculateMaturityAmount(
+                              term.principalAmount,
+                              term.interestRate,
+                              term.term
+                            ) || 0}
+                          </td>
+                          <td>
+                            <div className="button_grid">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeposit(term);
+                                }}
+                                className="buy_button"
+                              >
+                                Renew
+                              </button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleWithdraw(term);
+                                }}
+                                className="sell_button"
+                              >
+                                Withdraw
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    ))}
+                  </>
+                ) : (
+                  <tbody>
+                    <tr>
+                      <td className="no_holding">
+                        No Fixed Terms Deposits Available.
+                      </td>
+                    </tr>
+                  </tbody>
+                )}
+              </table>
+              <div className="dropdown_btn">
+                <button onClick={() => handleOpenModal("isAddBondOpen")}>
+                  Add Fixed Term Deposit
+                </button>
+              </div>
+            </div>
+
+            {/* <div className="user_details">
             <h3>Document</h3>
             {docs.length === 0 ? (
               <>
@@ -468,18 +600,19 @@ const UserOverview = () => {
           bankingDetails={bankingDetails[0]}
         />
       )}
-     {modalState.isAddTransactionOpen && (
+      {modalState.isAddTransactionOpen && (
         <AddTransaction
           onClose={() => {
             handleCloseModal("isAddTransactionOpen");
             setSelectedUserForAdd(null);
           }}
           setTransactions={setTransactions}
-          setIsAdding={setIsAdding}
+          transactions={transactions}
+          totalBalance={totalBalance}
           userId={user}
         />
       )}
-     {modalState.isEditTransactionOpen && (
+      {modalState.isEditTransactionOpen && (
         <EditTransaction
           onClose={() => {
             handleCloseModal("isEditTransactionOpen");
@@ -495,29 +628,18 @@ const UserOverview = () => {
       {modalState.isAddBondOpen && (
         <AddBond
           onClose={() => {
-            handleOpenModal("isAddBondOpen")
+            handleCloseModal("isAddBondOpen");
             setSelectedUserForAdd(null);
           }}
-          bonds={bonds}
-          setBonds={setBonds}
+          bonds={bondsHoldings}
+          setBonds={setBondsHoldings}
           userId={user}
         />
       )}
-      {/*{isAddAccountOpen && (
-        <AddToAccount
-          onClose={() => {
-            setIsAddAccountOpen(false);
-            setSelectedUserForAdd(null);
-          }}
-          accounts={accounts}
-          setAccounts={setAccounts}
-          userId={user}
-        />
-      )}
-      {isAddNewTermOpen && (
+      {modalState.isAddNewTermOpen && (
         <AddNewTerm
           onClose={() => {
-            setIsAddNewTermOpen(false);
+            handleCloseModal("isAddNewTermOpen");
             setSelectedUserForAdd(null);
           }}
           fixedTerm={fixedTerm}
@@ -525,6 +647,7 @@ const UserOverview = () => {
           userId={user}
         />
       )}
+      {/* 
       {isAddNewDocumentOpen && (
         <AddDocument
           onClose={() => {
@@ -535,7 +658,7 @@ const UserOverview = () => {
           setDocument={setDocument}
           userId={user}
         />
-      )} */}
+      )}  */}
     </div>
   );
 };

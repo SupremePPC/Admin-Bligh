@@ -477,6 +477,17 @@ export async function addNewBond(bondData) {
   }
 }
 
+//add new bonds for a particular user
+export async function addBondUser(userId, bondData) {
+  try {
+    const bondsRef = collection(db, USERS_COLLECTION, userId, "bondsHoldings");
+    const newBondRef = await addDoc(bondsRef, bondData);
+    return { success: true, id: newBondRef.id };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+}
+
 //uodate existing bond
 export async function updateBond(bondId, updatedData) {
   try {

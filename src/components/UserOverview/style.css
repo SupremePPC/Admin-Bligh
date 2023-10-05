@@ -1,10 +1,111 @@
-.userOverview_container .user_wrap{
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 1rem;
-    margin: 0;
-    gap: 0.5rem;
-    border: 1px solid wheat;
-    border-radius: 5px;
+.userOverview_container .user_wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 1rem;
+  margin: 0;
+  gap: 0.5rem;
+}
+
+.term_table {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 8px;
+}
+
+.term_table td,
+.term_table th {
+  border: 1px solid #cccccc80;
+  padding: 10px;
+  text-align: left;
+  font-size: 14px;
+  /* min-width: 150px; */
+}
+
+/* Style the buttons */
+.term_table button {
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  width: 100%;
+}
+
+/* Use a grid layout for the buttons */
+.term_table td > div.button_grid {
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  justify-items: center;
+  align-items: center;
+}
+
+.button_grid img {
+  width: 1.2rem;
+  height: 1rem;
+}
+
+/* Different colors for buttons */
+.buy_button {
+  background-color: transparent;
+  color: #256528;
+}
+
+.sell_button {
+  background-color: transparent;
+  color: #c12c21;
+  border: 1px solid var(--setermary);
+}
+
+.details_button {
+  color: #008cba;
+  background-color: transparent;
+}
+
+tr .no_holding {
+  font-weight: 500;
+  text-align: center;
+  color: var(--white);
+  padding: 1rem;
+}
+
+td .holding_dropdown {
+  border-radius: 0px 0px 8px 8px;
+  color: var(--white);
+  font-size: 14px;
+  background-color: transparent;
+  max-height: 500px;
+  margin: 0;
+  transition: max-height 0.5s ease-in-out;
+}
+
+td .holding_dropdown {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+td .holding_dropdown .dropdown_row {
+  display: flex;
+  gap: 0.35rem;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  width: 100%;
+}
+
+td .holding_dropdown .dropdown_row .bold_text {
+  font-size: var(--font-fourteen);
+  font-weight: 500;
+  color: var(--white);
+}
+
+td .holding_dropdown .dropdown_row .reg_text {
+  font-size: var(--font-fourteen);
+  font-weight: 400;
+  color: var(--white);
+}
+
+.userOverview_container .term_table td,
+.userOverview_container .term_table th,
+.userOverview_container .term_table p {
+  color: var(--white);
 }

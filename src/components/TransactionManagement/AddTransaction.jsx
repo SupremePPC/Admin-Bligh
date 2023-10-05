@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Swal from "sweetalert2";
-import { addTransaction } from "../../firebaseConfig/firestore";
 import LoadingScreen from "../LoadingScreen";
+import { addTransaction } from "../../firebaseConfig/firestore";
 
 const AddTransaction = ({
   transactions,
@@ -54,7 +54,6 @@ const AddTransaction = ({
     };
 
     try {
-      console.log('New Transaction:', newTransaction);
       const result = await addTransaction(userId.userId, newTransaction);
       if (result.success) {
         Swal.fire({
