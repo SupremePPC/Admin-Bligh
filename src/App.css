@@ -206,7 +206,7 @@ img {
 .error_msg {
   width: 100%;
   font-size: var(--font-twelve);
-  color: #fea3a3;
+  color: #c76262;
   font-weight: 500;
   background-color: rgba(250 128 75 / 33%);
   border: 1px solid var(--red);
@@ -219,7 +219,7 @@ img {
 .success_msg {
   width: 100%;
   font-size: var(--font-twelve);
-  color: #3d8d00;
+  color: #327200;
   font-weight: 500;
   background-color: rgba(61 141 0 / 33%);
   border: 1px solid var(--green);
