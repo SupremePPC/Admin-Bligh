@@ -10,7 +10,7 @@ import AddTransaction from "../TransactionManagement/AddTransaction";
 import EditTransaction from "../TransactionManagement/Edit";
 import AddBond from "../BondRequestManagement/Add";
 import Swal from "sweetalert2";
-import "./style.css"
+import "./style.css";
 
 const UserOverview = () => {
   const user = useParams();
@@ -18,20 +18,11 @@ const UserOverview = () => {
   const [accountTypes, setAccountTypes] = useState([]);
   const [bankingDetails, setBankingDetails] = useState([]);
   const [bondsHoldings, setBondsHoldings] = useState([]);
-  const [bondsRequest, setBondsRequest] = useState([]);
   const [docs, setDocs] = useState([]);
+  const [ipos, setIpos] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [fixedTerm, setFixedTerm] = useState([]);
-  const [document, setDocument] = useState([]);
   const [selectedUserForAdd, setSelectedUserForAdd] = useState(null);
-
-  // const [isAddTransactionOpen, setIsAddTransactionOpen] = useState(false);
-  // const [isAddBondOpen, setIsAddBondOpen] = useState(false);
-  // const [isAddAccountOpen, setIsAddAccountOpen] = useState(false);
-  // const [isAddNewTermOpen, setIsAddNewTermOpen] = useState(false);
-  // const [isUserDetailsOpen, setIsUserDetailsOpen] = useState(false);
-  // const [isAddNewDocumentOpen, setIsAddNewDocumentOpen] = useState(false);
-  // const [isEditUserDetails, setIsEditUserDetails] = useState(false);
 
   const [modalState, setModalState] = useState({
     isAddTransactionOpen: false,
@@ -44,6 +35,7 @@ const UserOverview = () => {
     isAddTransactionOpen: false,
     isEditUserDetailsOpen: false,
     isAddNewTermOpen: false,
+    isAddNewIpos: false,
   });
 
   const handleOpenModal = (modalType) => {
@@ -95,9 +87,9 @@ const UserOverview = () => {
       fetchSubCollection("accountTypes", setAccountTypes);
       fetchSubCollection("bankingDetails", setBankingDetails);
       fetchSubCollection("bondsHoldings", setBondsHoldings);
-      fetchSubCollection("bondsRequest", setBondsRequest);
       fetchSubCollection("transactions", setTransactions);
       fetchSubCollection("fixedTermDeposits", setFixedTerm);
+      fetchSubCollection("ipos", setIpos);
       fetchSubCollection("docs", setDocs);
       // console.log(bankingDetails, bankingDetails[0].id);
     } else {
@@ -152,6 +144,14 @@ const UserOverview = () => {
     return maturityAmount.toFixed(2);
   };
 
+  const firestoreTimestampToDate = (timestamp) => {
+    return timestamp
+      ? new Date(timestamp.seconds * 1000).toLocaleDateString()
+      : "";
+  };
+
+  const numberOfShares = ipos.amountInvested / ipos.sharePrice;
+
   return (
     <div className="container">
       {!modalState.isAddBondOpen &&
@@ -162,7 +162,8 @@ const UserOverview = () => {
         !modalState.isEditUserDetailsOpen &&
         !modalState.isEditTransactionOpen &&
         !modalState.isEditBankingDetails &&
-        !modalState.isAddNewTermOpen && (
+        !modalState.isAddNewTermOpen &&
+        !modalState.isAddNewIpos && (
           <div className="userOverview_container">
             {/* User Details */}
             {userDetails && (
@@ -474,7 +475,6 @@ const UserOverview = () => {
                         <th title="The amount receivable upon maturity.">
                           Maturity Amount
                         </th>
-                        <th>Actions</th>
                       </tr>
                     </thead>
                     {fixedTerm.map((term, index) => (
@@ -497,28 +497,6 @@ const UserOverview = () => {
                               term.term
                             ) || 0}
                           </td>
-                          <td>
-                            <div className="button_grid">
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleDeposit(term);
-                                }}
-                                className="buy_button"
-                              >
-                                Renew
-                              </button>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleWithdraw(term);
-                                }}
-                                className="sell_button"
-                              >
-                                Withdraw
-                              </button>
-                            </div>
-                          </td>
                         </tr>
                       </tbody>
                     ))}
@@ -540,36 +518,84 @@ const UserOverview = () => {
               </div>
             </div>
 
+            {/* IPOs  */}
+            <div className="user_details">
+              <table className="terms_table">
+                {" "}
+                {ipos.length > 0 ? (
+                  <>
+                    <thead>
+                      <tr>
+                        <th>Company Name</th>
+                        <th>Purchase Date</th>
+                        <th>Purchase Price</th>
+                        <th>Number of Shares</th>
+                        <th>Current Price</th>
+                      </tr>
+                    </thead>
+                    {ipos.map((ipos, index) => (
+                      <tbody key={index}>
+                        <tr>
+                          <td>
+                            <div className="button_grid">
+                              <img src={ipos.logo} alt="logo" />
+                              <p>{ipos.name}</p>
+                            </div>
+                          </td>
+                          <td>{firestoreTimestampToDate(ipos.date)}</td>
+                          <td>€ {ipos.amountInvested}</td>
+                          <td>{numberOfShares}</td>
+                          <td>€ {ipos.sharePrice}</td>
+                        </tr>
+                      </tbody>
+                    ))}
+                  </>
+                ) : (
+                  <tbody>
+                    <tr>
+                      <td className="no_holding">No current Holdings.</td>
+                    </tr>
+                  </tbody>
+                )}
+              </table>
+              <div className="dropdown_btn">
+                <button onClick={() => handleOpenModal("isAddBondOpen")}>
+                  Add IPOs
+                </button>
+              </div>
+            </div>
+
+            {/* Document */}
             {/* <div className="user_details">
-            <h3>Document</h3>
-            {docs.length === 0 ? (
-              <>
-                <p className="bold_text">No document has been added yet.</p>
-                <div className="dropdown_btn">
-                  <button onClick={handleAddBond}>Add Document</button>
-                </div>
-              </>
-            ) : (
-              docs.map((item) => (
-                <div className="user_wrap" key={item.id}>
-                  <div className="text_wrap">
+              <h3>Document</h3>
+              {docs.length === 0 ? (
+                <>
+                  <p className="bold_text">No document has been added yet.</p>
+                  <div className="dropdown_btn">
+                    <button onClick={handleAddBond}>Add Document</button>
+                  </div>
+                </>
+              ) : (
+                docs.map((item) => (
+                  <div className="user_wrap" key={item.id}>
                     <div className="text_wrap">
-                      <p className="bold_text">File Description :</p>
-                      <span className="reg_text">{item.fileDescription}</span>
+                      <div className="text_wrap">
+                        <p className="bold_text">File Description :</p>
+                        <span className="reg_text">{item.fileDescription}</span>
+                      </div>
+                    </div>
+                    <div className="text_wrap">
+                      <a className="bold_text" href={item.downloadURL}>
+                        <u>Download URL</u>
+                      </a>
+                    </div>
+                    <div className="dropdown_btn">
+                      <button onClick={handleAddBond}>Edit Document</button>
                     </div>
                   </div>
-                  <div className="text_wrap">
-                    <a className="bold_text" href={item.downloadURL}>
-                      <u>Download URL</u>
-                    </a>
-                  </div>
-                  <div className="dropdown_btn">
-                    <button onClick={handleAddBond}>Edit Document</button>
-                  </div>
-                </div>
-              ))
-            )}
-          </div> */}
+                ))
+              )}
+            </div> */}
           </div>
         )}
       {modalState.isAddBankingDetails && (

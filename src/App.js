@@ -23,6 +23,7 @@ import IPOs from "./components/IPOs";
 import TermsRequestTable from "./components/TermRequestManagement";
 import IposRequestPage from "./components/IPOrequests";
 import "./App.css";
+import SettingsPage from "./components/Settings";
 
 function App() {
   const { loadingAuthState } = useAuth();
@@ -141,6 +142,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <NotificationPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="settings"
+                element={
+                  <ProtectedRoute>
+                    <SettingsPage />
                   </ProtectedRoute>
                 }
               />

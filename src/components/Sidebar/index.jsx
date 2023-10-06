@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   IoHomeOutline,
+  IoSettingsOutline
 } from "react-icons/io5";
 import { CgMenuGridR } from "react-icons/cg";
 import { BiTransfer } from "react-icons/bi";
@@ -125,6 +126,18 @@ function Sidebar() {
           >
             <IoMdNotificationsOutline  size={20}/>
             {!collapsed && "Notifications"}
+          </Link>
+        </li>
+        
+        <li className="menu_list">
+          <Link
+            className={`menu_link ${
+              isActive("/dashboard/settings") ? "active" : ""
+            }`}
+            to="/dashboard/settings"
+          >
+            <IoSettingsOutline  size={20}/>
+            {!collapsed && "Settings"}
           </Link>
         </li>
 
