@@ -1,9 +1,7 @@
 import React, {useState} from 'react';
 import { FaAngleRight } from "react-icons/fa";
 import { RiLockPasswordFill } from "react-icons/ri";
-// import { GoPencil } from "react-icons/go";
-// import { IoNewspaperOutline } from "react-icons/io5";
-// import { BsBank } from "react-icons/bs";
+
 import "./style.css";
 import ChangePassword from '../ChangePassword';
 
@@ -82,21 +80,7 @@ export default function SettingsPage() {
     );
   }
   
-  // Individual Tab Components
-  
-//   const AccountInfoTab = () => {
-//     return <AccountInfo />;
-//   };
-  
   const ChangePasswordTab = () => {
     return <ChangePassword/>;
   };
-  
-//   const DocumentsTab = () => {
-//     return <UploadDoc/>;
-//   };
-  
-//   const BankingDetailsTab = () => {
-//     return <BankingDetails/>;
-//   };
   

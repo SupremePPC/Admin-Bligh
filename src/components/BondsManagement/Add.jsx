@@ -27,21 +27,38 @@ const AddNewBond = ({ setIsAdding, refreshBond }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+
+    // Check if the field is a monetary value (couponRate, currentValue, minimumAmount, quantity)
+    if (["minimumAmount"].includes(name)) {
+      // Remove commas and format as a number with two decimal places
+      const formattedValue = parseFloat(value.replace(/,/g, "")).toFixed(2).toLocaleString();
+      setFormData({
+        ...formData,
+        [name]: formattedValue,
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value,
+      });
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      await addNewBond(formData);
+      // Remove commas from monetary values before submitting
+      const formattedData = {
+        ...formData,
+        minimumAmount: parseFloat(formData.minimumAmount.replace(/,/g, "")),
+      };
+      
+      await addNewBond(formattedData);
       Swal.fire({
         icon: "success",
         title: "Added!",
-        text: `Bond added succesfully.`,
+        text: `Bond added successfully.`,
         showConfirmButton: false,
         timer: 2000,
       });

@@ -11,6 +11,7 @@ import EditTransaction from "../TransactionManagement/Edit";
 import AddBond from "../BondRequestManagement/Add";
 import Swal from "sweetalert2";
 import "./style.css";
+import AddUserIpos from "../IPOrequests/Add";
 
 const UserOverview = () => {
   const user = useParams();
@@ -520,8 +521,8 @@ const UserOverview = () => {
 
             {/* IPOs  */}
             <div className="user_details">
+              <h3>IPOs</h3>
               <table className="terms_table">
-                {" "}
                 {ipos.length > 0 ? (
                   <>
                     <thead>
@@ -559,7 +560,7 @@ const UserOverview = () => {
                 )}
               </table>
               <div className="dropdown_btn">
-                <button onClick={() => handleOpenModal("isAddBondOpen")}>
+                <button onClick={() => handleOpenModal("isAddNewIpos")}>
                   Add IPOs
                 </button>
               </div>
@@ -670,6 +671,17 @@ const UserOverview = () => {
           }}
           fixedTerm={fixedTerm}
           setFixedTerm={setFixedTerm}
+          userId={user}
+        />
+      )}
+      {modalState.isAddNewIpos && (
+        <AddUserIpos
+          onClose={() => {
+            handleCloseModal("isAddNewIpos");
+            setSelectedUserForAdd(null);
+          }}
+          ipos={ipos}
+          setIpos={setIpos}
           userId={user}
         />
       )}
