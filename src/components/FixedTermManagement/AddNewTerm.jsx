@@ -18,10 +18,20 @@ const AddNewTerm = ({ setFixedTerm, fixedTerm, userId }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    // Check if the field is a monetary value (couponRate, currentValue, minAmount, quantity)
+    if (["minAmount"].includes(name)) {
+      // Remove commas and format as a number with two decimal places
+      const formattedValue = parseFloat(value.replace(/,/g, "")).toFixed(2).toLocaleString();
+      setFormData({
+        ...formData,
+        [name]: formattedValue,
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value,
+      });
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -49,7 +59,14 @@ const AddNewTerm = ({ setFixedTerm, fixedTerm, userId }) => {
     };
 
     try {
-      const result = await addTermToUserCollection(userId.userId, newTerm);
+      const formattedData = {
+        ...newTerm,
+        minAmount: parseFloat(newTerm.minAmount.replace(/,/g, "")),
+      };
+      const result = await addTermToUserCollection(
+        userId.userId,
+        formattedData
+      );
       if (result.success) {
         Swal.fire({
           icon: "success",
@@ -113,7 +130,7 @@ const AddNewTerm = ({ setFixedTerm, fixedTerm, userId }) => {
             value={formData.term}
             required
           />
-          <label htmlFor="minimumAmount">Minimum Amount:</label>
+          <label htmlFor="minAmount">Minimum Amount:</label>
           <input
             type="number"
             min={0}

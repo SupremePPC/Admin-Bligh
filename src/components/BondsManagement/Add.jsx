@@ -27,7 +27,6 @@ const AddNewBond = ({ setIsAdding, refreshBond }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     // Check if the field is a monetary value (couponRate, currentValue, minimumAmount, quantity)
     if (["minimumAmount"].includes(name)) {
       // Remove commas and format as a number with two decimal places

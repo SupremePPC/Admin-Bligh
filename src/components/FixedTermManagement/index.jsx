@@ -17,7 +17,7 @@ export default function TermsPage() {
   const [selectedTerm, setSelectedTerm] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedTermId, setSelectedTermId] = useState(null);
-  const [isDeleting, setIsDeleting] = useState(false);
+  
   // Function to handle edit button click
   const handleEditClick = (term) => {
     setSelectedTerm(term); // Set the selected term
@@ -76,12 +76,6 @@ export default function TermsPage() {
       setIsLoading(false);
       setSelectedTermId(null); // Reset the selected term ID
     }
-  };
-
-  const showDeleteModal = (id) => {
-    const selected = terms.find((term) => term.id === id);
-    selectedTerm(selected);
-    setIsDeleting(true);
   };
 
   return (

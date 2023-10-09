@@ -41,9 +41,6 @@ export async function getUser(uid) {
   const userRef = doc(db, USER_COLLECTION, uid);
   const userSnap = await getDoc(userRef);
 
-  console.log("getuser UID:", uid);
-  console.log("user snapshot data:", userSnap.data());
-
   if (userSnap.exists()) {
     return [{ ...userSnap.data(), id: userSnap.id }];
   } else {
@@ -144,15 +141,6 @@ export async function addBankingDetails(
   iban,
   swiftCode
 ) {
-  console.log("Add Function Params:", {
-    uid,
-    accountName,
-    bankName,
-    branch,
-    iban,
-    swiftCode,
-  });
-
   const bankingDetailsRef = collection(
     db,
     ADMINUSERS_COLLECTION,
@@ -177,14 +165,6 @@ export async function updateBankingDetails(
   iban,
   swiftCode
 ) {
-  console.log("Update Function Params:", {
-    uid,
-    accountName,
-    bankName,
-    branch,
-    iban,
-    swiftCode,
-  });
 
   const bankingDetailsRef = collection(
     db,
@@ -522,7 +502,6 @@ export async function getAllTerms() {
     ...doc.data(),
     id: doc.id,
   }));
-  console.log(allTerms);
   // If there are no terms at all, return null
   if (allTerms.length === 0) {
     return null;
@@ -663,14 +642,9 @@ export async function handleDepositApproval(uid, termData) {
         "Document does not exist, creating the fixedTermDeposits subcollection and setting the document..."
       );
       await setDoc(termDocRef, { ...termData });
-      console.log("Operation successful");
       return;
     }
-
-    // If termDoc exists, then update the document
-    console.log("Document exists, updating...");
     await updateDoc(termDocRef, { amount: termData.amount });
-    console.log("Operation successful");
   } catch (error) {
     console.error("Error in handleDepositApproval:", error);
   }
@@ -733,7 +707,6 @@ export const updateIpo = async (ipoId, updatedData) => {
   try {
     const ipoRef = doc(db, IPOS_COLLECTION, ipoId);
     await updateDoc(ipoRef, updatedData);
-    console.log("IPO Updated Successfully");
   } catch (error) {
     console.error("Error updating IPO: ", error);
     throw error;
@@ -745,7 +718,6 @@ export const addNewIpos = async (ipoData) => {
   try {
     const iposCollectionRef = collection(db, IPOS_COLLECTION);
     const docRef = await addDoc(iposCollectionRef, ipoData);
-    console.log("IPO Added Successfully with ID: ", docRef.id);
     return docRef.id;
   } catch (error) {
     console.error("Error adding IPO: ", error);
@@ -758,7 +730,6 @@ export const deleteIpos = async (ipoId) => {
   try {
     const ipoRef = doc(db, IPOS_COLLECTION, ipoId);
     await deleteDoc(ipoRef);
-    console.log("IPO Deleted Successfully");
   } catch (error) {
     console.error("Error deleting IPO: ", error);
     throw error;

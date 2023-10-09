@@ -18,17 +18,32 @@ const AddNewTerm = ({ setIsAdding, refreshTerm }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    // Check if the field is a monetary value (couponRate, currentValue, minAmount, quantity)
+    if (["minAmount"].includes(name)) {
+      // Remove commas and format as a number with two decimal places
+      const formattedValue = parseFloat(value.replace(/,/g, "")).toFixed(2).toLocaleString();
+      setFormData({
+        ...formData,
+        [name]: formattedValue,
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value,
+      });
+    }
   };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      await addNewTerm(formData);
+      const formattedData = {
+        ...newTerm,
+        minAmount: parseFloat(formData.minAmount.replace(/,/g, "")),
+      };
+      await addNewTerm(formattedData);
       Swal.fire({
         icon: "success",
         title: "Added!",
