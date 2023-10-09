@@ -4,14 +4,14 @@ import { doc, getDoc, collection, getDocs } from "firebase/firestore";
 import { db } from "../../firebaseConfig/firebase";
 import AddBankingDetails from "../BankingDetails/Add";
 import EditBankingDetails from "../BankingDetails/Edit";
-
 import EditUser from "../RegisteredUsers/Edit";
 import AddTransaction from "../TransactionManagement/AddTransaction";
 import EditTransaction from "../TransactionManagement/Edit";
 import AddBond from "../BondRequestManagement/Add";
-import Swal from "sweetalert2";
-import "./style.css";
 import AddUserIpos from "../IPOrequests/Add";
+import AddNewTerm from "../TermRequestManagement/Add";
+import Swal from "sweetalert2";g
+import "./style.css";
 
 const UserOverview = () => {
   const user = useParams();
@@ -513,7 +513,7 @@ const UserOverview = () => {
                 )}
               </table>
               <div className="dropdown_btn">
-                <button onClick={() => handleOpenModal("isAddBondOpen")}>
+                <button onClick={() => handleOpenModal("isAddNewTermOpen")}>
                   Add Fixed Term Deposit
                 </button>
               </div>

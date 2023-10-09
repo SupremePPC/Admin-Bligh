@@ -15,7 +15,7 @@ const AddNewBond = ({ setIsAdding, refreshBond }) => {
     isin: "",
     issuerName: "",
     maturityDate: "",
-    minimumAmount: 0,
+    minimumAmount: 0.00,
     purchaseDate: "",
     quantity: 0,
     sector: "",

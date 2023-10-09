@@ -674,12 +674,20 @@ export async function deleteFixedTermRequestStatus(userId, requestId) {
 
 // Function to add term to user's terms sub-collection
 export async function addTermToUserCollection(userId, termData) {
+  try {
   const userTermsHoldingsPath = collection(
     db,
     `users/${userId}/fixedTermDeposits`
   );
-  await addDoc(userTermsHoldingsPath, termData);
-}
+  const docRef= await addDoc(userTermsHoldingsPath, termData);
+  const docId = docRef.id;
+
+    return { success: true, id: docId };
+  } catch (error) {
+    console.error('Error adding term:', error);
+    return { success: false, error: error.message };
+  }
+};
 
 //IPOS
 const IPOS_COLLECTION = "ipos";

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "firebase/firestore";
 import Swal from "sweetalert2";
-import { addNewTerm } from "../../firebaseConfig/firestore";
+import { addTermToUserCollection } from "../../firebaseConfig/firestore";
 import LoadingScreen from "../LoadingScreen";
 
 const AddNewTerm = ({ setIsAdding, refreshTerm }) => {
@@ -104,7 +104,7 @@ const AddNewTerm = ({ setIsAdding, refreshTerm }) => {
             value={formData.term}
             required
           />
-          <label htmlFor="minimumAmount">Minimum Amount:</label>
+          <label htmlFor="minAmount">Minimum Amount:</label>
           <input
             type="number"
             min={0}
