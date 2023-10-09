@@ -11,7 +11,7 @@ const AddTransaction = ({
   totalBalance,
 }) => {
   const [formData, setFormData] = useState({
-    amount: "",
+    amount: "0.00",
     accountType: "",
     type: "",
     status: "",
@@ -40,13 +40,16 @@ const AddTransaction = ({
       return Swal.fire({
         icon: "error",
         title: "Error!",
-        text: "Insufficient balance. Try a small amount.",
+        text: "Insufficient balance. Try a smaller amount.",
         showConfirmButton: true,
       });
     }
 
+    // Format the amount with commas and two decimal places
+    const formattedAmount = parseFloat(amount.replace(/,/g, "")).toFixed(2);
+
     const newTransaction = {
-      amount,
+      amount: formattedAmount,
       accountType,
       type,
       status,
@@ -63,12 +66,9 @@ const AddTransaction = ({
           showConfirmButton: false,
           timer: 3000,
         });
-        setTransactions([
-          ...transactions,
-          { ...newTransaction, id: result.id },
-        ]);
+        setTransactions([...transactions, { ...newTransaction, id: result.id }]);
         setFormData({
-          amount: "",
+          amount: "0.00",
           accountType: "",
           type: "",
           status: "",
@@ -91,6 +91,25 @@ const AddTransaction = ({
     }
   };
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+  console.log("click")
+    if (name === "amount") {
+      // Format the value with commas and two decimal places
+      const formattedValue = parseFloat(value.replace(/,/g, "")).toFixed(2);
+      setFormData({
+        ...formData,
+        [name]: formattedValue,
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value,
+      });
+    }
+  };
+  
+
   return (
     <div className="small-container">
       {isLoading ? (
@@ -99,8 +118,10 @@ const AddTransaction = ({
         <form onSubmit={handleAdd}>
           <h1>Add Transaction</h1>
           <div className="text_wrap">
-          <label >Total Balance: {" "}{totalBalance === 0 ? 0 : totalBalance}{" "}</label>
-          
+            <label>
+              Total Balance: {" "}
+              {totalBalance === "0.00" ? "0.00" : totalBalance}
+            </label>
           </div>
           <label htmlFor="accountType">Account Type</label>
           <select
@@ -123,15 +144,15 @@ const AddTransaction = ({
             type="number"
             value={formData.amount}
             onChange={(e) =>
-              setFormData({ ...formData, amount: e.target.value })
-            }
+              setFormData({ ...formData, amount: e.target.value })}
           />
 
           <label htmlFor="type">Transaction Type</label>
           <select
             id="type"
             value={formData.type}
-            onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, type: e.target.value })}
           >
             <option value="">--Select--</option>
             <option value="Deposit">Deposit</option>
@@ -142,7 +163,7 @@ const AddTransaction = ({
             id="status"
             value={formData.status}
             onChange={(e) =>
-              setFormData({ ...formData, status: e.target.value })
+              setFormData({ ...formData, statuse: e.target.value })
             }
           >
             <option value="">--Select--</option>
@@ -172,5 +193,6 @@ const AddTransaction = ({
     </div>
   );
 };
+
 
 export default AddTransaction;

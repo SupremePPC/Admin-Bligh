@@ -11,7 +11,7 @@ const AddNewIpos = ({ setIsAdding, refreshIpos }) => {
     logo: "",
     description: "",
     expListingPrice: 0,
-    expectedate: "",
+    expectedDate: "",
     minInvestment: 0,
     preAllocation: "",
     preSharePrice: 0,
@@ -22,17 +22,40 @@ const AddNewIpos = ({ setIsAdding, refreshIpos }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    // Check if the field is a monetary value (expListingPrice, preSharePrice, minInvestment, sharePrice)
+    if (
+      name === 'expListingPrice' ||
+      name === 'sharePrice' ||
+      name === 'minInvestment' ||
+      name === 'preSharePrice'
+    ) {
+      // Remove commas and format to two decimal places
+      const formattedValue = parseFloat(value.replace(/,/g, '')).toFixed(2);
+      setFormData({
+        ...formData,
+        [name]: formattedValue,
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value,
+      });
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    const formattedFormData = {
+      ...formData,
+      minInvestment: parseFloat(formData.minInvestment.replace(/,/g, '')).toFixed(2),
+      sharePrice: parseInt(formData.sharePrice.replace(/,/g, ''), 10),
+      preSharePrice: parseInt(formData.preSharePrice.replace(/,/g, ''), 10),
+      expListingPrice: parseFloat(formData.expListingPrice.replace(/,/g, '')).toFixed(2),
+    };
+  
     try {
-      await addNewIpos(formData);
+      await addNewIpos(formattedFormData);
       Swal.fire({
         icon: "success",
         title: "Added!",

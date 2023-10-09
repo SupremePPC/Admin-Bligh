@@ -2,17 +2,21 @@ import React, { useState } from 'react';
 import Swal from 'sweetalert2';
 import { addTransaction } from '../../firebaseConfig/firestore';
 
-const AddTransaction = ({ setTransactions, setIsAdding, userId, onClose}) => {
-  const [fullName, setFullName] = useState("");
-  const [amount, setAmount] = useState("");
-  const [accountType, setAccountType] = useState("");
-  const [type, setType] = useState("");
-  const [status, setStatus] = useState("");
-  const [date, setDate] = useState("");
+const AddTransaction = ({ setTransactions, setIsAdding, userId, onClose }) => {
+  const [formData, setFormData] = useState({
+    fullName: "",
+    amount: "0.00", // Initialize amount with a string value
+    accountType: "",
+    type: "",
+    status: "",
+    date: "",
+  });
 
   const handleUpdate = async (e) => {
     e.preventDefault();
-  
+
+    const { fullName, amount, accountType, type, status, date } = formData;
+
     if (!fullName || !amount || !accountType || !type || !status || !date) {
       return Swal.fire({
         icon: 'error',
@@ -21,20 +25,25 @@ const AddTransaction = ({ setTransactions, setIsAdding, userId, onClose}) => {
         showConfirmButton: true,
       });
     }
-  
+
+    const formattedAmount = parseFloat(amount.replace(/,/g, '')).toFixed(2);
     const newTransaction = {
       fullName,
-      amount,
+      amount: formattedAmount,
       accountType,
       type,
       status,
       date,
     };
-  
+
     try {
       const result = await addTransaction(userId, newTransaction);
+
       if (result.success) {
-        setTransactions(prevTransactions => [...prevTransactions, { ...newTrans, id: result.id }]);
+        setTransactions((prevTransactions) => [
+          ...prevTransactions,
+          { ...newTransaction, id: result.id },
+        ]);
         setIsAdding(false);
         Swal.fire({
           icon: 'success',
@@ -44,7 +53,7 @@ const AddTransaction = ({ setTransactions, setIsAdding, userId, onClose}) => {
           timer: 2000,
         });
       } else {
-        throw new Error("Failed to add transaction");
+        throw new Error('Failed to add transaction');
       }
     } catch (error) {
       console.error(error);
@@ -56,7 +65,26 @@ const AddTransaction = ({ setTransactions, setIsAdding, userId, onClose}) => {
       });
     }
   };
-  
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    // Check if the field is the "amount" field
+    if (name === 'amount') {
+      // Format the value with commas and two decimal places
+      const formattedValue = parseFloat(value.replace(/,/g, '')).toFixed(2);
+      setFormData({
+        ...formData,
+        [name]: formattedValue,
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value,
+      });
+    }
+  };
+
   return (
     <div className="small-container">
       <form onSubmit={handleUpdate}>
@@ -65,21 +93,21 @@ const AddTransaction = ({ setTransactions, setIsAdding, userId, onClose}) => {
         <input
           id="fullName"
           type="text"
-          value={fullName}
-          onChange={(e) => setFullName(e.target.value)}
+          value={formData.fullName}
+          onChange={handleChange}
         />
         <label htmlFor="amount">Amount</label>
         <input
           id="amount"
           type="number"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
+          value={formData.amount}
+          onChange={handleChange}
         />
         <label htmlFor="accountType">Account Type</label>
         <select
           id="accountType"
-          value={accountType}
-          onChange={(e) => setAccountType(e.target.value)}
+          value={formData.accountType}
+          onChange={handleChange}
         >
           <option value="">--Select--</option>
           <option value="Easy Access">Easy Access</option>
@@ -90,8 +118,8 @@ const AddTransaction = ({ setTransactions, setIsAdding, userId, onClose}) => {
         <label htmlFor="type">Transaction Type</label>
         <select
           id="type"
-          value={type}
-          onChange={(e) => setType(e.target.value)}
+          value={formData.type}
+          onChange={handleChange}
         >
           <option value="">--Select--</option>
           <option value="Deposit">Deposit</option>
@@ -100,8 +128,8 @@ const AddTransaction = ({ setTransactions, setIsAdding, userId, onClose}) => {
         <label htmlFor="status">Status</label>
         <select
           id="status"
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
+          value={formData.status}
+          onChange={handleChange}
         >
           <option value="">--Select--</option>
           <option value="Pending">Pending</option>
@@ -112,8 +140,8 @@ const AddTransaction = ({ setTransactions, setIsAdding, userId, onClose}) => {
         <input
           id="date"
           type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
+          value={formData.date}
+          onChange={handleChange}
         />
         <div style={{ marginTop: "30px" }}>
           <input type="submit" value="Add" />
