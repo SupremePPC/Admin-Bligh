@@ -25,20 +25,10 @@ const AddBond = ({ setBond, bonds, userId, onClose }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    // Check if the field is a monetary value (couponRate, currentValue, minimumAmount, quantity)
-    if (["minimumAmount"].includes(name)) {
-      // Remove commas and format as a number with two decimal places
-      const formattedValue = parseFloat(value.replace(/,/g, "")).toFixed(2).toLocaleString();
-      setFormData({
-        ...formData,
-        [name]: formattedValue,
-      });
-    } else {
-      setFormData({
-        ...formData,
-        [name]: value,
-      });
-    }
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -88,12 +78,8 @@ const AddBond = ({ setBond, bonds, userId, onClose }) => {
       type,
     };
 
-    const formattedData = {
-      ...newBond,
-      minimumAmount: parseFloat(newBond.minimumAmount.replace(/,/g, "")),
-    };
     try {
-      const result = await addBondUser(userId.userId, formattedData);
+      const result = await addBondUser(userId.userId, newBond);
       if (result.success) {
         Swal.fire({
           icon: "success",
@@ -194,12 +180,14 @@ const AddBond = ({ setBond, bonds, userId, onClose }) => {
             value={formData.maturityDate}
           />
           <label htmlFor="minimumAmount">Minimum Amount:</label>
-          <input
-            type="number"
-            min={0}
+          <CurrencyInput
+            decimalSeparator="."
+            prefix="€"
             name="minimumAmount"
-            onChange={handleChange}
-            value={formData.minimumAmount}
+            placeholder="0.00"
+            defaultValue={0.00}
+            decimalsLimit={2}
+            onValueChange={formData.minimumAmount}
           />
           <label htmlFor="currentValue">Current Value:</label>
           <input

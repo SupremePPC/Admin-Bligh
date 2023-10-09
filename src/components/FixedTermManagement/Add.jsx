@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import "firebase/firestore";
 import Swal from "sweetalert2";
-import { addTermToUserCollection } from "../../firebaseConfig/firestore";
+import { addNewTerm } from "../../firebaseConfig/firestore";
 import LoadingScreen from "../LoadingScreen";
+import CurrencyInput from 'react-currency-input-field';
 
 const AddNewTerm = ({ setIsAdding, refreshTerm }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -33,7 +34,6 @@ const AddNewTerm = ({ setIsAdding, refreshTerm }) => {
       });
     }
   };
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -105,13 +105,14 @@ const AddNewTerm = ({ setIsAdding, refreshTerm }) => {
             required
           />
           <label htmlFor="minAmount">Minimum Amount:</label>
-          <input
-            type="number"
-            min={0}
+          <CurrencyInput
+            decimalSeparator="."
+            prefix="€"
             name="minAmount"
-            onChange={handleChange}
-            value={formData.minAmount}
-            required
+            placeholder="0.00"
+            defaultValue={0.00}
+            decimalsLimit={2}
+            onValueChange={formData.minAmount}
           />
           <label htmlFor="interestRate">Interest Rate:</label>
           <input

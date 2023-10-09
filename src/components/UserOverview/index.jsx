@@ -10,7 +10,7 @@ import EditTransaction from "../TransactionManagement/Edit";
 import AddBond from "../BondRequestManagement/Add";
 import AddUserIpos from "../IPOrequests/Add";
 import AddNewTerm from "../TermRequestManagement/Add";
-import Swal from "sweetalert2";g
+import Swal from "sweetalert2";
 import "./style.css";
 
 const UserOverview = () => {
@@ -123,9 +123,11 @@ const UserOverview = () => {
     const termUnit = termParts[1];
 
     // If the term is in months, convert it to years
-    if (termUnit.startsWith("Month")) {
+    if (termUnit.startsWith("Month") || termUnit.startsWith("Months") || termUnit.startsWith("month") 
+    || termUnit.startsWith("months")) {
       termNumber = termNumber / 12;
-    } else if (!termUnit.startsWith("Year")) {
+    } else if (!termUnit.startsWith("Year") || !termUnit.startsWith("Years") || !termUnit.startsWith("year") 
+    || !termUnit.startsWith("years")) {
       console.error("Invalid term unit:", termUnit); // Log error for invalid termUnit
       return "Invalid Input"; // Return error message for invalid termUnit
     }

@@ -3,6 +3,7 @@ import "firebase/firestore";
 import Swal from "sweetalert2";
 import { addNewIpos } from "../../firebaseConfig/firestore";
 import LoadingScreen from "../LoadingScreen";
+import CurrencyInput from 'react-currency-input-field';
 
 const AddNewIpos = ({ setIsAdding, refreshIpos }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -29,8 +30,9 @@ const AddNewIpos = ({ setIsAdding, refreshIpos }) => {
       name === 'minInvestment' ||
       name === 'preSharePrice'
     ) {
-      // Remove commas and format to two decimal places
-      const formattedValue = parseFloat(value.replace(/,/g, '')).toFixed(2);
+      const formattedValue = parseFloat(value.replace(/,/g, ""))
+        .toFixed(2)
+        .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
       setFormData({
         ...formData,
         [name]: formattedValue,
@@ -117,27 +119,31 @@ const AddNewIpos = ({ setIsAdding, refreshIpos }) => {
             value={formData.description}
           />
           <label htmlFor="expListingPrice">Expected Listing Price:</label>
-          <input
-            type="number"
-            min={0}
+          <CurrencyInput
+            decimalSeparator="."
+            prefix="€"
             name="expListingPrice"
-            onChange={handleChange}
-            value={formData.expListingPrice}
+            placeholder="0.00"
+            defaultValue={0.00}
+            decimalsLimit={2}
+            onValueChange={formData.expListingPrice}
           />
-          <label htmlFor="expectedate">Expected Date:</label>
+          <label htmlFor="expectedDate">Expected Date:</label>
           <input
             type="text"
-            name="expectedate"
+            name="expectedDate"
             onChange={handleChange}
-            value={formData.expectedate}
+            value={formData.expectedDate}
           />
           <label htmlFor="minInvestment">Minimum Investment:</label>
-          <input
-            type="number"
-            min={0}
+          <CurrencyInput
+            decimalSeparator="."
+            prefix="€"
             name="minInvestment"
-            onChange={handleChange}
-            value={formData.minInvestment}
+            placeholder="0.00"
+            defaultValue={0.00}
+            decimalsLimit={2}
+            onValueChange={formData.minInvestment}
           />
           <label htmlFor="preAllocation">Pre Allocation:</label>
           <input
@@ -147,18 +153,24 @@ const AddNewIpos = ({ setIsAdding, refreshIpos }) => {
             value={formData.preAllocation}
           />
           <label htmlFor="preSharePrice">Pre Share Price:</label>
-          <input
-            type="number"
+          <CurrencyInput
+            decimalSeparator="."
+            prefix="€"
             name="preSharePrice"
-            onChange={handleChange}
-            value={formData.preSharePrice}
+            placeholder="0.00"
+            defaultValue={0.00}
+            decimalsLimit={2}
+            onValueChange={formData.preSharePrice}
           />
           <label htmlFor="sharePrice">Share Price:</label>
-          <input
-            type="number"
+          <CurrencyInput
+            decimalSeparator="."
+            prefix="€"
             name="sharePrice"
-            onChange={handleChange}
-            value={formData.sharePrice}
+            placeholder="0.00"
+            defaultValue={0.00}
+            decimalsLimit={2}
+            onValueChange={formData.sharePrice}
           />
           <div style={{ marginTop: "30px" }}>
             <input type="submit" value="Save" />

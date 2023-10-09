@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import "firebase/firestore";
 import Swal from "sweetalert2";
-import { addIposToUserCollection, addNewIpos } from "../../firebaseConfig/firestore";
+import { addIposToUserCollection } from "../../firebaseConfig/firestore";
 import LoadingScreen from "../LoadingScreen";
+import CurrencyInput from "react-currency-input-field";
 
 const AddUserIpos = ({ ipos, setIpos, userId, onClose }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -22,16 +23,32 @@ const AddUserIpos = ({ ipos, setIpos, userId, onClose }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    // Check if the field is a monetary value (expListingPrice, preSharePrice, minInvestment, sharePrice)
+    if (
+      name === "expListingPrice" ||
+      name === "sharePrice" ||
+      name === "minInvestment" ||
+      name === "preSharePrice"
+    ) {
+      const formattedValue = parseFloat(value.replace(/,/g, ""))
+        .toFixed(2)
+        .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      setFormData({
+        ...formData,
+        [name]: formattedValue,
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value,
+      });
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-  
+
     const {
       name,
       logo,
@@ -43,7 +60,7 @@ const AddUserIpos = ({ ipos, setIpos, userId, onClose }) => {
       preSharePrice,
       sharePrice,
     } = formData;
-  
+
     if (
       !name ||
       !logo ||
@@ -63,9 +80,20 @@ const AddUserIpos = ({ ipos, setIpos, userId, onClose }) => {
         showConfirmButton: true,
       });
     }
-  
+    const formattedFormData = {
+      ...formData,
+      minInvestment: parseFloat(
+        formData.minInvestment.replace(/,/g, "")
+      ).toFixed(2),
+      sharePrice: parseInt(formData.sharePrice.replace(/,/g, ""), 10),
+      preSharePrice: parseInt(formData.preSharePrice.replace(/,/g, ""), 10),
+      expListingPrice: parseFloat(
+        formData.expListingPrice.replace(/,/g, "")
+      ).toFixed(2),
+    };
+
     try {
-      await addIposToUserCollection(formData);
+      await addIposToUserCollection(formattedFormData);
       Swal.fire({
         icon: "success",
         title: "Added!",
@@ -97,7 +125,7 @@ const AddUserIpos = ({ ipos, setIpos, userId, onClose }) => {
     } finally {
       setIsLoading(false);
     }
-  };  
+  };
 
   return (
     <div className="small-container">
@@ -143,12 +171,14 @@ const AddUserIpos = ({ ipos, setIpos, userId, onClose }) => {
             value={formData.expectedate}
           />
           <label htmlFor="minInvestment">Minimum Investment:</label>
-          <input
-            type="number"
-            min={0}
+          <CurrencyInput
+            decimalSeparator="."
+            prefix="€"
             name="minInvestment"
-            onChange={handleChange}
-            value={formData.minInvestment}
+            placeholder="0.00"
+            defaultValue={0.00}
+            decimalsLimit={2}
+            onValueChange={formData.minInvestment}
           />
           <label htmlFor="preAllocation">Pre Allocation:</label>
           <input
@@ -158,19 +188,26 @@ const AddUserIpos = ({ ipos, setIpos, userId, onClose }) => {
             value={formData.preAllocation}
           />
           <label htmlFor="preSharePrice">Pre Share Price:</label>
-          <input
-            type="number"
+          <CurrencyInput
+            decimalSeparator="."
+            prefix="€"
             name="preSharePrice"
-            onChange={handleChange}
-            value={formData.preSharePrice}
+            placeholder="0.00"
+            defaultValue={0.00}
+            decimalsLimit={2}
+            onValueChange={formData.preSharePrice}
           />
           <label htmlFor="sharePrice">Share Price:</label>
-          <input
-            type="number"
+          <CurrencyInput
+            decimalSeparator="."
+            prefix="€"
             name="sharePrice"
-            onChange={handleChange}
-            value={formData.sharePrice}
+            placeholder="0.00"
+            defaultValue={0.00}
+            decimalsLimit={2}
+            onValueChange={formData.sharePrice}
           />
+          
           <div style={{ marginTop: "30px" }}>
             <input type="submit" value="Save" />
             <input
@@ -187,6 +224,6 @@ const AddUserIpos = ({ ipos, setIpos, userId, onClose }) => {
       )}
     </div>
   );
-};
+}
 
 export default AddUserIpos;

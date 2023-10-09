@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import "firebase/firestore";
-import Swal from "sweetalert2";
 import { addTermToUserCollection } from "../../firebaseConfig/firestore";
 import LoadingScreen from "../LoadingScreen";
+import CurrencyInput from 'react-currency-input-field';
+import "firebase/firestore";
+import Swal from "sweetalert2";
 
 const AddNewTerm = ({ setFixedTerm, fixedTerm, userId, onClose }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -81,7 +82,7 @@ const AddNewTerm = ({ setFixedTerm, fixedTerm, userId, onClose }) => {
     };
     console.log(newData);
     try {
-      const result = await addTermToUserCollection(newData);
+      await addTermToUserCollection(userId, newData);
       Swal.fire({
         icon: "success",
         title: "Added!",
@@ -98,7 +99,7 @@ const AddNewTerm = ({ setFixedTerm, fixedTerm, userId, onClose }) => {
         term: "",
         type: "",
       });
-      setFixedTerm([...fixedTerm, { ...newData, id: result.id }]);
+      // setFixedTerm([...fixedTerm, { ...newData, id: result.id }]);
     } catch (error) {
       console.error(error);
       Swal.fire({
@@ -144,12 +145,14 @@ const AddNewTerm = ({ setFixedTerm, fixedTerm, userId, onClose }) => {
             required
           />
           <label htmlFor="minAmount">Minimum Amount:</label>
-          <input
-            type="text" // Use text type to handle formatted value
+          <CurrencyInput
+            decimalSeparator="."
+            prefix="€"
             name="minAmount"
-            onChange={handleChange}
-            value={formData.minAmount}
-            required
+            placeholder="0.00"
+            defaultValue={0.00}
+            decimalsLimit={2}
+            onValueChange={formData.minAmount}
           />
           <label htmlFor="interestRate">Interest Rate:</label>
           <input

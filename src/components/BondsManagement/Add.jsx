@@ -3,6 +3,7 @@ import "firebase/firestore";
 import Swal from "sweetalert2";
 import { addNewBond } from "../../firebaseConfig/firestore";
 import LoadingScreen from "../LoadingScreen";
+import CurrencyInput from 'react-currency-input-field';
 
 const AddNewBond = ({ setIsAdding, refreshBond }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -149,12 +150,14 @@ const AddNewBond = ({ setIsAdding, refreshBond }) => {
             value={formData.maturityDate}
           />
           <label htmlFor="minimumAmount">Minimum Amount:</label>
-          <input
-            type="number"
-            min={0}
+           <CurrencyInput
+            decimalSeparator="."
+            prefix="€"
             name="minimumAmount"
-            onChange={handleChange}
-            value={formData.minimumAmount}
+            placeholder="0.00"
+            defaultValue={0.00}
+            decimalsLimit={2}
+            onValueChange={formData.minimumAmount}
           />
           <label htmlFor="currentValue">Current Value:</label>
           <input
