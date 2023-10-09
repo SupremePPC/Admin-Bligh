@@ -102,12 +102,7 @@ const Login = () => {
             </button>
           )}
 
-          <div className="signup_info">
-            <p className="text">Do not have an account?</p>{" "}
-            <Link to={"/signup"} className="signup_text">
-              Sign Up
-            </Link>
-          </div>
+         
         </form>
       </div>
     </section>

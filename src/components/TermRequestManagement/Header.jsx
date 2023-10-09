@@ -7,7 +7,6 @@ const Header = ({searchQuery, handleSearch, setSearchQuery}) => {
       <h1 className="header_title">Fixed Term Deposits Requests</h1>
       <div className="header__wrap">
         <div className="addRow_btn">
-          {/* <button>Add User</button> */}
         </div>
         <div className="search__field">
           <input

@@ -17,6 +17,8 @@ import Swal from "sweetalert2";
 const TermsRequestTable = () => {
   const [termRequests, setTermRequests] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState(""); // To store the search query
+  const [filteredTermRequests, setFilteredTermRequests] = useState([]); // To store the filtered requests
 
   useEffect(() => {
     const fetchTermRequests = async () => {
@@ -31,6 +33,7 @@ const TermsRequestTable = () => {
           })
         );
         setTermRequests(requestsWithUserDetails);
+        setFilteredTermRequests(requestsWithUserDetails); // Set filteredTermRequests here
       } catch (error) {
         console.error("Error fetching request:", error);
       } finally {
@@ -41,69 +44,91 @@ const TermsRequestTable = () => {
     fetchTermRequests();
   }, []);
 
+  const handleSearch = () => {
+    const query = searchQuery.toLowerCase().trim();
+    if (query === "") {
+      // If the search query is empty, show all term requests
+      setFilteredTermRequests(termRequests);
+    } else {
+      // Filter term requests based on the search query (e.g., userName and bankName)
+      const filteredRequests = termRequests.filter(
+        (request) =>
+          request.userName.toLowerCase().includes(query) ||
+          request.bankName.toLowerCase().includes(query)
+      );
+      setFilteredTermRequests(filteredRequests);
+    }
+  };
+
   const handleUpdateRequest = async (userId, requestId, newStatus) => {
     try {
-        setIsLoading(true);
-        
-        // Fetching the request data
-        const requestData = await getTermRequests(userId, requestId);
-        const requestObject = requestData[0]; // Accessing the object inside the array
-        
-        let message;
-        if (newStatus === "Approved") {
-            if (requestObject.type === "deposit") {
-                await handleDepositApproval(userId, requestObject);
-                message = `Your fixed term deposit request to deposit €${requestObject.principalAmount} to ${requestObject.bankName} with ${requestObject.term} term and ${requestObject.coupon}% coupon has been approved.`;
-                await addTermToUserCollection(userId, requestObject, newStatus);
-            } else if (requestObject.type === "withdraw") {
-                await handleWithdrawalApproval(userId, requestObject);
-                message = `Your fixed term deposit request to withdraw €${requestObject.principalAmount} has been approved.`;
-            }
-        } else { // Assuming the newStatus here can only be "Approved" or "Declined"
-            if (requestObject.type === "deposit") {
-                message = `Your fixed term deposit request to deposit €${requestObject.principalAmount} has been declined.`;
-            } else if (requestObject.type === "withdraw") {
-                message = `Your fixed term deposit request to withdraw €${requestObject.principalAmount} has been declined.`;
-            }
+      setIsLoading(true);
+
+      // Fetching the request data
+      const requestData = await getTermRequests(userId, requestId);
+      const requestObject = requestData[0]; // Accessing the object inside the array
+
+      let message;
+      if (newStatus === "Approved") {
+        if (requestObject.type === "deposit") {
+          await handleDepositApproval(userId, requestObject);
+          message = `Your fixed term deposit request to deposit €${requestObject.principalAmount} to ${requestObject.bankName} with ${requestObject.term} term and ${requestObject.coupon}% coupon has been approved.`;
+          await addTermToUserCollection(userId, requestObject, newStatus);
+        } else if (requestObject.type === "withdraw") {
+          await handleWithdrawalApproval(userId, requestObject);
+          message = `Your fixed term deposit request to withdraw €${requestObject.principalAmount} has been approved.`;
         }
-        
-        // Delete the request from Firestore and update the notifications
-        await deleteFixedTermRequestStatus(userId, requestId);
-        if (message) await addNotification(userId, message, newStatus);
-        
-        // Refresh the table data
-        const allRequests = await getTermRequests();
-        setTermRequests(allRequests);
-        
-        Swal.fire({
-            icon: "success",
-            title: "Updated!",
-            text: `Request status has been updated to ${newStatus}.`,
-            showConfirmButton: false,
-            timer: 2000,
-        });
+      } else {
+        // Assuming the newStatus here can only be "Approved" or "Declined"
+        if (requestObject.type === "deposit") {
+          message = `Your fixed term deposit request to deposit €${requestObject.principalAmount} has been declined.`;
+        } else if (requestObject.type === "withdraw") {
+          message = `Your fixed term deposit request to withdraw €${requestObject.principalAmount} has been declined.`;
+        }
+      }
+
+      // Delete the request from Firestore and update the notifications
+      await deleteFixedTermRequestStatus(userId, requestId);
+      if (message) await addNotification(userId, message, newStatus);
+
+      // Refresh the table data
+      const allRequests = await getTermRequests();
+      setTermRequests(allRequests);
+
+      Swal.fire({
+        icon: "success",
+        title: "Updated!",
+        text: `Request status has been updated to ${newStatus}.`,
+        showConfirmButton: false,
+        timer: 2000,
+      });
     } catch (err) {
-        console.error("Error updating request:", err);
-        Swal.fire({
-            icon: "error",
-            title: "Error!",
-            text: `Error updating request: ${err}`,
-            showConfirmButton: true,
-        });
+      console.error("Error updating request:", err);
+      Swal.fire({
+        icon: "error",
+        title: "Error!",
+        text: `Error updating request: ${err}`,
+        showConfirmButton: true,
+      });
     } finally {
-        setIsLoading(false);
+      setIsLoading(false);
     }
-};
- 
+  };
+
   return (
     <div className="container">
       {isLoading ? (
         <LoadingScreen />
       ) : (
         <>
-          <Header />
+          <Header
+            handleSearch={handleSearch}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+          />
+
           <Table
-            termRequests={termRequests}
+            termRequests={filteredTermRequests}
             handleUpdateRequest={handleUpdateRequest}
           />
         </>

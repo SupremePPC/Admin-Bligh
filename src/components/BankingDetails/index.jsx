@@ -5,10 +5,9 @@ import {
 } from "firebase/firestore";
 import Header from "./Header";
 import Table from "./Table";
-import Modal from "../CustomsModal";
 import Edit from "./Edit";
-import { db } from "../../firebaseConfig/firebase";
 import LoadingScreen from "../LoadingScreen";
+import { getBankingDetails } from '../../firebaseConfig/firestore';
 
 const BankingDetails = () => {
   const [bankingDetails, setBankingDetails] = useState([]);  
@@ -18,35 +17,20 @@ const BankingDetails = () => {
 
   useEffect(() => {
     const fetchBankingDetails = async () => {
+      setIsLoading(true);
       try {
-        const usersRef = collection(db, "users");
-        const usersSnapshot = await getDocs(usersRef);
-        let allBankingDetails = [];
-        setIsLoading(true);
+        const uid = "your_user_id"; // Replace with the user's ID
+        const allBankingDetails = await getBankingDetails(uid);
 
-        for (const userDoc of usersSnapshot.docs) {
-          // const userName = userDoc.data().fullName;
-          const bankingDetailsRef = collection(
-            db,
-            "users",
-            userDoc.id,
-            "bankingDetails"
-          );
-          const bankingDetailsSnapshot = await getDocs(bankingDetailsRef);
-          const userBankingDetails = bankingDetailsSnapshot.docs.map(
-            (bankingDetailDoc) => ({
-              ...bankingDetailDoc.data(),
-              id: bankingDetailDoc.id,
-              userId: userDoc.id,
-            })
-            );
-          allBankingDetails = allBankingDetails.concat(userBankingDetails);
+        if (allBankingDetails) {
+          setBankingDetails(allBankingDetails);
+        } else {
+          console.error("No banking details found");
         }
-
-        setBankingDetails(allBankingDetails);
-        setIsLoading(false);
       } catch (error) {
         console.error("Error fetching banking details:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -67,8 +51,7 @@ const BankingDetails = () => {
 
   return (
     <div className="container">
-      
-      {!isEditing (
+      {!isEditing && (
           <>
           <Header />
           {isLoading ? (

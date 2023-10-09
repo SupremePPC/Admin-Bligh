@@ -74,6 +74,7 @@
   font-weight: 600;
   font-size: var(--font-sixteen);
   padding: 1rem 0 0;
+  text-transform: uppercase;
 }
 
 .termTypeWrapper {
@@ -206,7 +207,9 @@
   .fixedTermsContainer .contentSection {
     flex-direction: row;
     flex-wrap: wrap;
+    justify-content: flex-start;
   }
+  
   .termCard {
     width: 45%;
   }

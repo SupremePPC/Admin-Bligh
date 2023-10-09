@@ -30,22 +30,10 @@ const AddNewTerm = ({ setFixedTerm, fixedTerm, userId, onClose }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    // Check if the field is a monetary value (minAmount)
-    if (name === "minAmount") {
-      // Format the value with commas and two decimal places
-      const formattedValue = parseFloat(value.replace(/,/g, ""))
-        .toFixed(2)
-        .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-      setFormData({
-        ...formData,
-        [name]: formattedValue,
-      });
-    } else {
-      setFormData({
-        ...formData,
-        [name]: value,
-      });
-    }
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
   };
 
   const handleSubmit = async (e) => {
