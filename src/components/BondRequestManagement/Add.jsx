@@ -34,7 +34,7 @@ const AddBond = ({ setBond, bond, userId, onClose }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    
+
     const {
       companyWebsite,
       couponFrequency,
@@ -50,7 +50,7 @@ const AddBond = ({ setBond, bond, userId, onClose }) => {
       sector,
       type,
     } = formData;
-console.log(formData);
+    console.log(formData);
 
     if (
       !companyWebsite ||
@@ -238,7 +238,7 @@ console.log(formData);
             min={0}
             value={formData.couponFrequency}
           />
-<label htmlFor="purchaseDate">Purchase Date:</label>
+          <label htmlFor="purchaseDate">Purchase Date:</label>
           <input
             type="date"
             name="purchaseDate"

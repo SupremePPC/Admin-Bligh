@@ -10,8 +10,10 @@ import EditTransaction from "../TransactionManagement/Edit";
 import AddBond from "../BondRequestManagement/Add";
 import AddUserIpos from "../IPOrequests/Add";
 import AddNewTerm from "../TermRequestManagement/Add";
+import AddDocument from "../DocumentManagement/Add";
 import Swal from "sweetalert2";
 import "./style.css";
+import EditDocument from "../DocumentManagement/Edit";
 
 const UserOverview = () => {
   const user = useParams();
@@ -24,6 +26,7 @@ const UserOverview = () => {
   const [transactions, setTransactions] = useState([]);
   const [fixedTerm, setFixedTerm] = useState([]);
   const [selectedUserForAdd, setSelectedUserForAdd] = useState(null);
+  const [selectedDocument, setSelectedDocument] = useState(null);
 
   const [modalState, setModalState] = useState({
     isAddTransactionOpen: false,
@@ -51,6 +54,12 @@ const UserOverview = () => {
       ...modalState,
       [modalType]: false,
     });
+  };
+
+  // Example function to select a document for editing
+  const handleEditDocument = (document) => {
+    setSelectedDocument(document);
+    handleOpenModal("isEditDocumentOpen");
   };
 
   const fetchSubCollection = async (subCollectionName, setFunction) => {
@@ -111,38 +120,43 @@ const UserOverview = () => {
     // Parse principal and interestRate to float numbers
     const principalNumber = parseFloat(principal);
     const interestRateNumber = parseFloat(interestRate);
-  
+
     // Parse the term string to extract the number and the unit
     const termParts = term.split(" ");
     if (termParts.length !== 2) {
       console.error("Invalid term format:", term);
       return "Invalid Input";
     }
-  
+
     const termNumber = parseFloat(termParts[0]);
     const termUnit = termParts[1].toLowerCase();
-  
+
     if (!["year", "years", "month", "months"].includes(termUnit)) {
       console.error("Invalid term unit:", termUnit);
       return "Invalid Input";
     }
-  
-    if (isNaN(principalNumber) || isNaN(interestRateNumber) || isNaN(termNumber)) {
+
+    if (
+      isNaN(principalNumber) ||
+      isNaN(interestRateNumber) ||
+      isNaN(termNumber)
+    ) {
       return "Invalid Input";
     }
-  
+
     // Create a separate variable for the converted term in years
     let termInYears = termNumber;
-  
+
     if (termUnit === "months" || termUnit === "month") {
       // Convert months to years
       termInYears /= 12;
     }
-  
-    const maturityAmount = principalNumber * (1 + (interestRateNumber / 100) * termInYears);
+
+    const maturityAmount =
+      principalNumber * (1 + (interestRateNumber / 100) * termInYears);
     return maturityAmount.toFixed(2);
   };
-  
+
   const firestoreTimestampToDate = (timestamp) => {
     return timestamp
       ? new Date(timestamp.seconds * 1000).toLocaleDateString()
@@ -160,7 +174,9 @@ const UserOverview = () => {
         !modalState.isEditTransactionOpen &&
         !modalState.isEditBankingDetails &&
         !modalState.isAddNewTermOpen &&
-        !modalState.isAddNewIpos && (
+        !modalState.isAddNewIpos &&
+        !modalState.isAddNewDocumentOpen &&
+        !modalState.isEditDocumentOpen && (
           <div className="userOverview_container">
             {/* User Details */}
             {userDetails && (
@@ -227,34 +243,36 @@ const UserOverview = () => {
               ) : (
                 bankingDetails.map((item, index) => (
                   <>
-                  <div className="user_wrap" key={index}>
-                    <div className="text_wrap">
-                      <p className="bold_text"> Bank Name :</p>
-                      <span className="reg_text">{item.bankName}</span>
+                    <div className="user_wrap" key={index}>
+                      <div className="text_wrap">
+                        <p className="bold_text"> Bank Name :</p>
+                        <span className="reg_text">{item.bankName}</span>
+                      </div>
+                      <div className="text_wrap">
+                        <p className="bold_text"> IBAN :</p>
+                        <span className="reg_text">{item.iban}</span>
+                      </div>
+                      <div className="text_wrap">
+                        <p className="bold_text">Swift Code:</p>
+                        <span className="reg_text">{item.swiftCode}</span>
+                      </div>
+                      <div className="text_wrap">
+                        <p className="bold_text"> Branch:</p>
+                        <span className="reg_text">{item.branch}</span>
+                      </div>
+                      <div className="text_wrap">
+                        <p className="bold_text">Account Name: </p>
+                        <span className="reg_text">{item.accountName}</span>
+                      </div>
                     </div>
-                    <div className="text_wrap">
-                      <p className="bold_text"> IBAN :</p>
-                      <span className="reg_text">{item.iban}</span>
+                    <div className="dropdown_btn">
+                      <button
+                        onClick={() => handleOpenModal("isEditBankingDetails")}
+                      >
+                        Edit Banking Details
+                      </button>
                     </div>
-                    <div className="text_wrap">
-                      <p className="bold_text">Swift Code:</p>
-                      <span className="reg_text">{item.swiftCode}</span>
-                    </div>
-                    <div className="text_wrap">
-                      <p className="bold_text"> Branch:</p>
-                      <span className="reg_text">{item.branch}</span>
-                    </div>
-                    <div className="text_wrap">
-                      <p className="bold_text">Account Name: </p>
-                      <span className="reg_text">{item.accountName}</span>
-                    </div>
-                  </div>
-              <div className="dropdown_btn">
-                <button onClick={() => handleOpenModal("isEditBankingDetails")}>
-                  Edit Banking Details
-                </button>
-              </div>
-              </>
+                  </>
                 ))
               )}
             </div>
@@ -565,36 +583,47 @@ const UserOverview = () => {
             </div>
 
             {/* Document */}
-            {/* <div className="user_details">
+            <div className="user_details">
               <h3>Document</h3>
               {docs.length === 0 ? (
                 <>
                   <p className="bold_text">No document has been added yet.</p>
-                  <div className="dropdown_btn">
-                    <button onClick={handleAddBond}>Add Document</button>
-                  </div>
                 </>
               ) : (
-                docs.map((item) => (
-                  <div className="user_wrap" key={item.id}>
+                docs.map((doc, item) => (
+                  <div className="user_wrap" key={item}>
+                    {/* <div className="text_wrap"> */}
                     <div className="text_wrap">
-                      <div className="text_wrap">
-                        <p className="bold_text">File Description :</p>
-                        <span className="reg_text">{item.fileDescription}</span>
-                      </div>
+                      <p className="bold_text">File Description :</p>
+                      <span className="reg_text">{doc.fileDescription}</span>
                     </div>
+                    {/* </div> */}
                     <div className="text_wrap">
-                      <a className="bold_text" href={item.downloadURL}>
+                      <p className="bold_text">File Url :</p>
+                      <a className="bold_text" href={doc.downloadURL}>
                         <u>Download URL</u>
                       </a>
                     </div>
-                    <div className="dropdown_btn">
-                      <button onClick={handleAddBond}>Edit Document</button>
-                    </div>
+                    {/* <div className="text_wrap">
+                      <div className="dropdown_btn">
+                        <button
+                          onClick={() => {
+                            handleEditDocument(doc);
+                          }}
+                        >
+                          Edit Document
+                        </button>
+                      </div>
+                    </div> */}
                   </div>
                 ))
               )}
-            </div> */}
+              <div className="dropdown_btn">
+                <button onClick={() => handleOpenModal("isAddNewDocumentOpen")}>
+                  Add Document
+                </button>
+              </div>
+            </div>
           </div>
         )}
       {modalState.isAddBankingDetails && (
@@ -684,18 +713,29 @@ const UserOverview = () => {
           userId={user}
         />
       )}
-      {/* 
-      {isAddNewDocumentOpen && (
+
+      {modalState.isAddNewDocumentOpen && (
         <AddDocument
           onClose={() => {
-            setIsAddNewDocumentOpen(false);
+            handleCloseModal("isAddNewDocumentOpen");
             setSelectedUserForAdd(null);
           }}
-          document={document}
-          setDocument={setDocument}
+          docs={docs}
+          setDocs={setDocs}
           userId={user}
         />
-      )}  */}
+      )}
+      {modalState.isEditDocumentOpen && (
+        <EditDocument
+          onClose={() => {
+            handleCloseModal("isEditDocumentOpen");
+            setSelectedDocument(null); // Clear the selected document when closing the modal
+          }}
+          docs={selectedDocument}
+          setDocs={setDocs}
+          userId={user}
+        />
+      )}
     </div>
   );
 };

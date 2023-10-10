@@ -24,10 +24,11 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { db } from "./firebase";
-import { ref, deleteObject, getStorage } from "firebase/storage";
+import { ref, deleteObject, getStorage, getDownloadURL, uploadBytesResumable } from "firebase/storage";
 
 const ADMINUSER_COLLECTION = "adminUser";
 // const USER_COLLECTION = "user";
+const USERS_COLLECTION = "users";
 
 export function addAdminUser(uid, fullName, email) {
   // Use the uid directly as the document ID
@@ -38,7 +39,7 @@ export function addAdminUser(uid, fullName, email) {
 }
 
 export async function getUser(uid) {
-  const userRef = doc(db, USER_COLLECTION, uid);
+  const userRef = doc(db, USERS_COLLECTION, uid);
   const userSnap = await getDoc(userRef);
 
   if (userSnap.exists()) {
@@ -49,17 +50,16 @@ export async function getUser(uid) {
 }
 
 export function updateuser(uid, userData) {
-  const userDoc = doc(db, USER_COLLECTION, uid);
+  const userDoc = doc(db, USERS_COLLECTION, uid);
   return updateDoc(userDoc, userData);
 }
 
 export function deleteuser(uid) {
-  const userDoc = doc(db, USER_COLLECTION, uid);
+  const userDoc = doc(db, USERS_COLLECTION, uid);
   return deleteDoc(userDoc);
 }
 
 // Transactions
-const USERS_COLLECTION = "users";
 const TRANSACTIONS_SUB_COLLECTION = "transactions";
 
 export async function getAllTransactions() {
@@ -131,7 +131,7 @@ export async function editTransaction(userId, transactionId, updatedFields) {
 
 // Banking Details
 const BANKING_DETAILS_SUB_COLLECTION = "bankingDetails";
-const ADMINUSERS_COLLECTION = "user";
+// const ADMINUSERS_COLLECTION = "user";
 
 export async function addBankingDetails(
   uid,
@@ -421,6 +421,60 @@ export const deleteDocument = async (userId, docId, fileName) => {
     await deleteDoc(docRef);
   } catch (error) {
     console.error("Error during deletion:", error);
+    throw error;
+  }
+};
+
+export const uploadDocument = async (userId, fileDescription, file) => {
+  const storage = getStorage();
+  const uid = userId.userId;
+  const storageRef = ref(storage, `${uid}/${file.name}`);
+console.log(fileDescription, file, uid)
+  try {
+    // Upload the document to Firebase Storage
+    const uploadTask = uploadBytesResumable(storageRef, file);
+
+    // Set up event listeners for the upload task if needed
+    // For example, to track upload progress
+
+    // Wait for the upload to complete
+    const snapshot = await uploadTask;
+
+    // Get the download URL of the uploaded file
+    const downloadURL = await getDownloadURL(snapshot.ref);
+
+    // Add the metadata to Firestore
+    const userDocCollectionRef = collection(db, "users", uid, "docs");
+    const docData = {
+      fileDescription,
+      downloadURL,
+    };
+
+    await addDoc(userDocCollectionRef, docData);
+  } catch (error) {
+    console.error("Error during file upload or Firestore save:", error);
+    throw error;
+  }
+};
+
+export const updateDocumentInFirestore = async (userId, documentId, fileDescription, file) => {
+  try {
+    // Create a reference to the Firestore document
+    const docRef = doc(db, 'users', userId, 'docs', documentId);
+
+    // Create a reference to the Firebase Storage for the user
+    const storage = getStorage();
+    const storagePath = ref(storage, `${userId}/${file.name}`);
+
+    // Update the document data with the new file description and file URL
+    const updatedDocData = {
+      fileDescription,
+      downloadURL: storagePath.fullPath, // You may need to adjust this based on your storage structure
+    };
+
+    // Update the document in Firestore
+    await updateDoc(docRef, updatedDocData);
+  } catch (error) {
     throw error;
   }
 };
