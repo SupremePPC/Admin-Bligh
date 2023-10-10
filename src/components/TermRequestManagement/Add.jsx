@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { addTermToUserCollection } from "../../firebaseConfig/firestore";
 import LoadingScreen from "../LoadingScreen";
-import CurrencyInput from 'react-currency-input-field';
+import CurrencyInput from "react-currency-input-field";
 import "firebase/firestore";
 import Swal from "sweetalert2";
 
@@ -10,21 +10,19 @@ const AddNewTerm = ({ setFixedTerm, fixedTerm, userId, onClose }) => {
   const [errors, setErrors] = useState({});
   const [formData, setFormData] = useState({
     bankName: "",
-    date: "",
     interestRate: 0,
     logo: "",
     minAmount: 0,
     status: "",
     term: "",
     type: "",
-    userId: "",
   });
 
   const getCurrentDate = () => {
     const now = new Date();
     const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0'); // Month is zero-based
-    const day = String(now.getDate()).padStart(2, '0');
+    const month = String(now.getMonth() + 1).padStart(2, "0"); // Month is zero-based
+    const day = String(now.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
   };
 
@@ -40,13 +38,19 @@ const AddNewTerm = ({ setFixedTerm, fixedTerm, userId, onClose }) => {
     e.preventDefault();
     setIsLoading(true);
 
+    // Destructure the values from formData
+    const { bankName, interestRate, logo, minAmount, status, term, type } =
+      formData;
+    console.log(formData);
+
     if (
-      !formData.logo ||
-      !formData.bankName ||
-      !formData.minAmount ||
-      !formData.interestRate ||
-      !formData.term ||
-      !formData.type
+      !logo ||
+      !bankName ||
+      !minAmount ||
+      !interestRate ||
+      !term ||
+      !status ||
+      !type
     ) {
       setIsLoading(false);
       return Swal.fire({
@@ -58,36 +62,42 @@ const AddNewTerm = ({ setFixedTerm, fixedTerm, userId, onClose }) => {
     }
 
     const newData = {
-      bankName: formData.bankName,
+      bankName: bankName,
       date: getCurrentDate(),
-      interestRate: parseFloat(formData.interestRate.replace(/,/g, "")), // Convert to a float
-      logo: formData.logo,
-      principalAmount: parseFloat(formData.minAmount.replace(/,/g, "")), // Convert to a float
-      status: formData.status,
-      term: formData.term,
-      type: formData.type,
+      interestRate: parseFloat(interestRate.replace(/,/g, "")), // Convert to a float
+      logo: logo,
+      principalAmount: parseFloat(minAmount.replace(/,/g, "")), // Convert to a float
+      status: status,
+      term: term,
+      type: type,
       userId: userId.userId,
     };
     console.log(newData);
+
     try {
-      await addTermToUserCollection(userId, newData);
-      Swal.fire({
-        icon: "success",
-        title: "Added!",
-        text: `Term added successfully.`,
-        showConfirmButton: false,
-        timer: 2000,
-      });
-      setFormData({
-        bankName: "",
-        interestRate: 0,
-        logo: "",
-        minAmount: "0.00", // Reset to string
-        status: "",
-        term: "",
-        type: "",
-      });
-      // setFixedTerm([...fixedTerm, { ...newData, id: result.id }]);
+      const result = await addTermToUserCollection(userId.userId, newData);
+      if (result.success) {
+        Swal.fire({
+          icon: "success",
+          title: "Added!",
+          text: `Term added successfully.`,
+          showConfirmButton: false,
+          timer: 2000,
+        });
+        // Reset the form data
+        setFormData({
+          bankName: "",
+          interestRate: 0,
+          logo: "",
+          minAmount: "0.00", // Reset to string
+          status: "",
+          term: "",
+          type: "",
+        });
+        setFixedTerm([...fixedTerm, { ...newData, id: result.id }]);
+      } else {
+        throw new Error(result.error);
+      }
     } catch (error) {
       console.error(error);
       Swal.fire({
@@ -138,10 +148,13 @@ const AddNewTerm = ({ setFixedTerm, fixedTerm, userId, onClose }) => {
             prefix="€"
             name="minAmount"
             placeholder="0.00"
-            defaultValue={0.00}
+            defaultValue={formData.minAmount} // Use the formData value here
             decimalsLimit={2}
-            onValueChange={formData.minAmount}
+            onValueChange={(value, name) => {
+              setFormData({ ...formData, [name]: value });
+            }}
           />
+
           <label htmlFor="interestRate">Interest Rate:</label>
           <input
             type="number"
@@ -150,19 +163,17 @@ const AddNewTerm = ({ setFixedTerm, fixedTerm, userId, onClose }) => {
             value={formData.interestRate}
             required
           />
-           <label htmlFor="accountType">Term Type</label>
+          <label htmlFor="accountType">Term Type</label>
           <select
             id="type"
             value={formData.type}
-            onChange={(e) =>
-              setFormData({ ...formData, type: e.target.value })
-            }
+            onChange={(e) => setFormData({ ...formData, type: e.target.value })}
           >
             <option value="">--Select--</option>
             <option value="Deposit">Deposit</option>
             <option value="Withdrawal">Withdrawal</option>
           </select>
-           <label htmlFor="accountType">Status</label>
+          <label htmlFor="accountType">Status</label>
           <select
             id="status"
             value={formData.status}

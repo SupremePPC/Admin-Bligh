@@ -23,26 +23,10 @@ const AddUserIpos = ({ ipos, setIpos, userId, onClose }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    // Check if the field is a monetary value (expListingPrice, preSharePrice, minInvestment, sharePrice)
-    if (
-      name === "expListingPrice" ||
-      name === "sharePrice" ||
-      name === "minInvestment" ||
-      name === "preSharePrice"
-    ) {
-      const formattedValue = parseFloat(value.replace(/,/g, ""))
-        .toFixed(2)
-        .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-      setFormData({
-        ...formData,
-        [name]: formattedValue,
-      });
-    } else {
-      setFormData({
-        ...formData,
-        [name]: value,
-      });
-    }
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -80,20 +64,21 @@ const AddUserIpos = ({ ipos, setIpos, userId, onClose }) => {
         showConfirmButton: true,
       });
     }
-    const formattedFormData = {
-      ...formData,
-      minInvestment: parseFloat(
-        formData.minInvestment.replace(/,/g, "")
-      ).toFixed(2),
-      sharePrice: parseInt(formData.sharePrice.replace(/,/g, ""), 10),
-      preSharePrice: parseInt(formData.preSharePrice.replace(/,/g, ""), 10),
-      expListingPrice: parseFloat(
-        formData.expListingPrice.replace(/,/g, "")
-      ).toFixed(2),
+
+    const newIpos = {
+      name,
+      logo,
+      description,
+      expListingPrice,
+      expectedate,
+      minInvestment,
+      preAllocation,
+      preSharePrice,
+      sharePrice,
     };
 
     try {
-      await addIposToUserCollection(formattedFormData);
+      const result = await addIposToUserCollection(formData);
       Swal.fire({
         icon: "success",
         title: "Added!",
@@ -101,6 +86,7 @@ const AddUserIpos = ({ ipos, setIpos, userId, onClose }) => {
         showConfirmButton: false,
         timer: 2000,
       });
+      setIpos([...ipos, { ...newIpos, id: result.id }]);
       setFormData({
         name: "",
         logo: "",
@@ -112,8 +98,6 @@ const AddUserIpos = ({ ipos, setIpos, userId, onClose }) => {
         preSharePrice: 0,
         sharePrice: 0,
       });
-      refreshIpos();
-      setIsAdding(false);
     } catch (error) {
       console.error(error);
       Swal.fire({
@@ -156,12 +140,14 @@ const AddUserIpos = ({ ipos, setIpos, userId, onClose }) => {
             value={formData.description}
           />
           <label htmlFor="expListingPrice">Expected Listing Price:</label>
-          <input
-            type="number"
-            min={0}
+          <CurrencyInput
+            decimalSeparator="."
+            prefix="€"
             name="expListingPrice"
-            onChange={handleChange}
-            value={formData.expListingPrice}
+            placeholder="0.00"
+            defaultValue={0.00}
+            decimalsLimit={2}
+            onValueChange={formData.expListingPrice}
           />
           <label htmlFor="expectedate">Expected Date:</label>
           <input

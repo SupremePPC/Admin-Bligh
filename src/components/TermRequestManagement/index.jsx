@@ -92,9 +92,7 @@ const TermsRequestTable = () => {
       if (message) await addNotification(userId, message, newStatus);
 
       // Refresh the table data
-      const allRequests = await getTermRequests();
-      setTermRequests(allRequests);
-
+      
       Swal.fire({
         icon: "success",
         title: "Updated!",
@@ -102,6 +100,9 @@ const TermsRequestTable = () => {
         showConfirmButton: false,
         timer: 2000,
       });
+      
+      const allRequests = await getTermRequests();
+      setTermRequests(allRequests);
     } catch (err) {
       console.error("Error updating request:", err);
       Swal.fire({

@@ -111,42 +111,39 @@ const UserOverview = () => {
     // Parse principal and interestRate to float numbers
     const principalNumber = parseFloat(principal);
     const interestRateNumber = parseFloat(interestRate);
-
+  
     // Parse the term string to extract the number and the unit
     const termParts = term.split(" ");
     if (termParts.length !== 2) {
-      console.error("Invalid term format:", term); // Log error for invalid term
-      return "Invalid Input"; // Return error message for invalid term
+      console.error("Invalid term format:", term);
+      return "Invalid Input";
     }
-
-    let termNumber = parseFloat(termParts[0]);
-    const termUnit = termParts[1];
-
-    // If the term is in months, convert it to years
-    if (termUnit.startsWith("Month") || termUnit.startsWith("Months") || termUnit.startsWith("month") 
-    || termUnit.startsWith("months")) {
-      termNumber = termNumber / 12;
-    } else if (!termUnit.startsWith("Year") || !termUnit.startsWith("Years") || !termUnit.startsWith("year") 
-    || !termUnit.startsWith("years")) {
-      console.error("Invalid term unit:", termUnit); // Log error for invalid termUnit
-      return "Invalid Input"; // Return error message for invalid termUnit
+  
+    const termNumber = parseFloat(termParts[0]);
+    const termUnit = termParts[1].toLowerCase();
+  
+    if (!["year", "years", "month", "months"].includes(termUnit)) {
+      console.error("Invalid term unit:", termUnit);
+      return "Invalid Input";
     }
-
-    // Check for invalid inputs
-    if (
-      isNaN(principalNumber) ||
-      isNaN(interestRateNumber) ||
-      isNaN(termNumber)
-    ) {
-      return "Invalid Input"; // Return error message for NaN values
+  
+    if (isNaN(principalNumber) || isNaN(interestRateNumber) || isNaN(termNumber)) {
+      return "Invalid Input";
     }
-
-    // Calculate the maturity amount
-    const maturityAmount =
-      principalNumber * (1 + (interestRateNumber / 100) * termNumber);
+  
+    // Create a separate variable for the converted term in years
+    let termInYears = termNumber;
+  
+    if (termUnit === "months" || termUnit === "month") {
+      // Convert months to years
+      termInYears /= 12;
+    }
+  
+    const maturityAmount = principalNumber * (1 + (interestRateNumber / 100) * termInYears);
     return maturityAmount.toFixed(2);
   };
-
+  
+  
   const firestoreTimestampToDate = (timestamp) => {
     return timestamp
       ? new Date(timestamp.seconds * 1000).toLocaleDateString()
@@ -232,6 +229,7 @@ const UserOverview = () => {
                 </>
               ) : (
                 bankingDetails.map((item, index) => (
+                  <>
                   <div className="user_wrap" key={index}>
                     <div className="text_wrap">
                       <p className="bold_text"> Bank Name :</p>
@@ -254,13 +252,14 @@ const UserOverview = () => {
                       <span className="reg_text">{item.accountName}</span>
                     </div>
                   </div>
-                ))
-              )}
               <div className="dropdown_btn">
                 <button onClick={() => handleOpenModal("isEditBankingDetails")}>
                   Edit Banking Details
                 </button>
               </div>
+              </>
+                ))
+              )}
             </div>
 
             {/* Account types and balances*/}
