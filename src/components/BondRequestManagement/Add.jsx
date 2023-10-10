@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import Swal from "sweetalert2";
 import LoadingScreen from "../LoadingScreen";
+import CurrencyInput from "react-currency-input-field";
 import { addBondUser } from "../../firebaseConfig/firestore";
 
-const AddBond = ({ setBond, bonds, userId, onClose }) => {
+const AddBond = ({ setBond, bond, userId, onClose }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     companyWebsite: "",
@@ -14,11 +15,10 @@ const AddBond = ({ setBond, bonds, userId, onClose }) => {
     isin: "",
     issuerName: "",
     maturityDate: "",
-    minimumAmount: 0.00,
+    minimumAmount: 0.0,
     purchaseDate: "",
     quantity: 0,
     sector: "",
-    ticker: "",
     type: "",
   });
   const [errors, setErrors] = useState({});
@@ -34,6 +34,23 @@ const AddBond = ({ setBond, bonds, userId, onClose }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    
+    const {
+      companyWebsite,
+      couponFrequency,
+      couponRate,
+      currentValue,
+      image,
+      isin,
+      issuerName,
+      maturityDate,
+      minimumAmount,
+      purchaseDate,
+      quantity,
+      sector,
+      type,
+    } = formData;
+console.log(formData);
 
     if (
       !companyWebsite ||
@@ -50,7 +67,6 @@ const AddBond = ({ setBond, bonds, userId, onClose }) => {
       !purchaseDate ||
       !quantity ||
       !sector ||
-      !ticker ||
       !type
     ) {
       setIsLoading(false);
@@ -63,21 +79,21 @@ const AddBond = ({ setBond, bonds, userId, onClose }) => {
     }
 
     const newBond = {
-      companyWebsite,
-      couponFrequency,
-      couponRate,
-      currentValue,
-      image,
-      isin,
-      issuerName,
-      maturityDate,
-      minimumAmount,
-      purchaseDate,
-      quantity,
-      sector,
-      type,
+      companyWebsite: companyWebsite,
+      couponFrequency: couponFrequency,
+      couponRate: couponRate,
+      currentValue: currentValue,
+      image: image,
+      isin: isin,
+      issuerName: issuerName,
+      maturityDate: maturityDate,
+      minimumAmount: minimumAmount,
+      purchaseDate: purchaseDate,
+      quantity: quantity,
+      sector: sector,
+      type: type,
     };
-
+    console.log(newBond);
     try {
       const result = await addBondUser(userId.userId, newBond);
       if (result.success) {
@@ -88,7 +104,7 @@ const AddBond = ({ setBond, bonds, userId, onClose }) => {
           showConfirmButton: false,
           timer: 2000,
         });
-        setBond([...bonds, { ...newBond, id: result.id }]);
+        setBond([...bond, { ...newBond, id: result.id }]);
         setFormData({
           companyWebsite: "",
           couponFrequency: 0,
@@ -98,7 +114,7 @@ const AddBond = ({ setBond, bonds, userId, onClose }) => {
           isin: "",
           issuerName: "",
           maturityDate: "",
-          minimumAmount: 0.00,
+          minimumAmount: 0.0,
           purchaseDate: "",
           quantity: 0,
           sector: "",
@@ -150,6 +166,14 @@ const AddBond = ({ setBond, bonds, userId, onClose }) => {
             onChange={handleChange}
             value={formData.type}
           />
+
+          <label htmlFor="companyWebsite">Company Website:</label>
+          <input
+            type="url"
+            name="companyWebsite"
+            onChange={handleChange}
+            value={formData.companyWebsite}
+          />
           <label htmlFor="isin">ISIN:</label>
           <input
             type="text"
@@ -185,9 +209,11 @@ const AddBond = ({ setBond, bonds, userId, onClose }) => {
             prefix="€"
             name="minimumAmount"
             placeholder="0.00"
-            defaultValue={0.00}
+            defaultValue={0.0}
             decimalsLimit={2}
-            onValueChange={formData.minimumAmount}
+            onValueChange={(value, name) => {
+              setFormData({ ...formData, [name]: value });
+            }}
           />
           <label htmlFor="currentValue">Current Value:</label>
           <input
@@ -196,13 +222,6 @@ const AddBond = ({ setBond, bonds, userId, onClose }) => {
             name="currentValue"
             onChange={handleChange}
             value={formData.currentValue}
-          />
-          <label htmlFor="companyWebsite">Company Website:</label>
-          <input
-            type="url"
-            name="companyWebsite"
-            onChange={handleChange}
-            value={formData.companyWebsite}
           />
           <label htmlFor="couponRate">Coupon Rate:</label>
           <input
@@ -219,7 +238,13 @@ const AddBond = ({ setBond, bonds, userId, onClose }) => {
             min={0}
             value={formData.couponFrequency}
           />
-
+<label htmlFor="purchaseDate">Purchase Date:</label>
+          <input
+            type="date"
+            name="purchaseDate"
+            onChange={handleChange}
+            value={formData.purchaseDate}
+          />
           <div style={{ marginTop: "30px" }}>
             <input type="submit" value="Add" />
             <input

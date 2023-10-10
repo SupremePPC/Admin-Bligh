@@ -143,14 +143,11 @@ const UserOverview = () => {
     return maturityAmount.toFixed(2);
   };
   
-  
   const firestoreTimestampToDate = (timestamp) => {
     return timestamp
       ? new Date(timestamp.seconds * 1000).toLocaleDateString()
       : "";
   };
-
-  const numberOfShares = ipos.amountInvested / ipos.sharePrice;
 
   return (
     <div className="container">
@@ -523,7 +520,7 @@ const UserOverview = () => {
             {/* IPOs  */}
             <div className="user_details">
               <h3>IPOs</h3>
-              <table className="terms_table">
+              <table className="term_table">
                 {ipos.length > 0 ? (
                   <>
                     <thead>
@@ -546,7 +543,7 @@ const UserOverview = () => {
                           </td>
                           <td>{firestoreTimestampToDate(ipos.date)}</td>
                           <td>€ {ipos.amountInvested}</td>
-                          <td>{numberOfShares}</td>
+                          <td>{ipos.numberOfShares}</td>
                           <td>€ {ipos.sharePrice}</td>
                         </tr>
                       </tbody>
@@ -659,8 +656,8 @@ const UserOverview = () => {
             handleCloseModal("isAddBondOpen");
             setSelectedUserForAdd(null);
           }}
-          bonds={bondsHoldings}
-          setBonds={setBondsHoldings}
+          bond={bondsHoldings}
+          setBond={setBondsHoldings}
           userId={user}
         />
       )}
@@ -680,6 +677,7 @@ const UserOverview = () => {
           onClose={() => {
             handleCloseModal("isAddNewIpos");
             setSelectedUserForAdd(null);
+            fetchSubCollection("ipos", setIpos);
           }}
           ipos={ipos}
           setIpos={setIpos}

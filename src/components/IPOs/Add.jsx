@@ -23,41 +23,50 @@ const AddNewIpos = ({ setIsAdding, refreshIpos }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    // Check if the field is a monetary value (expListingPrice, preSharePrice, minInvestment, sharePrice)
-    if (
-      name === 'expListingPrice' ||
-      name === 'sharePrice' ||
-      name === 'minInvestment' ||
-      name === 'preSharePrice'
-    ) {
-      const formattedValue = parseFloat(value.replace(/,/g, ""))
-        .toFixed(2)
-        .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-      setFormData({
-        ...formData,
-        [name]: formattedValue,
-      });
-    } else {
-      setFormData({
-        ...formData,
-        [name]: value,
-      });
-    }
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    const formattedFormData = {
-      ...formData,
-      minInvestment: parseFloat(formData.minInvestment.replace(/,/g, '')).toFixed(2),
-      sharePrice: parseInt(formData.sharePrice.replace(/,/g, ''), 10),
-      preSharePrice: parseInt(formData.preSharePrice.replace(/,/g, ''), 10),
-      expListingPrice: parseFloat(formData.expListingPrice.replace(/,/g, '')).toFixed(2),
+
+    if (
+      !name ||
+      !logo ||
+      !description ||
+      !expListingPrice ||
+      !expectedDate ||
+      !minInvestment ||
+      !preAllocation ||
+      !preSharePrice ||
+      !sharePrice
+    ) {
+      setIsLoading(false);
+      return Swal.fire({
+        icon: "error",
+        title: "Error!",
+        text: "All fields are required.",
+        showConfirmButton: true,
+      });
+    }
+
+    const newIpos = {
+      logo,
+      name,
+      description,
+      expListingPrice,
+      expectedDate,
+      minInvestment,
+      preAllocation,
+      preSharePrice,
+      sharePrice,
     };
-  
+   
     try {
-      await addNewIpos(formattedFormData);
+      await addNewIpos(newIpos);
       Swal.fire({
         icon: "success",
         title: "Added!",

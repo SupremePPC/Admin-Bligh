@@ -749,9 +749,22 @@ const IPOS_REQUESTS_COLLECTION = "ipoInvestmentRequests";
 
 // 1. Add IPO details to a sub-collection in the user's document
 export const addIposToUserCollection = async (userId, ipoData) => {
-  const userIpoCollectionRef = collection(db, USERS_COLLECTION, userId, "ipos");
-  await addDoc(userIpoCollectionRef, ipoData);
+  try {
+    const userIposHoldingsPath = collection(
+      db,
+      `users/${userId}/ipos`
+    );
+    const docRef= await addDoc(userIposHoldingsPath, ipoData);
+    const docId = docRef.id;
+  
+      return { success: true, id: docId };
+    } catch (error) {
+      console.error('Error adding term:', error);
+      return { success: false, error: error.message };
+    }
 };
+
+
 
 // 3. Delete the IPO request status from the user's request collection
 export const deleteIposRequestStatus = async (uid, requestId) => {

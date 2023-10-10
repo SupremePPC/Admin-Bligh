@@ -1,215 +1,141 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "firebase/firestore";
-import Swal from "sweetalert2";
-import { addIposToUserCollection } from "../../firebaseConfig/firestore";
+import { getAllIpos } from "../../firebaseConfig/firestore";
 import LoadingScreen from "../LoadingScreen";
-import CurrencyInput from "react-currency-input-field";
+import InvestIpoModal from "./Modals/InvestModal";
 
-const AddUserIpos = ({ ipos, setIpos, userId, onClose }) => {
+const AddUserIpos = ({ userId, onClose }) => {
+  const [ipos, setIpos] = useState([]);
+  const [iposModalOpen, setIposModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    name: "",
-    logo: "",
-    description: "",
-    expListingPrice: 0,
-    expectedate: "",
-    minInvestment: 0,
-    preAllocation: "",
-    preSharePrice: 0,
-    sharePrice: 0,
-  });
+  const [selectedIpo, setSelectedIpo] = useState(null);
 
-  const [errors, setErrors] = useState({});
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const fetchIpos = async () => {
     setIsLoading(true);
-
-    const {
-      name,
-      logo,
-      description,
-      expListingPrice,
-      expectedate,
-      minInvestment,
-      preAllocation,
-      preSharePrice,
-      sharePrice,
-    } = formData;
-
-    if (
-      !name ||
-      !logo ||
-      !description ||
-      !expListingPrice ||
-      !expectedate ||
-      !minInvestment ||
-      !preAllocation ||
-      !preSharePrice ||
-      !sharePrice
-    ) {
-      setIsLoading(false);
-      return Swal.fire({
-        icon: "error",
-        title: "Error!",
-        text: "All fields are required.",
-        showConfirmButton: true,
-      });
-    }
-
-    const newIpos = {
-      name,
-      logo,
-      description,
-      expListingPrice,
-      expectedate,
-      minInvestment,
-      preAllocation,
-      preSharePrice,
-      sharePrice,
-    };
-
     try {
-      const result = await addIposToUserCollection(formData);
-      Swal.fire({
-        icon: "success",
-        title: "Added!",
-        text: `IPOs added successfully.`,
-        showConfirmButton: false,
-        timer: 2000,
-      });
-      setIpos([...ipos, { ...newIpos, id: result.id }]);
-      setFormData({
-        name: "",
-        logo: "",
-        description: "",
-        expListingPrice: 0,
-        expectedate: "",
-        minInvestment: 0,
-        preAllocation: "",
-        preSharePrice: 0,
-        sharePrice: 0,
-      });
+      const fetchedIpos = await getAllIpos();
+      setIpos(fetchedIpos);
     } catch (error) {
-      console.error(error);
-      Swal.fire({
-        icon: "error",
-        title: "Error!",
-        text: `Error adding IPOs: ${error}`,
-        showConfirmButton: true,
-      });
+      console.error("Error occurred while fetching IPOs: ", error);
     } finally {
       setIsLoading(false);
     }
   };
 
+  useEffect(() => {
+    fetchIpos();
+  }, []);
+
   return (
-    <div className="small-container">
-      {isLoading ? (
-        <LoadingScreen />
-      ) : (
-        <form onSubmit={handleSubmit}>
-          <h3>Add New IPOs for {userId.userId}</h3>
-          <label htmlFor="logo"> Logo:</label>
-          <input
-            type="url"
-            name="logo"
-            onChange={handleChange}
-            value={formData.logo}
-          />
-          <label htmlFor="name">Name:</label>
-          <input
-            type="text"
-            name="name"
-            onChange={handleChange}
-            value={formData.name}
-          />
-          <label htmlFor="description">Description:</label>
-          <input
-            type="text"
-            name="description"
-            onChange={handleChange}
-            value={formData.description}
-          />
-          <label htmlFor="expListingPrice">Expected Listing Price:</label>
-          <CurrencyInput
-            decimalSeparator="."
-            prefix="€"
-            name="expListingPrice"
-            placeholder="0.00"
-            defaultValue={0.00}
-            decimalsLimit={2}
-            onValueChange={formData.expListingPrice}
-          />
-          <label htmlFor="expectedate">Expected Date:</label>
-          <input
-            type="text"
-            name="expectedate"
-            onChange={handleChange}
-            value={formData.expectedate}
-          />
-          <label htmlFor="minInvestment">Minimum Investment:</label>
-          <CurrencyInput
-            decimalSeparator="."
-            prefix="€"
-            name="minInvestment"
-            placeholder="0.00"
-            defaultValue={0.00}
-            decimalsLimit={2}
-            onValueChange={formData.minInvestment}
-          />
-          <label htmlFor="preAllocation">Pre Allocation:</label>
-          <input
-            type="text"
-            name="preAllocation"
-            onChange={handleChange}
-            value={formData.preAllocation}
-          />
-          <label htmlFor="preSharePrice">Pre Share Price:</label>
-          <CurrencyInput
-            decimalSeparator="."
-            prefix="€"
-            name="preSharePrice"
-            placeholder="0.00"
-            defaultValue={0.00}
-            decimalsLimit={2}
-            onValueChange={formData.preSharePrice}
-          />
-          <label htmlFor="sharePrice">Share Price:</label>
-          <CurrencyInput
-            decimalSeparator="."
-            prefix="€"
-            name="sharePrice"
-            placeholder="0.00"
-            defaultValue={0.00}
-            decimalsLimit={2}
-            onValueChange={formData.sharePrice}
-          />
-          
-          <div style={{ marginTop: "30px" }}>
-            <input type="submit" value="Save" />
-            <input
-              style={{ marginLeft: "12px" }}
-              className="muted-button"
-              type="button"
-              value="Cancel"
-              onClick={onClose}
-            />
-          </div>
-          {errors.isin && <div>{errors.isin}</div>}
-          {errors.issuerName && <div>{errors.issuerName}</div>}
-        </form>
-      )}
+    <div className="iposPage_Wrapper">
+      <div className="headerSection">
+        <h2 className="title">IPOs</h2>
+        <div className="svgWrapper">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="180"
+            height="9"
+            viewBox="0 0 230 9"
+          >
+            <rect
+              id="Rectangle_28"
+              data-name="Rectangle 28"
+              width="230"
+              height="9"
+              rx="4.5"
+              fill="#688fb7"
+            ></rect>
+          </svg>
+        </div>
+      </div>
+      <div className="contentBody">
+        {ipos.length === 0 && <h5>No IPOs Available.</h5>}
+        {isLoading ? (
+          <LoadingScreen />
+        ) : (
+          ipos.map((ipo, index) => (
+            <div key={index} className="ipoCard">
+              <div className="ipoDetails">
+                <div className="ipoColumn">
+                  <div className="companyLogoWrapper">
+                    <img src={ipo.logo} alt="Logo" />
+                  </div>
+                  <div className="columnDetails">
+                    <div className="companyDetails">
+                      <p className="companyName"> {ipo.name} </p>
+                    </div>
+                    <div className="additionalDetails">
+                      <div className="detailsRow">
+                        <span className="regularText"> {ipo.description} </span>
+                      </div>
+                      <div className="detailsRow">
+                        <p className="boldText">Expected IPO Date:</p>
+                        <span className="regularText">
+                          {" "}
+                          {ipo.expectedDate}{" "}
+                        </span>
+                      </div>
+                      <div className="detailsRow">
+                        <p className="boldText">Pre-IPO Share Price:</p>
+                        <span className="regularText">
+                          {" "}
+                          € {ipo.preSharePrice}{" "}
+                        </span>
+                      </div>
+                      <div className="detailsRow">
+                        <p className="boldText">Minimum Investment:</p>
+                        <span className="regularText">
+                          {" "}
+                          € {ipo.minInvestment}{" "}
+                        </span>
+                      </div>
+                      <div className="detailsRow">
+                        <p className="boldText">Expected Listing Price:</p>
+                        <span className="regularText">
+                          {" "}
+                          € {ipo.expListingPrice}{" "}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setIposModalOpen(true);
+                      setSelectedIpo(ipo);
+                    }}
+                    className="purchaseButton"
+                  >
+                    Invest Now
+                  </button>
+                  <InvestIpoModal
+                    isOpen={iposModalOpen}
+                    onClose={() => {
+                      setIposModalOpen(false);
+                      setSelectedIpo(null);
+                    }}
+                    ipo={selectedIpo}
+                    userId={userId}
+                  />
+                </div>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+      <div style={{ marginTop: "30px" }}>
+        <input
+          style={{ marginLeft: "12px" }}
+          className="muted-button"
+          type="button"
+          value="Close"
+          onClick={() => {
+            fetchIpos();
+            onClose();
+          }}
+        />
+      </div>
     </div>
   );
-}
+};
 
 export default AddUserIpos;

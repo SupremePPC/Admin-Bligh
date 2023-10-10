@@ -1,0 +1,183 @@
+.invest_ipo_overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+    animation: fadeIn 0.3s forwards;
+}
+  
+.invest_ipo_modal {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 500px;
+    height: fit-content;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    margin: 0.5rem;
+    animation: scaleUp 0.3s forwards;
+}
+  
+.section_header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+.section_header .logo {
+    width: 150px;
+    height: 150px;
+    object-fit: contain;
+}
+
+.section_header .title {
+    font-size: var(--font-twentyFour);
+    font-weight: 600;
+    color: var(--black);
+    /* margin-bottom: 1rem; */
+}
+  
+.section_header .subtitle {
+    background-color: #82d1ff;
+    border-radius: 4px;
+    padding: 2px 10px;
+    max-width: 200px;
+    text-align: center;
+}
+  
+.section_header .subtitle span {
+    color: #13035f;
+    font-weight: 500;
+    font-size: var(--font-fourteen);
+    text-align: center;
+    text-transform: capitalize;
+}
+  
+.invest_ipo_overlay .section_body {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+}
+  
+.section_body .more_dets {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: .5rem;
+}
+  
+.more_dets .bold_text {
+    font-size: var(--font-sixteen);
+    font-weight: 500;
+    color: var(--black);
+    /* padding: 1rem 0 0.5rem; */
+}
+  
+.more_dets .reg_text {
+    font-size: var(--font-sixteen);
+    color: var(--black);
+}
+  
+.input_group {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-top: 1rem;
+    margin-bottom: .5rem;
+    gap: .35rem;
+}
+  
+.input_group label {
+    color: var(--black);
+    font-size: var(--font-sixteen);
+    font-weight: 600;
+}
+  
+.section_body input {
+    display: block;
+    width: 100%;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+  
+.section_body input ::placeholder {
+    color: var(--grey);
+}
+  
+.invest_ipo_overlay .buttons_wrap {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: nowrap;
+}
+  
+.buttons_wrap .submit_btn {
+    max-width: 200px;
+    color: var(--white);
+    font-size: var(--font-eighteen);
+    font-weight: 400;
+    width: 49%;
+    height: 3rem;
+    font-weight: 400;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 10px;
+    margin-top: 1rem;
+    background-color: var(--green);
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+  
+.buttons_wrap .cancel_btn {
+    max-width: 200px;
+    color: var(--white);
+    font-size: var(--font-eighteen);
+    font-weight: 400;
+    width: 49%;
+    height: 3rem;
+    font-weight: 400;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 10px;
+    margin-top: 1rem;
+    background-color: var(--red);
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+  
+@media screen and (max-width: 415px) {
+    .invest_ipo_modal {
+        height: fit-content;
+        padding: 20px 16px;
+    }
+  
+    .buttons_wrap {
+        gap: 0.5rem;
+        flex-wrap: nowrap;
+        justify-content: center;
+    }
+  
+    .buttons_wrap button {
+        margin-top: 0;
+        width: 100%;
+        height: 2.5rem;
+        font-size: var(--font-sixteen);
+    }
+}
