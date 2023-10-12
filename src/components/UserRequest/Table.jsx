@@ -3,15 +3,14 @@ import Modal from "../CustomsModal";
 
 const Table = ({
   userRequests,
-  isApproved,
-  isRejected,
-  setIsApproved,
-  setIsRejected,
   handleApproval,
   handleRejection,
 }) => {
-  const [selectedUserId, setSelectedUserId] = useState(null); // To keep track of the selected user's ID
-
+const firestoreTimestampToDate = (timestamp) => {
+  return timestamp
+    ? new Date(timestamp.seconds * 1000).toLocaleDateString()
+    : "";
+};
   return (
     <div className="contain-table">
       <table className="striped-table">
@@ -35,7 +34,7 @@ const Table = ({
                 <td>{user.fullName.split(" ")[0] || "N/A"}</td>{" "}
                 <td>{user.fullName.split(" ")[1] || "N/A"}</td>{" "}
                 <td>{user.email || "N/A"}</td>
-                <td>{user.date || "N/A"}</td>
+                <td>{firestoreTimestampToDate(user.date) || "N/A"}</td>
                 <td className="text-right">
                   <button
                     onClick={() => handleApproval(user.id, user)}

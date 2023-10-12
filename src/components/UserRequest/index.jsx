@@ -29,7 +29,7 @@ export default function UserRequest() {
   useEffect(() => {
     const fetchUserRequests = async () => {
       try {
-        const adminDashRef = collection(db, "adminDash");
+        const adminDashRef = collection(db, "admin_users");
         const adminDocs = await getDocs(adminDashRef);
 
         let allUserRequests = [];
@@ -37,7 +37,7 @@ export default function UserRequest() {
         for (const doc of adminDocs.docs) {
           const userRequestsRef = collection(
             db,
-            "adminDash",
+            "admin_users",
             doc.id,
             "userRequests"
           );
@@ -71,7 +71,7 @@ export default function UserRequest() {
         requestData.email,
         requestData.password
       );
-
+  
       // Step 2: Use the User ID as the document ID in the 'users' collection
       const newUserId = userCredential.user.uid;
       await setDoc(doc(db, "users", newUserId), {
@@ -79,18 +79,19 @@ export default function UserRequest() {
         email: requestData.email,
         address: requestData.address,
         mobilePhone: requestData.mobilePhone,
+        country: requestData.country,
       });
-
+  
       // Delete the admin request
       await deleteDoc(
-        doc(db, "adminDash", requestData.uid, "userRequests", userId)
+        doc(db, "admin_users", requestData.uid, "userRequests", userId)
       );
-
+  
       // Remove the user request from the state
       setUserRequests((prevRequests) =>
         prevRequests.filter((request) => request.id !== userId)
       );
-
+  
       Swal.fire({
         icon: "success",
         title: "Approved!",
@@ -98,7 +99,7 @@ export default function UserRequest() {
         showConfirmButton: false,
         timer: 2000,
       });
-
+  
       // After successfully adding the user to the 'users' collection:
       const mailRef = collection(db, "mail");
       await addDoc(mailRef, {
@@ -106,53 +107,49 @@ export default function UserRequest() {
         message: {
           subject: "Signup Request Approved",
           html: `<p>Hello ${requestData.fullName},</p>
-        <p>Your signup request has been approved! You can now log in using your credentials.</p>
-        <p>Thank you for joining us!</p>`,
+          <p>Your signup request has been approved! You can now log in using your credentials.</p>
+          <p>Thank you for joining us!</p>`,
         },
       });
+      // Delete the admin request document from 'admin_users' collection
+      await deleteDoc(doc(db, "admin_users", requestData.uid, "userRequests", userId));
     } catch (error) {
       if (error.code === "auth/email-already-in-use") {
         setError("The email is already in use. Please use a different email.");
       } else {
         console.error("Error approving user:", error);
-        setError("Error approving user: " + error.message);
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: `Error approving user: ${error.message}`,
+          showConfirmButton: false,
+          timer: 2000,
+        });
       }
-      setTimeout(() => {
-        setError("");
-      }, 4000);
     } finally {
       setIsLoading(false);
     }
   };
-
+  
   const handleRejection = async (userId, requestData) => {
     setIsLoading(true);
-    console.log("UID:", requestData.uid);
-    console.log("User Request ID:", userId);
-
+  
     try {
       const userRequestDocRef = doc(
         db,
-        "adminDash",
+        "admin_users",
         requestData.uid,
         "userRequests",
         userId
       );
-
-      const userDocRef = doc(db, "adminDash", requestData.uid);
-      console.log("userDocRef:", userDocRef);
+  
       // First, delete the specific user request from the userRequests sub-collection.
       await deleteDoc(userRequestDocRef);
-      console.log("userRequestDocRef:", userRequestDocRef);
-
+  
       setUserRequests((prevRequests) =>
         prevRequests.filter((request) => request.id !== userId)
       );
-
-      const userDocSnapshot = await getDoc(userDocRef);
-      if (userDocSnapshot.exists()) {
-        await deleteDoc(userDocRef);
-      }
+  
       Swal.fire({
         icon: "success",
         title: "Removed!",
@@ -160,6 +157,7 @@ export default function UserRequest() {
         showConfirmButton: false,
         timer: 2000,
       });
+  
       const mailRef = collection(db, "mail");
       await addDoc(mailRef, {
         to: requestData.email,
@@ -171,16 +169,29 @@ export default function UserRequest() {
             <p>Thank you for your understanding!</p>`,
         },
       });
+      Swal.fire({
+        icon: "success",
+        title: "Removed!",
+        text: `User request rejected and removed successfully.`,
+        showConfirmButton: false,
+        timer: 2000,
+      });
+      // Delete the admin request document from 'admin_users' collection
+      await deleteDoc(doc(db, "admin_users", requestData.uid, "userRequests", userId));
     } catch (error) {
       console.error("Error rejecting and removing user:", error);
-      setError("Error rejecting and removing user");
-      setTimeout(() => {
-        setError("");
-      }, 4000);
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: `Error rejecting and removing user: ${error.message}`,
+        showConfirmButton: false,
+        timer: 2000,
+      });
     } finally {
       setIsLoading(false);
     }
   };
+  
 
   return (
     <div className="container">
@@ -200,10 +211,10 @@ export default function UserRequest() {
           }}
         />
       )}
-      {error && <div className="error-message">{error}</div>}
+      {/* {error && <div className="error-message">{error}</div>}
       {successMessage && (
         <div className="success-message">{successMessage}</div>
-      )}
+      )} */}
       {isApproved && pendingRequestData && (
         <Modal
           isOpen={isApproved}
