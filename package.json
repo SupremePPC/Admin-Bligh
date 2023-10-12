@@ -6,6 +6,7 @@
   "author": "Lilianada <lilibest30.lb@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "@bytescale/upload-widget-react": "^4.10.0",
     "@reduxjs/toolkit": "^1.9.5",
     "@sendgrid/mail": "^7.7.0",
     "@testing-library/jest-dom": "^5.16.4",

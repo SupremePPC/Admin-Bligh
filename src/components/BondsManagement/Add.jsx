@@ -1,43 +1,89 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "firebase/firestore";
 import Swal from "sweetalert2";
 import { addNewBond } from "../../firebaseConfig/firestore";
 import LoadingScreen from "../LoadingScreen";
-import CurrencyInput from 'react-currency-input-field';
+import CurrencyInput from "react-currency-input-field";
+import { getStorage, ref, uploadBytes } from "firebase/storage";
 
 const AddNewBond = ({ setIsAdding, refreshBond }) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState({});
   const [formData, setFormData] = useState({
     companyWebsite: "",
     couponFrequency: 0,
     couponRate: 0,
     currentValue: 0,
-    image: "",
+    image: null,
+    imagePreview: "",
     isin: "",
     issuerName: "",
     maturityDate: "",
-    minimumAmount: 0.00,
+    minimumAmount: 0.0,
     purchaseDate: "",
     quantity: 0,
     sector: "",
-    ticker: "",
+    // ticker: "",
     type: "",
   });
-
-  const [errors, setErrors] = useState({});
-
+  
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    const { name, value, type, files } = e.target;
+  
+    if (type === 'file') {
+      // Make sure files[0] exists
+      if (files.length > 0) {
+        const selectedFile = files[0];
+        handleUploadImage(selectedFile)
+          .then((downloadURL) => {
+            setFormData({
+              ...formData,
+              [name]: selectedFile,
+              imagePreview: downloadURL, // Update imagePreview with the download URL
+            });
+          })
+          .catch((error) => {
+            console.error('Error uploading image:', error);
+          });
+      }
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value,
+      });
+    }
+  };
+  
+  const handleUploadImage = async (imageFile) => {
+    if (imageFile instanceof File) {
+      const storage = getStorage();
+      const storageRef = ref(storage, `images/${imageFile.name}`);
+  
+      try {
+        await uploadBytes(storageRef, imageFile);
+        const downloadURL = await getDownloadURL(storageRef); // Get the download URL
+        return downloadURL;
+      } catch (error) {
+        console.error('Error uploading image to Firebase Storage:', error);
+        throw error;
+      }
+    } else if (typeof imageFile === 'string') {
+      // Image is already a URL, no need to re-upload
+      // return imageFile;
+    } else {
+      return null; // Handle other cases (e.g., null) as needed
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     try {
+      if (formData.image) {
+        const imageUrl = await handleUploadImage(formData.image);
+        formData.image = imageUrl; // Update the image field with the Firebase Storage URL
+      }
+
       await addNewBond(formData);
       Swal.fire({
         icon: "success",
@@ -81,13 +127,14 @@ const AddNewBond = ({ setIsAdding, refreshBond }) => {
       ) : (
         <form onSubmit={handleSubmit}>
           <h1>Add New Bond</h1>
-          <label htmlFor="image">Issuer Logo:</label>
+          {formData.imagePreview && (
+            <img src={formData.imagePreview} alt="Image Preview" width={100} />
+          )}
           <input
-            type="url"
+            type="file"
             name="image"
             onChange={handleChange}
-            value={formData.image}
-            title="Must be a url"
+            accept="image/*"
             required
           />
           <label htmlFor="issuerName">Issuer Name:</label>
@@ -134,15 +181,21 @@ const AddNewBond = ({ setIsAdding, refreshBond }) => {
             value={formData.maturityDate}
           />
           <label htmlFor="minimumAmount">Minimum Amount:</label>
-           <CurrencyInput
+          <CurrencyInput
             decimalSeparator="."
             prefix="€"
             name="minimumAmount"
             placeholder="0.00"
-            defaultValue={0.00}
+            defaultValue={0.0}
             decimalsLimit={2}
-            onValueChange={formData.minimumAmount}
+            onValueChange={(value) => {
+              setFormData({
+                ...formData,
+                minimumAmount: parseFloat(value), // Convert the value to a float
+              });
+            }}
           />
+
           <label htmlFor="currentValue">Current Value:</label>
           <input
             type="number"
@@ -163,7 +216,6 @@ const AddNewBond = ({ setIsAdding, refreshBond }) => {
             type="number"
             name="couponRate"
             onChange={handleChange}
-           
             value={formData.couponRate}
           />
           <label htmlFor="couponFrequency">Coupon Frequency:</label>

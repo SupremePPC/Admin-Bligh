@@ -12,101 +12,97 @@ export default function List({ bonds, handleDelete, handleEditClick }) {
   };
 
   return (
-    <div className="bonds_page">
-      <div className="section_body">
-        {bonds.length === 0 && <h5>NO BONDS FOUND.</h5>}
-        {bonds.map((bond, index) => (
-          <div
-            key={index}
-            className="portfolio_card"
-            onClick={() => toggleDropdown(index)}
-          >
-            <div className="portfolio">
-              <div className="portfolio_col">
-                <div className="portfolio_img">
-                  <img src={bond.image} alt="" />
-                </div>
-                <div className="col_details">
-                  <div className="issuer_dets">
-                    <p className="name"> {bond.issuerName} </p>
-                    <div className="type">
-                      <span> {bond.type} </span>
-                    </div>
-                  </div>
-                  <div className="more_dets">
-                    <div className="maturity_row">
-                      <p className="bold_text">Sector:</p>
-                      <span className="reg_text"> {bond.sector} </span>
-                    </div>
-
-                    <div className="">
-                      <div className="maturity_row">
-                        <p className="bold_text">Maturity Date:</p>
-                        <span className="reg_text">{bond.maturityDate}</span>
-                      </div>
-                      <div className="maturity_row">
-                        <p className="bold_text">Minimum Amount:</p>
-                        <span className="reg_text">
-                          $ {bond.minimumAmount}{" "}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="coupon_dets">
-                    <div className="coupon_wrap">
-                      <div className="coupon_percent">
-                        <span className="number"> {bond.couponRate} </span>
-                        <span className="percent">%</span>
-                      </div>
-                      <span className="reg_text">Coupon</span>
-                    </div>
-                  </div>
-                </div>
+    <div className="bondsPage">
+    <div className="sectionBody">
+      {bonds.length === 0 && <h5>NO BONDS FOUND.</h5>}
+      {bonds.map((bond, index) => (
+        <div
+          key={index}
+          className="portfolioCard"
+          onClick={() => toggleDropdown(index)}
+        >
+          <div className="portfolio">
+            <div className="portfolioCol">
+              <div className="portfolioImg">
+                <img src={bond.image} alt="" />
               </div>
-            </div>
-
-            <div
-              className={`bonds_dropdown ${
-                visibleDropdownIndex === index ? "show" : ""
-              }`}
-            >
-              <div className="dropdown_col">
-                <div className="dropdown_row">
-                  <p className="bold_text">Company Website :</p>
-                  <span className="reg_text"> {bond.companyWebsite} </span>
+              <div className="colDetails">
+                <div className="issuerDets">
+                  <p className="name"> {bond.issuerName} </p>
+                  <div className="type">
+                    <span> {bond.type} </span>
+                  </div>
                 </div>
-                <div className="dropdown_row">
-                  <p className="bold_text">ISIN :</p>
-                  <span className="reg_text"> {bond.isin} </span>
+                <div className="moreDets">
+                  <div className="maturityRow">
+                    <p className="boldText">Sector:</p>
+                    <span className="regText"> {bond.sector} </span>
+                  </div>
+                  <div className="">
+                    <div className="maturityRow">
+                      <p className="boldText">Maturity Date:</p>
+                      <span className="regText">{bond.maturityDate}</span>
+                    </div>
+                    <div className="maturityRow">
+                      <p className="boldText">Minimum Amount:</p>
+                      <span className="regText">$ {bond.minimumAmount} </span>
+                    </div>
+                  </div>
                 </div>
-                <div className="dropdown_row">
-                  <p className="bold_text">Coupon Frequency :</p>
-                  <span className="reg_text"> {bond.couponFrequency} </span>
+                <div className="couponDets">
+                  <div className="couponWrap">
+                    <div className="couponPercent">
+                      <span className="number"> {bond.couponRate} </span>
+                      <span className="percent">%</span>
+                    </div>
+                    <span className="regText">Coupon</span>
+                  </div>
                 </div>
-                <div className="dropdown_row">
-                  <p className="bold_text">Minimum Investment Amount :</p>
-                  <span className="reg_text">$ {bond.minimumAmount} </span>
-                </div>
-              </div>
-              <div style={{ marginTop: "30px" }}>
-                <input
-                  type="submit"
-                  value="Delete Bond"
-                  onClick={() => handleDelete(bond.id)}
-                />
-
-                <input
-                  style={{ marginLeft: "12px" }}
-                  className="muted-button"
-                  type="button"
-                  value="Edit Bond"
-                  onClick={() => handleEditClick(bond)}
-                />
               </div>
             </div>
           </div>
-        ))}
-      </div>
+          <div
+            className={`bondsDropdown ${
+              visibleDropdownIndex === index ? "show" : ""
+            }`}
+          >
+            <div className="dropdownCol">
+              <div className="dropdownRow">
+                <p className="boldText">Company Website :</p>
+                <span className="regText"> {bond.companyWebsite} </span>
+              </div>
+              <div className="dropdownRow">
+                <p className="boldText">ISIN :</p>
+                <span className="regText"> {bond.isin} </span>
+              </div>
+              <div className="dropdownRow">
+                <p className="boldText">Coupon Frequency :</p>
+                <span className="regText"> {bond.couponFrequency} </span>
+              </div>
+              <div className="dropdownRow">
+                <p className="boldText">Minimum Investment Amount :</p>
+                <span className="regText">$ {bond.minimumAmount} </span>
+              </div>
+            </div>
+            <div style={{ marginTop: "30px" }}>
+              <input
+                type="submit"
+                value="Delete Bond"
+                onClick={() => handleDelete(bond.id)}
+              />
+              <input
+                style={{ marginLeft: "12px" }}
+                className="mutedButton"
+                type="button"
+                value="Edit Bond"
+                onClick={() => handleEditClick(bond)}
+              />
+            </div>
+          </div>
+        </div>
+      ))}
     </div>
+  </div>
+  
   );
 }

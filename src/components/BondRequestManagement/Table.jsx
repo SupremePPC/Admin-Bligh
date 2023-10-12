@@ -101,10 +101,10 @@ function Table({ bondRequests, handleUpdateRequest }) {
                             <p className="bold_text">ISIN :</p>
                             <span className="reg_text"> {request.isin} </span>
                           </div>
-                          <div className="dropdown_row">
+                          {/* <div className="dropdown_row">
                             <p className="bold_text">Ticker :</p>
                             <span className="reg_text"> {request.ticker} </span>
-                          </div>
+                          </div> */}
                           <div className="dropdown_row">
                             <p className="bold_text">Coupon Frequency :</p>
                             <span className="reg_text">

@@ -1172,6 +1172,28 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
+"@bytescale/sdk@^3.2.0":
+  version "3.6.0"
+  resolved "https://registry.yarnpkg.com/@bytescale/sdk/-/sdk-3.6.0.tgz#cfaa494e8688b2835b045614b0fd865a5f10a6e4"
+  integrity sha512-g06Fg3DblmSeegYxdP9SVqm4KYt4MFnkiCcKE7QNNamnrKo2hj/ZCZO/fHCztUq0dYgJGvPPGb/1hImO8a54+A==
+
+"@bytescale/upload-widget-react@^4.10.0":
+  version "4.10.0"
+  resolved "https://registry.yarnpkg.com/@bytescale/upload-widget-react/-/upload-widget-react-4.10.0.tgz#0cae3fd2591b09ff6663e16d1213371999576238"
+  integrity sha512-IY9IF5ITJ2flr4ymTTMmVPDRM6rZXbgONE9je/9wrfgsA1+5Kn8vnILrkxLOKLxY8ocXoL1X3U4mUfF1FJK92w==
+  dependencies:
+    "@bytescale/upload-widget" "^4.13.0"
+    lodash.isequal "^4.5.0"
+
+"@bytescale/upload-widget@^4.13.0":
+  version "4.13.1"
+  resolved "https://registry.yarnpkg.com/@bytescale/upload-widget/-/upload-widget-4.13.1.tgz#b4bc84ad2b3d80aed30140436298fd370f85d769"
+  integrity sha512-P15xGtU3maxfQUwcDY21FVn3yKjRtpPhWHIFcBP/XNA1t6BlVzl65CuTkDOnWC7GhoOPX3ZDt7NUkD4XIiUSPA==
+  dependencies:
+    "@bytescale/sdk" "^3.2.0"
+    classnames "^2.2.6"
+    preact "^10.6.5"
+
 "@colors/colors@1.5.0":
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/@colors/colors/-/colors-1.5.0.tgz#bb504579c1cae923e6576a4f5da43d25f97bdbd9"
@@ -4360,6 +4382,11 @@ cjson@^0.3.1:
   integrity sha512-yKNcXi/Mvi5kb1uK0sahubYiyfUO2EUgOp4NcY9+8NX5Xmc+4yeNogZuLFkpLBBj7/QI9MjRUIuXrV9XOw5kVg==
   dependencies:
     json-parse-helpfulerror "^1.0.3"
+
+classnames@^2.2.6:
+  version "2.3.2"
+  resolved "https://registry.yarnpkg.com/classnames/-/classnames-2.3.2.tgz#351d813bf0137fcc6a76a16b88208d2560a0d924"
+  integrity sha512-CSbhY4cFEJRe6/GQzIk5qXZ4Jeg5pcsP7b5peFSDpffpe1cqjASH/n9UTjBwOp6XpMSTwQ8Za2K5V02ueA7Tmw==
 
 clean-css@^5.2.2:
   version "5.3.2"
@@ -8817,6 +8844,11 @@ lodash.isboolean@^3.0.3:
   resolved "https://registry.yarnpkg.com/lodash.isboolean/-/lodash.isboolean-3.0.3.tgz#6c2e171db2a257cd96802fd43b01b20d5f5870f6"
   integrity sha512-Bz5mupy2SVbPHURB98VAcw+aHh4vRV5IPNhILUCsOzRmsTmSQ17jIuqopAentWoehktxGd9e/hbIXq980/1QJg==
 
+lodash.isequal@^4.5.0:
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/lodash.isequal/-/lodash.isequal-4.5.0.tgz#415c4478f2bcc30120c22ce10ed3226f7d3e18e0"
+  integrity sha512-pDo3lu8Jhfjqls6GkMgpahsF9kCyayhgykjyLMNFTKWrpVdAQtYyB4muAMWozBB4ig/dtWAmsMxLEI8wuz+DYQ==
+
 lodash.isinteger@^4.0.4:
   version "4.0.4"
   resolved "https://registry.yarnpkg.com/lodash.isinteger/-/lodash.isinteger-4.0.4.tgz#619c0af3d03f8b04c31f5882840b77b11cd68343"
@@ -10466,6 +10498,11 @@ postcss@^8.3.5, postcss@^8.4.21, postcss@^8.4.23, postcss@^8.4.4:
     nanoid "^3.3.6"
     picocolors "^1.0.0"
     source-map-js "^1.0.2"
+
+preact@^10.6.5:
+  version "10.18.1"
+  resolved "https://registry.yarnpkg.com/preact/-/preact-10.18.1.tgz#3b84bb305f0b05f4ad5784b981d15fcec4e105da"
+  integrity sha512-mKUD7RRkQQM6s7Rkmi7IFkoEHjuFqRQUaXamO61E6Nn7vqF/bo7EZCmSyrUnp2UWHw0O7XjZ2eeXis+m7tf4lg==
 
 prelude-ls@^1.2.1:
   version "1.2.1"

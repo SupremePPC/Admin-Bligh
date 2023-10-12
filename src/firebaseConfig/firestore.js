@@ -608,17 +608,28 @@ export async function addNotification(userId, message, type = "info") {
       userId,
       NOTIFICATIONS_SUB_COLLECTION
     );
-    const notificationRef = await addDoc(notificationsRef, {
+
+    const notificationData = {
       message,
       type,
       timestamp: new Date(),
-    });
+    };
+
+    const notificationRef = await addDoc(notificationsRef, notificationData);
+
+    // Save the notification ID in the document data
+    notificationData.notificationId = notificationRef.id;
+
+    // Update the document with the notification ID
+    await updateDoc(doc(db, USERS_COLLECTION, userId, NOTIFICATIONS_SUB_COLLECTION, notificationRef.id), notificationData);
+
     return { success: true, id: notificationRef.id };
   } catch (error) {
     console.error("Error adding notification:", error);
     return { success: false, error: error.message };
   }
 }
+
 
 //TERMS REQUEST
 const TERMS_REQUEST_SUB_COLLECTION = "termDepositRequest";
