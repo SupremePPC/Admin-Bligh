@@ -26,7 +26,7 @@ import {
 import { db } from "./firebase";
 import { ref, deleteObject, getStorage, getDownloadURL, uploadBytesResumable } from "firebase/storage";
 
-const ADMINUSER_COLLECTION = "adminUser";
+const ADMINUSER_COLLECTION = "admin_users";
 // const USER_COLLECTION = "user";
 const USERS_COLLECTION = "users";
 
@@ -226,7 +226,7 @@ export function deleteBankingDetails(uid, bankingDetailsId) {
 }
 
 //BONDS REQUEST
-const ADMINDASH_COLLECTION = "adminDash";
+const ADMINDASH_COLLECTION = "admin_users";
 const BONDS_REQUEST_SUB_COLLECTION = "bondsRequest";
 
 export async function getBondRequests() {
@@ -235,7 +235,7 @@ export async function getBondRequests() {
     const adminDashSnapshot = await getDocs(adminDashRef);
 
     if (adminDashSnapshot.empty) {
-      console.warn("No documents found in adminDash collection");
+      console.warn("No documents found in admin users collection");
       return [];
     }
 
@@ -640,7 +640,7 @@ export async function getTermRequests() {
     const adminDashSnapshot = await getDocs(adminDashRef);
 
     if (adminDashSnapshot.empty) {
-      console.warn("No documents found in adminDash collection");
+      console.warn("No documents found in admin users collection");
       return [];
     }
 
@@ -844,7 +844,7 @@ export async function getIposRequests() {
     const adminDashSnapshot = await getDocs(adminDashRef);
 
     if (adminDashSnapshot.empty) {
-      console.warn("No documents found in adminDash collection");
+      console.warn("No documents found in admin users collection");
       return [];
     }
 
