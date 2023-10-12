@@ -14,8 +14,8 @@ export default function List({ fixedTerms, handleDelete, handleEditClick }) {
   return (
     <div className="fixedTermsContainer">
       <div className="contentSection">
-        {fixedTerms.length === 0 && <h5>No Fixed Term Deposits Found.</h5>}
-        {fixedTerms.map((fixedTerm, index) => (
+        {!fixedTerms || fixedTerms.length === 0 ? (<h5 className="no_data">No Fixed Term Deposits Found.</h5>) :
+        fixedTerms.map((fixedTerm, index) => (
           <div
             key={index}
             className="termCard"

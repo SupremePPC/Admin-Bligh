@@ -292,7 +292,7 @@ img {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: 2rem auto;
+  margin: 1rem auto;
   width: 95%;
 }
 
@@ -305,6 +305,12 @@ img {
 /* Search bar */
 .header__left {
   width: 50%;
+}
+
+/* NO DATA FOUND? */
+.no_data{
+  text-align: center;
+  margin: 0 auto;
 }
 
 .search__field {

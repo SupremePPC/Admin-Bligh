@@ -71,14 +71,14 @@ export default function ChangePassword () {
     <section className="changePassword_section">
       <div className="section_header">
         <h2 className="title">Change Password</h2>
+        <p className="password_label">
+          Password must be at least 8 characters long
+        </p>
       </div>
 
-      <form onSubmit={handleChangePassword} className="info_form">
-        <label htmlFor="password" className="password_label">
-          Password must be at least 8 characters long
-        </label>
+      <form onSubmit={handleChangePassword} className="changePassword_form">
 
-        <div className="input_group">
+        <div className="changePassword_form_group">
           <label htmlFor="new_password">New Password:</label>
           <input
             type="password"
@@ -89,7 +89,7 @@ export default function ChangePassword () {
           />
         </div>
 
-        <div className="input_group">
+        <div className="changePassword_form_group">
           <label htmlFor="confirm_password">Confirm Password:</label>
           <input
             type="password"

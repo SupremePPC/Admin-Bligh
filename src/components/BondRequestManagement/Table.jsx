@@ -12,7 +12,7 @@ function Table({ bondRequests, handleUpdateRequest }) {
   return (
     <div className="contain-table">
       {bondRequests.length === 0 ? (
-        <h5 style={{textAlign: 'center'}}>NO REQUEST FOUND.</h5>
+        <h5 className="no_data">NO REQUEST FOUND.</h5>
       ) : (
         <>
           <table className="striped-table">

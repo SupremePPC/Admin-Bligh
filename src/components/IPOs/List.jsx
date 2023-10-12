@@ -9,11 +9,11 @@ export default function List({
     <div className="iposPage_Wrapper">
     
     <div className="contentBody">
-      {ipos.length === 0 && <h5>No IPOs Available.</h5>}
-      {isLoading ? (
+      {!ipos || ipos.length === 0 ? (<h5 className='no_data'>No IPOs Available.</h5>) :
+        ipos.map((ipo, index) => (
+      isLoading ? (
         <LoadingScreen />
       ) : (
-        ipos.map((ipo, index) => (
           <div
             key={index}
             className="ipoCard"

@@ -16,7 +16,7 @@
 }
 
 .account_item{
-    margin-bottom: 1rem;
+    /* margin-bottom: 1rem; */
     cursor: pointer;
     display: flex;
     justify-content: space-between;
