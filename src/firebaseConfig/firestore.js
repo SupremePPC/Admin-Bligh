@@ -798,8 +798,9 @@ export const addNewIpos = async (ipoData) => {
 
 //Delete
 export const deleteIpos = async (ipoId) => {
+  console.log(ipoId);
+  const ipoRef = doc(db, IPOS_COLLECTION, ipoId);
   try {
-    const ipoRef = doc(db, IPOS_COLLECTION, ipoId);
     await deleteDoc(ipoRef);
   } catch (error) {
     console.error("Error deleting IPO: ", error);

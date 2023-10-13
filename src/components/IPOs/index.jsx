@@ -3,8 +3,9 @@ import LoadingScreen from "../LoadingScreen";
 import List from "./List";
 import Modal from "../CustomsModal";
 import Header from "./Header";
-import { getAllIpos } from "../../firebaseConfig/firestore";
+import { deleteIpos, getAllIpos } from "../../firebaseConfig/firestore";
 import Edit from "./Edit";
+import Swal from "sweetalert2";
 import AddNewIpos from "./Add";
 import "./style.css";
 
@@ -40,14 +41,14 @@ export default function IPOs() {
   }, []);
 
   const handleDelete = (iposId) => {
-    setSelectedIpo(iposId); // set the bond ID you want to delete
+    setSelectedIpoId(iposId); // set the bond ID you want to delete
     setIsDeleteModalOpen(true); // open the delete confirmation modal
   };
 
   const confirmDelete = async () => {
     setIsLoading(true);
     try {
-      await deleteIpo(selectedIpoId);
+      await deleteIpos(selectedIpoId);
       setIpos((ipos) => ipos.filter((ipo) => ipo.id !== selectedIpoId));
   
       Swal.fire({
@@ -83,22 +84,22 @@ export default function IPOs() {
             <LoadingScreen />
           ) : (
             <>
-                handleDelete={handleDelete}
               <List
                 ipos={ipos}
                 setIsEditPageOpen={setIsEditPageOpen}
                 handleEditClick={handleEditClick}
+                handleDelete={handleDelete}
               />
               {isDeleteModalOpen && (
                 <Modal
                   isOpen={isDeleteModalOpen}
                   onClose={() => {
                     setIsDeleteModalOpen(false);
-                    selectedIpoId(null); // Reset the selected bond ID on modal close
+                    setSelectedIpoId(null); // Reset the selected bond ID on modal close
                   }}
                   onPositiveAction={confirmDelete}
-                  title="Delete Bond"
-                  description="Are you sure you want to delete this bond?"
+                  title="Delete IPOs"
+                  description="Are you sure you want to delete this IPOs?"
                   positiveLabel="Delete"
                   negativeLabel="Cancel"
                 />

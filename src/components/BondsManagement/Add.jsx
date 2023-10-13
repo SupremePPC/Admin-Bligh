@@ -23,7 +23,6 @@ const AddNewBond = ({ setIsAdding, refreshBond }) => {
     purchaseDate: "",
     quantity: 0,
     sector: "",
-    // ticker: "",
     type: "",
   });
   

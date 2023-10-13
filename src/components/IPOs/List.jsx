@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import "./style.css";
 
 export default function List({
-    ipos, handleDelete, setIsEditPageOpen, handleEditClick
+    ipos, handleDelete, handleEditClick
 }) {
     const [isLoading, setIsLoading] = useState(false);
     const [visibleDropdownIndex, setVisibleDropdownIndex] = useState(null);
@@ -14,10 +14,8 @@ export default function List({
       setVisibleDropdownIndex(index); // open the clicked dropdown and close any other open dropdown
     }
   };
-
   return (
     <div className="iposPage_Wrapper">
-    
     <div className="contentBody">
       {!ipos || ipos.length === 0 ? (<h5 className='no_data'>No IPOs Available.</h5>) :
         ipos.map((ipo, index) => (
@@ -86,11 +84,11 @@ export default function List({
                   </div>
                   <div className="dropdownRow">
                     <p className="boldText">Pre Share Price :</p>
-                    <span className="regText"> {ipo.preSharePrice} </span>
+                    <span className="regText">$ {ipo.preSharePrice} </span>
                   </div>
                   <div className="dropdownRow">
                     <p className="boldText">Share Price :</p>
-                    <span className="regText"> {ipo.sharePrice} </span>
+                    <span className="regText">$ {ipo.sharePrice} </span>
                   </div>
                 </div>
                 <div style={{ marginTop: "30px" }}>
