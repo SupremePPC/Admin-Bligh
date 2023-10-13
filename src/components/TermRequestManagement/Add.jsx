@@ -145,7 +145,7 @@ const AddNewTerm = ({ setFixedTerm, fixedTerm, userId, onClose }) => {
           <label htmlFor="minAmount">Minimum Amount:</label>
           <CurrencyInput
             decimalSeparator="."
-            prefix="€"
+            prefix="$"
             name="minAmount"
             placeholder="0.00"
             defaultValue={formData.minAmount} // Use the formData value here

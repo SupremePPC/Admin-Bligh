@@ -59,21 +59,21 @@ const AddUserIpos = ({ userId, onClose }) => {
                         <p className="boldText">Pre-IPO Share Price:</p>
                         <span className="regularText">
                           {" "}
-                          € {ipo.preSharePrice}{" "}
+                          $ {ipo.preSharePrice}{" "}
                         </span>
                       </div>
                       <div className="detailsRow">
                         <p className="boldText">Minimum Investment:</p>
                         <span className="regularText">
                           {" "}
-                          € {ipo.minInvestment}{" "}
+                          $ {ipo.minInvestment}{" "}
                         </span>
                       </div>
                       <div className="detailsRow">
                         <p className="boldText">Expected Listing Price:</p>
                         <span className="regularText">
                           {" "}
-                          € {ipo.expListingPrice}{" "}
+                          $ {ipo.expListingPrice}{" "}
                         </span>
                       </div>
                     </div>

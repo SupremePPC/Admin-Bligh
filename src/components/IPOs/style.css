@@ -135,6 +135,68 @@
   cursor: pointer;
 }
 
+.iposDropdown {
+  background-color: azure;
+  border-radius: 0px 0px 8px 8px;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  padding-bottom: 1.5rem;
+  margin-top: -2rem;
+  color: #fff;
+  font-size: 14px;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s ease-out;
+}
+
+.iposDropdown.show {
+  margin-bottom: 2rem;
+  padding-top: 2.5rem;
+  max-height: 500px;
+  transition: max-height 0.5s ease-in;
+}
+
+.dropdownCol {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  padding-top: 3.5rem;
+}
+
+.dropdownRow {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.dropdownRow .boldText {
+  font-size: var(--font-fourteen);
+  font-weight: 500;
+  color: var(--black);
+}
+
+.dropdownRow .regText {
+  font-size: var(--font-fourteen);
+  font-weight: 400;
+  color: var(--black);
+}
+
+.dropdownBtn {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.dropdownBtn button {
+  border-radius: 8px;
+  background-color: #fff;
+  border: 1px solid #fff;
+  color: #000;
+  width: 200px;
+  padding: 10px 0rem;
+  font-weight: 600;
+  cursor: pointer;
+}
 
 @media screen and (min-width: 1005px) {
   .iposPage_Wrapper .contentBody {

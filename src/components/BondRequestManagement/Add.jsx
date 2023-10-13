@@ -217,7 +217,7 @@ const AddBond = ({ setBond, bond, userId, onClose }) => {
           <label htmlFor="minimumAmount">Minimum Amount:</label>
           <CurrencyInput
             decimalSeparator="."
-            prefix="€"
+            prefix="$"
             name="minimumAmount"
             placeholder="0.00"
             defaultValue={0.0}

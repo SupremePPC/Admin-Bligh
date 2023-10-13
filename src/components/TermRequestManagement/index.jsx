@@ -72,18 +72,18 @@ const TermsRequestTable = () => {
       if (newStatus === "Approved") {
         if (requestObject.type === "deposit") {
           await handleDepositApproval(userId, requestObject);
-          message = `Your fixed term deposit request to deposit €${requestObject.principalAmount} to ${requestObject.bankName} with ${requestObject.term} term and ${requestObject.coupon}% coupon has been approved.`;
+          message = `Your fixed term deposit request to deposit $${requestObject.principalAmount} to ${requestObject.bankName} with ${requestObject.term} term and ${requestObject.coupon}% coupon has been approved.`;
           await addTermToUserCollection(userId, requestObject, newStatus);
         } else if (requestObject.type === "withdraw") {
           await handleWithdrawalApproval(userId, requestObject);
-          message = `Your fixed term deposit request to withdraw €${requestObject.principalAmount} has been approved.`;
+          message = `Your fixed term deposit request to withdraw $${requestObject.principalAmount} has been approved.`;
         }
       } else {
         // Assuming the newStatus here can only be "Approved" or "Declined"
         if (requestObject.type === "deposit") {
-          message = `Your fixed term deposit request to deposit €${requestObject.principalAmount} has been declined.`;
+          message = `Your fixed term deposit request to deposit $${requestObject.principalAmount} has been declined.`;
         } else if (requestObject.type === "withdraw") {
-          message = `Your fixed term deposit request to withdraw €${requestObject.principalAmount} has been declined.`;
+          message = `Your fixed term deposit request to withdraw $${requestObject.principalAmount} has been declined.`;
         }
       }
 

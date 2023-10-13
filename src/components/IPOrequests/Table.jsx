@@ -82,7 +82,7 @@ function Table({ ipoRequests, handleUpdateRequest }) {
                               Expected Listing Price :
                             </p>
                             <span className="reg_text">
-                              € {request.expListingPrice}{" "}
+                              $ {request.expListingPrice}{" "}
                             </span>
                           </div>
                           <div className="dropdown_row">
@@ -95,7 +95,7 @@ function Table({ ipoRequests, handleUpdateRequest }) {
                           <div className="dropdown_row">
                             <p className="bold_text">Share Price :</p>
                             <span className="reg_text">
-                              € {request.sharePrice}{" "}
+                              $ {request.sharePrice}{" "}
                             </span>
                           </div>
                         </div>

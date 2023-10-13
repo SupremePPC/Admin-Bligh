@@ -145,7 +145,7 @@ const AddNewIpos = ({ setIsAdding, refreshIpos }) => {
           <label htmlFor="expListingPrice">Expected Listing Price:</label>
           <CurrencyInput
             decimalSeparator="."
-            prefix="€"
+            prefix="$"
             name="expListingPrice"
             placeholder="0.00"
             defaultValue={0.00}
@@ -167,7 +167,7 @@ const AddNewIpos = ({ setIsAdding, refreshIpos }) => {
           <label htmlFor="minInvestment">Minimum Investment:</label>
           <CurrencyInput
             decimalSeparator="."
-            prefix="€"
+            prefix="$"
             name="minInvestment"
             placeholder="0.00"
             defaultValue={0.00}
@@ -189,7 +189,7 @@ const AddNewIpos = ({ setIsAdding, refreshIpos }) => {
           <label htmlFor="preSharePrice">Pre Share Price:</label>
           <CurrencyInput
             decimalSeparator="."
-            prefix="€"
+            prefix="$"
             name="preSharePrice"
             placeholder="0.00"
             defaultValue={0.00}
@@ -204,7 +204,7 @@ const AddNewIpos = ({ setIsAdding, refreshIpos }) => {
           <label htmlFor="sharePrice">Share Price:</label>
           <CurrencyInput
             decimalSeparator="."
-            prefix="€"
+            prefix="$"
             name="sharePrice"
             placeholder="0.00"
             defaultValue={0.00}

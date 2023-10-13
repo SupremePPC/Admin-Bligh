@@ -16,7 +16,7 @@ export default function InvestIpoModal({ isOpen, onClose, ipo, userId }) {
       Swal.fire({
         icon: "error",
         title: "Error!",
-        text: `Investment amount must be greater than minimum investment value of €${ipo.minInvestment}`,
+        text: `Investment amount must be greater than minimum investment value of $${ipo.minInvestment}`,
         showConfirmButton: true,
       });
       return;
@@ -78,15 +78,15 @@ export default function InvestIpoModal({ isOpen, onClose, ipo, userId }) {
           </div>
           <div className="more_dets">
             <p className="bold_text">IPO Share Price: </p>
-            <p className="reg_text">€ {ipo.sharePrice}</p>
+            <p className="reg_text">$ {ipo.sharePrice}</p>
           </div>
           <div className="more_dets">
             <p className="bold_text">Expected Listing Price:</p>
-            <p className="reg_text">€ {ipo.expListingPrice}</p>
+            <p className="reg_text">$ {ipo.expListingPrice}</p>
           </div>
           <div className="more_dets">
             <p className="bold_text">Minimum Investment Amount:</p>
-            <p className="reg_text">€ {ipo.minInvestment}</p>
+            <p className="reg_text">$ {ipo.minInvestment}</p>
           </div>
           <div className="more_dets">
             <p className="bold_text">Number of Shares:</p>
@@ -94,15 +94,15 @@ export default function InvestIpoModal({ isOpen, onClose, ipo, userId }) {
           </div>
           <div className="more_dets">
             <p className="bold_text">Total Cost:</p>
-            <p className="reg_text">€ {totalCost}</p>
+            <p className="reg_text">$ {totalCost}</p>
           </div>
           <div className="input_group">
             <label htmlFor="title">Investment Amount:</label>
             <CurrencyInput
               decimalSeparator="."
-              prefix="€"
+              prefix="$"
               name="investmentAmount"
-              placeholder="€0"
+              placeholder="$0"
               defaultValue={investmentAmount}
               decimalsLimit={2}
               onValueChange={(value) => setInvestmentAmount(value)}

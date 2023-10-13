@@ -5,6 +5,16 @@ export default function List({
     ipos, handleDelete, setIsEditPageOpen, handleEditClick
 }) {
     const [isLoading, setIsLoading] = useState(false);
+    const [visibleDropdownIndex, setVisibleDropdownIndex] = useState(null);
+
+  const toggleDropdown = (index) => {
+    if (visibleDropdownIndex === index) {
+      setVisibleDropdownIndex(null); // if clicked again on the open dropdown, close it
+    } else {
+      setVisibleDropdownIndex(index); // open the clicked dropdown and close any other open dropdown
+    }
+  };
+
   return (
     <div className="iposPage_Wrapper">
     
@@ -16,6 +26,7 @@ export default function List({
       ) : (
           <div
             key={index}
+            onClick={() => toggleDropdown(index)}
             className="ipoCard"
           >
             <div className="ipoDetails">
@@ -42,36 +53,61 @@ export default function List({
                       <p className="boldText">Pre-IPO Share Price:</p>
                       <span className="regularText">
                         {" "}
-                        € {ipo.preSharePrice}{" "}
+                        $ {ipo.preSharePrice}{" "}
                       </span>
                     </div>
                     <div className="detailsRow">
                       <p className="boldText">Minimum Investment:</p>
                       <span className="regularText">
                         {" "}
-                        € {ipo.minInvestment}{" "}
+                        $ {ipo.minInvestment}{" "}
                       </span>
                     </div>
                     <div className="detailsRow">
                       <p className="boldText">Expected Listing Price:</p>
                       <span className="regularText">
                         {" "}
-                        € {ipo.expListingPrice}{" "}
+                        $ {ipo.expListingPrice}{" "}
                       </span>
                     </div>
                   </div>
                 </div>
-                  <button
-                    onClick={() => {
-                        setIsEditPageOpen(true);
-                        handleEditClick(ipo);
-                    }}
-                    className="purchaseButton"
-                  >
-                    Edit
-                  </button>
               </div>
             </div>
+             <div
+                className={`iposDropdown ${
+                  visibleDropdownIndex === index ? "show" : ""
+                }`}
+              >
+                <div className="dropdownCol">
+                  <div className="dropdownRow">
+                    <p className="boldText">Pre Allocation :</p>
+                    <span className="regText"> {ipo.preAllocation} </span>
+                  </div>
+                  <div className="dropdownRow">
+                    <p className="boldText">Pre Share Price :</p>
+                    <span className="regText"> {ipo.preSharePrice} </span>
+                  </div>
+                  <div className="dropdownRow">
+                    <p className="boldText">Share Price :</p>
+                    <span className="regText"> {ipo.sharePrice} </span>
+                  </div>
+                </div>
+                <div style={{ marginTop: "30px" }}>
+                  <input
+                    type="submit"
+                    value="Delete IPOs"
+                    onClick={() => handleDelete(ipo.id)}
+                  />
+                  <input
+                    style={{ marginLeft: "12px" }}
+                    className="mutedButton"
+                    type="button"
+                    value="Edit IPOs"
+                    onClick={() => handleEditClick(ipo)}
+                  />
+                </div>
+              </div> 
           </div>
         ))
       )}

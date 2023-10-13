@@ -206,7 +206,7 @@ const Edit = ({ bondToEdit, setIsEditPageOpen, refreshBonds }) => {
           <label htmlFor="minimumAmount">Minimum Amount:</label>
           <CurrencyInput
             decimalSeparator="."
-            prefix="€"
+            prefix="$"
             name="minimumAmount"
             placeholder="0.00"
             value={formData.minimumAmount}

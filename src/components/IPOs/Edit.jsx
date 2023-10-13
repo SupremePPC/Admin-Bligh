@@ -175,7 +175,7 @@ const Edit = ({ ipoToEdit, setIsEditPageOpen, refreshIpos }) => {
             onChange={handleChange}
             value={formData.expListingPrice}
           />
-          <label htmlFor="expectedDate">Expected Date:</label>
+          <label htmlFor="expectedDate">Expected IPO Date:</label>
           <input
             type="text"
             name="expectedDate"

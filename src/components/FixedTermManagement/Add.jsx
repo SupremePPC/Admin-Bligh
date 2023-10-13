@@ -109,7 +109,7 @@ const AddNewTerm = ({ setIsAdding, refreshTerm }) => {
           <label htmlFor="minAmount">Minimum Amount:</label>
           <CurrencyInput
             decimalSeparator="."
-            prefix="€"
+            prefix="$"
             name="minAmount"
             placeholder="0.00"
             defaultValue={0.00}

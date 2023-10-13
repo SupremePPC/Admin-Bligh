@@ -289,14 +289,14 @@ const UserOverview = () => {
                   {accountTypes.map((item, index) => (
                     <li key={index} className="text_wrap">
                       <p className="bold_text">{item.type} :</p>
-                      <span className="reg_text">€ {item.balance} </span>
+                      <span className="reg_text">$ {item.balance} </span>
                     </li>
                   ))}
                 </ul>
               )}
               <div className="text_wrap">
                 <p className="bold_text">Total Balance :</p>
-                <span className="reg_text">€ {totalBalance}</span>
+                <span className="reg_text">$ {totalBalance}</span>
               </div>
               {/* <div className="dropdown_btn">
               <button onClick={() => handleOpenModal("isAddAccountOpen")}>Add to Account</button>
@@ -338,14 +338,14 @@ const UserOverview = () => {
                             <td>
                               {deposits[i] && (
                                 <span className="reg_text">
-                                  € {deposits[i].amount}
+                                  $ {deposits[i].amount}
                                 </span>
                               )}
                             </td>
                             <td>
                               {withdrawals[i] && (
                                 <span className="reg_text">
-                                  € {withdrawals[i].amount}
+                                  $ {withdrawals[i].amount}
                                 </span>
                               )}
                             </td>
@@ -503,11 +503,11 @@ const UserOverview = () => {
                               <p>{term.bankName}</p>
                             </div>
                           </td>
-                          <td>€ {term.principalAmount}</td>
+                          <td>$ {term.principalAmount}</td>
                           <td>{term.term}</td>
                           <td>{term.interestRate} %</td>
                           <td>
-                            €{" "}
+                            ${" "}
                             {calculateMaturityAmount(
                               term.principalAmount,
                               term.interestRate,
@@ -560,9 +560,9 @@ const UserOverview = () => {
                             </div>
                           </td>
                           <td>{firestoreTimestampToDate(ipos.date)}</td>
-                          <td>€ {ipos.amountInvested}</td>
+                          <td>$ {ipos.amountInvested}</td>
                           <td>{ipos.numberOfShares}</td>
-                          <td>€ {ipos.sharePrice}</td>
+                          <td>$ {ipos.sharePrice}</td>
                         </tr>
                       </tbody>
                     ))}

@@ -142,7 +142,7 @@ const AddTransaction = ({
           <label htmlFor="amount">Amount</label>
           <CurrencyInput
             decimalSeparator="."
-            prefix="€"
+            prefix="$"
             name="amount"
             placeholder="0.00"
             defaultValue={0.00}

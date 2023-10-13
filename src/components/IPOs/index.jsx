@@ -5,8 +5,8 @@ import Modal from "../CustomsModal";
 import Header from "./Header";
 import { getAllIpos } from "../../firebaseConfig/firestore";
 import Edit from "./Edit";
-import "./style.css";
 import AddNewIpos from "./Add";
+import "./style.css";
 
 export default function IPOs() {
   const [ipos, setIpos] = useState([]);
@@ -83,8 +83,8 @@ export default function IPOs() {
             <LoadingScreen />
           ) : (
             <>
-              <List
                 handleDelete={handleDelete}
+              <List
                 ipos={ipos}
                 setIsEditPageOpen={setIsEditPageOpen}
                 handleEditClick={handleEditClick}
