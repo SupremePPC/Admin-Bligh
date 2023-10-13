@@ -6,11 +6,12 @@ const Table = ({
   handleApproval,
   handleRejection,
 }) => {
-const firestoreTimestampToDate = (timestamp) => {
-  return timestamp
-    ? new Date(timestamp.seconds * 1000).toLocaleDateString()
-    : "";
-};
+  const firestoreTimestampToDate = (timestamp) => {
+    return timestamp
+      ? new Date(timestamp.seconds * 1000).toLocaleDateString()
+      : "";
+  };
+  
   return (
     <div className="contain-table">
       <table className="striped-table">
@@ -31,14 +32,14 @@ const firestoreTimestampToDate = (timestamp) => {
             userRequests.map((user, i) => (
               <tr key={user.id}>
                 <td>{i + 1}</td>
-                <td>{user.fullName.split(" ")[0] || "N/A"}</td>{" "}
-                <td>{user.fullName.split(" ")[1] || "N/A"}</td>{" "}
+                <td>{user.fullName.split(" ")[0] || "N/A"}</td>
+                <td>{user.fullName.split(" ")[1] || "N/A"}</td>
                 <td>{user.email || "N/A"}</td>
                 <td>{firestoreTimestampToDate(user.date) || "N/A"}</td>
                 <td className="text-right">
                   <button
                     onClick={() => handleApproval(user.id, user)}
-                    className=" button accept_btn muted-button"
+                    className="button accept_btn muted-button"
                   >
                     Accept
                   </button>
@@ -60,9 +61,9 @@ const firestoreTimestampToDate = (timestamp) => {
           )}
         </tbody>
       </table>
-      
     </div>
   );
 };
+
 
 export default Table;
