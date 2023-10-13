@@ -77,6 +77,7 @@ const AddNewBond = ({ setIsAdding, refreshBond }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    
     try {
       if (formData.image) {
         const imageUrl = await handleUploadImage(formData.image);

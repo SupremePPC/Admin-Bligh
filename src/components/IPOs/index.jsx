@@ -28,9 +28,6 @@ export default function IPOs() {
     try {
       setIsLoading(true);
       const fetchedIpos = await getAllIpos();
-      if (!fetchedIpos) {
-        console.error("No bonds found");
-      }
       setIpos(fetchedIpos);
     } catch (error) {
       console.error("Error fetching ipos:", error);
