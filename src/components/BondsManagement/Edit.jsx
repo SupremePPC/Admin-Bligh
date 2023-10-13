@@ -108,7 +108,6 @@ const Edit = ({ bondToEdit, setIsEditPageOpen, refreshBonds }) => {
   
     try {
       let updatedFormData = { ...formData }; // Create a copy of formData
-      console.log('cl ic ked')
       if (formData.image instanceof File) {
         // New image selected, upload it and update the image URL
         const imageUrl = await handleUploadImage(formData.image);
@@ -139,10 +138,10 @@ const Edit = ({ bondToEdit, setIsEditPageOpen, refreshBonds }) => {
         showConfirmButton: true,
         timer: 2000,
       });
+    } finally{
       setIsLoading(false);
     }
   };
-  
 
   return (
     <div className="small-container">
@@ -153,7 +152,7 @@ const Edit = ({ bondToEdit, setIsEditPageOpen, refreshBonds }) => {
           <h1>Edit Bond</h1>
           <label htmlFor="image">Issuer Logo:</label>
           {formData.image && (
-            <img src={formData.image} alt="Image Preview" width={100} />
+            <img src={formData.image} alt="Image Preview" width={100} className="img_preview" />
           )}
           <input
             type="file"

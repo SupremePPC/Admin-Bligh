@@ -19,7 +19,6 @@ export default function IPOs() {
 
   // Function to handle edit button click
   const handleEditClick = (ipo) => {
-    console.log(ipo); // Log the IPO data to verify it's correct
     setSelectedIpo(ipo);
     setIsEditPageOpen(true);
   };

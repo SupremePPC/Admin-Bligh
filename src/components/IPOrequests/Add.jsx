@@ -5,27 +5,7 @@ import LoadingScreen from "../LoadingScreen";
 import InvestIpoModal from "./Modals/InvestModal";
 
 const AddUserIpos = ({ userId, onClose }) => {
-  const [ipos, setIpos] = useState([]);
-  const [iposModalOpen, setIposModalOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [selectedIpo, setSelectedIpo] = useState(null);
-
-  const fetchIpos = async () => {
-    setIsLoading(true);
-    try {
-      const fetchedIpos = await getAllIpos();
-      setIpos(fetchedIpos);
-    } catch (error) {
-      console.error("Error occurred while fetching IPOs: ", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchIpos();
-  }, []);
-
+  
   return (
     <div className="iposPage_Wrapper">
       <div className="headerSection">

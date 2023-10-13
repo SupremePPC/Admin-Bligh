@@ -1,29 +1,113 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "firebase/firestore";
 import Swal from "sweetalert2";
 import { updateIpo } from "../../firebaseConfig/firestore";
 import LoadingScreen from "../LoadingScreen";
+import { getDownloadURL, getStorage } from "firebase/storage";
 
 const Edit = ({ ipoToEdit, setIsEditPageOpen, refreshIpos }) => {
   const [formData, setFormData] = useState(ipoToEdit || {});
-
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
+  useEffect(() => {
+    // Set the existing image URL in the formData
+    setFormData({
+      ...ipoToEdit,
+      image: ipoToEdit.image, // Set the existing image URL
+    });
+  }, [ipoToEdit]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      // Check if the image URL starts with "gs://"
+      if (formData.logo.startsWith("gs://")) {
+        const storage = getStorage();
+        const imageRef = ref(storage, formData.logo);
+
+        try {
+          const downloadURL = await getDownloadURL(imageRef);
+          setFormData({
+            ...ipoToEdit,
+            image: downloadURL, // Set the existing image URL
+          });
+        } catch (error) {
+          console.error("Error fetching download URL:", error);
+        }
+      } else {
+        // Image URL is already a downloadable URL
+        setFormData({
+          ...ipoToEdit,
+        });
+      }
+    };
+
+    fetchData();
+  }, [ipoToEdit]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    const { name, value, type, files } = e.target;
+
+    if (type === "file") {
+      // Make sure files[0] exists
+      if (files.length > 0) {
+        const selectedFile = files[0];
+        handleUploadImage(selectedFile)
+          .then((downloadURL) => {
+            setFormData({
+              ...formData,
+              [name]: selectedFile,
+              imagePreview: downloadURL, // Update imagePreview with the download URL
+            });
+          })
+          .catch((error) => {
+            console.error("Error uploading image:", error);
+          });
+      }
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value,
+      });
+    }
+  };
+
+  const handleUploadImage = async (imageFile) => {
+    if (imageFile instanceof File) {
+      const storage = getStorage();
+      const storageRef = ref(storage, `images/${imageFile.name}`);
+
+      try {
+        await uploadBytes(storageRef, imageFile);
+        const downloadURL = await getDownloadURL(storageRef); // Get the download URL
+        return downloadURL;
+      } catch (error) {
+        console.error("Error uploading image to Firebase Storage:", error);
+        throw error;
+      }
+    } else if (typeof imageFile === "string") {
+      // Image is already a URL, no need to re-upload
+      // return imageFile;
+    } else {
+      return null; // Handle other cases (e.g., null) as needed
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      await updateIpo(formData.id, formData);
+      let updatedFormData = { ...formData }; // Create a copy of formData
+      if (formData.logo instanceof File) {
+        // New image selected, upload it and update the image URL
+        const imageUrl = await handleUploadImage(formData.logo);
+        updatedFormData.logo = imageUrl; // Update the image field with the Firebase Storage URL
+      } else if (!formData.logo) {
+        // If formData.image is empty, use the original image data
+        updatedFormData.logo = originalImageData; // Replace 'originalImageData' with the actual original image data
+        console.log(updatedFormData.logo, "clicked");
+      }
+      await updateIpo(formData.id, updatedFormData);
       Swal.fire({
         icon: "success",
         title: "Updated!",
@@ -31,6 +115,8 @@ const Edit = ({ ipoToEdit, setIsEditPageOpen, refreshIpos }) => {
         showConfirmButton: false,
         timer: 2000,
       });
+      setIsEditPageOpen(false);
+      refreshIpos();
     } catch (error) {
       console.error(error);
       Swal.fire({
@@ -40,102 +126,108 @@ const Edit = ({ ipoToEdit, setIsEditPageOpen, refreshIpos }) => {
         showConfirmButton: true,
         timer: 2000,
       });
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   return (
     <div className="small-container">
-      {
-        isLoading ? (
-          <LoadingScreen/>
-        ): (
-      <form onSubmit={handleSubmit}>
-        <h1>Edit IPO</h1>
-        <label htmlFor="logo"> Logo:</label>
-        <input
-          type="url"
-          name="logo"
-          onChange={handleChange}
-          value={formData.logo}
-        />
-        <label htmlFor="name">Name:</label>
-        <input
-          type="text"
-          name="name"
-          onChange={handleChange}
-          value={formData.name}
-        />
-        <label htmlFor="description">Description:</label>
-        <input
-          type="text"
-          name="description"
-          onChange={handleChange}
-          value={formData.description}
-        />
-        <label htmlFor="expListingPrice">Expected Listing Price:</label>
-        <input
-          type="number"
-          min={0}
-          name="expListingPrice"
-          onChange={handleChange}
-          value={formData.expListingPrice}
-        />
-        <label htmlFor="expectedate">Expected Date:</label>
-        <input
-          type="text"
-          name="expectedate"
-          onChange={handleChange}
-          value={formData.expectedate}
-        />
-        <label htmlFor="minInvestment">Minimum Investment:</label>
-        <input
-          type="number"
-          min={0}
-          name="minInvestment"
-          onChange={handleChange}
-          value={formData.minInvestment}
-        />
-        <label htmlFor="preAllocation">Pre Allocation:</label>
-        <input
-          type="text"
-          name="preAllocation"
-          onChange={handleChange}
-          value={formData.preAllocation}
-        />
-        <label htmlFor="preSharePrice">Pre Share Price:</label>
-        <input
-          type="number"
-          name="preSharePrice"
-          onChange={handleChange}
-          value={formData.preSharePrice}
-        />
-        <label htmlFor="sharePrice">Share Price:</label>
-        <input
-          type="number"
-          name="sharePrice"
-          onChange={handleChange}
-          value={formData.sharePrice}
-        />
-        <div style={{ marginTop: "30px" }}>
-          <input type="submit" value="Save" />
+      {isLoading ? (
+        <LoadingScreen />
+      ) : (
+        <form onSubmit={handleSubmit}>
+          <h1>Edit IPO</h1>
+          <label htmlFor="logo"> Logo:</label>
+          {formData.logo && (
+            <img
+              src={formData.logo}
+              alt="Image Preview"
+              width={100}
+              className="img_preview"
+            />
+          )}
           <input
-            style={{ marginLeft: "12px" }}
-            className="muted-button"
-            type="button"
-            value="Cancel"
-            onClick={() => {
-              setIsEditPageOpen(false);
-              refreshIpos();
-            }}
+            type="file"
+            name="logo"
+            onChange={handleChange}
+            accept="image/*"
           />
-        </div>
-        {errors.isin && <div>{errors.isin}</div>}
-        {errors.name && <div>{errors.name}</div>}
-      </form>
-
-        )
-      }
+          <label htmlFor="name">Name:</label>
+          <input
+            type="text"
+            name="name"
+            onChange={handleChange}
+            value={formData.name}
+          />
+          <label htmlFor="description">Description:</label>
+          <input
+            type="text"
+            name="description"
+            onChange={handleChange}
+            value={formData.description}
+          />
+          <label htmlFor="expListingPrice">Expected Listing Price:</label>
+          <input
+            type="number"
+            min={0}
+            name="expListingPrice"
+            onChange={handleChange}
+            value={formData.expListingPrice}
+          />
+          <label htmlFor="expectedDate">Expected Date:</label>
+          <input
+            type="text"
+            name="expectedDate"
+            onChange={handleChange}
+            value={formData.expectedDate}
+          />
+          <label htmlFor="minInvestment">Minimum Investment:</label>
+          <input
+            type="number"
+            min={0}
+            name="minInvestment"
+            onChange={handleChange}
+            value={formData.minInvestment}
+          />
+          <label htmlFor="preAllocation">Pre Allocation:</label>
+          <input
+            type="text"
+            name="preAllocation"
+            onChange={handleChange}
+            value={formData.preAllocation}
+          />
+          <label htmlFor="preSharePrice">Pre Share Price:</label>
+          <input
+            type="number"
+            name="preSharePrice"
+            onChange={handleChange}
+            value={formData.preSharePrice}
+          />
+          <label htmlFor="sharePrice">Share Price:</label>
+          <input
+            type="number"
+            name="sharePrice"
+            onChange={handleChange}
+            value={formData.sharePrice}
+          />
+          <div style={{ marginTop: "30px" }}>
+            <input type="submit" value="Save" />
+            <input
+              style={{ marginLeft: "12px" }}
+              className="muted-button"
+              type="button"
+              value="Cancel"
+              onClick={() => {
+                setIsEditPageOpen(false);
+                refreshIpos();
+              }}
+            />
+          </div>
+          {errors.isin && <div>{errors.isin}</div>}
+          {errors.name && <div>{errors.name}</div>}
+        </form>
+      )}
     </div>
   );
 };
