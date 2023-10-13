@@ -9,7 +9,7 @@ import {
   setDoc,
 } from "firebase/firestore";
 import { auth, db } from "../../firebaseConfig/firebase";
-import { createUserWithEmailAndPassword, sendEmailVerification, sendSignInLinkToEmail } from "firebase/auth";
+import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 import Header from "./Header";
 import Table from "./Table";
 import "./style.css";
@@ -75,9 +75,8 @@ export default function UserRequest() {
       );
 
       const user = userCredential.user;
-      console.log(user, user.email);
       // Send email verification
-      await sendSignInLinkToEmail(user, user.email );
+      await sendEmailVerification(user);
   
   
       // Step 2: Use the User ID as the document ID in the 'users' collection
