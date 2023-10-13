@@ -10,9 +10,9 @@ import { getStorage } from 'firebase/storage';
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyB30EGSrAKggO5cdmgfdA-2vQ8ED-JbK5g",
-  authDomain: "bligh-db.firebaseapp.com",
-  projectId: "bligh-db",
-  storageBucket: "bligh-db.appspot.com",
+  authDomain: "BLIGH ADMIN-db.firebaseapp.com",
+  projectId: "BLIGH ADMIN-db",
+  storageBucket: "BLIGH ADMIN-db.appspot.com",
   messagingSenderId: "815890595279",
   appId: "1:815890595279:web:649a277f31fa0e1810a6ba",
   measurementId: "G-HR9ES4164Y"

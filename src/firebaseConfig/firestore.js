@@ -27,7 +27,7 @@ import { db } from "./firebase";
 import { ref, deleteObject, getStorage, getDownloadURL, uploadBytesResumable } from "firebase/storage";
 
 const ADMINUSER_COLLECTION = "admin_users";
-// const USER_COLLECTION = "user";
+const ADMINDASH_COLLECTION = "admin_users";
 const USERS_COLLECTION = "users";
 
 export function addAdminUser(uid, fullName, email) {
@@ -131,7 +131,6 @@ export async function editTransaction(userId, transactionId, updatedFields) {
 
 // Banking Details
 const BANKING_DETAILS_SUB_COLLECTION = "bankingDetails";
-// const ADMINUSERS_COLLECTION = "user";
 
 export async function addBankingDetails(
   uid,
@@ -143,7 +142,7 @@ export async function addBankingDetails(
 ) {
   const bankingDetailsRef = collection(
     db,
-    ADMINUSERS_COLLECTION,
+    USERS_COLLECTION,
     uid,
     BANKING_DETAILS_SUB_COLLECTION
   );
@@ -168,7 +167,7 @@ export async function updateBankingDetails(
 
   const bankingDetailsRef = collection(
     db,
-    ADMINUSERS_COLLECTION,
+    USERS_COLLECTION,
     uid,
     BANKING_DETAILS_SUB_COLLECTION
   );
@@ -217,7 +216,7 @@ export function deleteBankingDetails(uid, bankingDetailsId) {
   return deleteDoc(
     doc(
       db,
-      ADMINUSERS_COLLECTION,
+      USERS_COLLECTION,
       uid,
       BANKING_DETAILS_SUB_COLLECTION,
       bankingDetailsId
@@ -226,7 +225,6 @@ export function deleteBankingDetails(uid, bankingDetailsId) {
 }
 
 //BONDS REQUEST
-const ADMINDASH_COLLECTION = "admin_users";
 const BONDS_REQUEST_SUB_COLLECTION = "bondsRequest";
 
 export async function getBondRequests() {

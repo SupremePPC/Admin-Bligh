@@ -9,7 +9,7 @@ import {
   setDoc,
 } from "firebase/firestore";
 import { auth, db } from "../../firebaseConfig/firebase";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, sendEmailVerification, sendSignInLinkToEmail } from "firebase/auth";
 import Header from "./Header";
 import Table from "./Table";
 import "./style.css";
@@ -26,6 +26,7 @@ export default function UserRequest() {
   const [isRejected, setIsRejected] = useState(false);
   const [pendingRequestData, setPendingRequestData] = useState(null); // Store data of the request being processed
 
+  //FETCH USER REQUESTS
   useEffect(() => {
     const fetchUserRequests = async () => {
       try {
@@ -62,6 +63,7 @@ export default function UserRequest() {
   useEffect(() => {
   }, [userRequests]);
 
+  //HANDLE APPROVAL
   const handleApproval = async (userId, requestData) => {
     setIsLoading(true);
     try {
@@ -71,6 +73,12 @@ export default function UserRequest() {
         requestData.email,
         requestData.password
       );
+
+      const user = userCredential.user;
+      console.log(user, user.email);
+      // Send email verification
+      await sendSignInLinkToEmail(user, user.email );
+  
   
       // Step 2: Use the User ID as the document ID in the 'users' collection
       const newUserId = userCredential.user.uid;
@@ -86,7 +94,7 @@ export default function UserRequest() {
       await deleteDoc(
         doc(db, "admin_users", requestData.uid, "userRequests", userId)
       );
-  
+
       // Remove the user request from the state
       setUserRequests((prevRequests) =>
         prevRequests.filter((request) => request.id !== userId)

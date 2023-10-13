@@ -5,6 +5,7 @@ import {
   createUserWithEmailAndPassword,
   getAuth,
   sendEmailVerification,
+  sendSignInLinkToEmail,
 } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { useDispatch } from "react-redux";
@@ -81,7 +82,6 @@ const Add = ({ setUsers, setIsAdding }) => {
         password
       );
       const user = userCredential.user;
-
       // Send email verification
       await sendEmailVerification(user);
 
@@ -98,9 +98,9 @@ const Add = ({ setUsers, setIsAdding }) => {
         country,
         postcode,
       };
-      const usersRef = doc(db, "users", user.uid);
+      const usersRef = doc(db, "users", newUser.uid);
       await setDoc(usersRef, newUser);
-
+      console.log("User added to Firestore");
       // Update state
       setUsers((prevUsers) => [...prevUsers, newUser]);
       setIsAdding(false);
@@ -115,6 +115,7 @@ const Add = ({ setUsers, setIsAdding }) => {
         showConfirmButton: false,
         timer: 2000,
       });
+      window.location.reload();
     } catch (error) {
       console.error("Error adding user:", error);
       Swal.fire({
@@ -129,6 +130,7 @@ const Add = ({ setUsers, setIsAdding }) => {
 
   return (
     <div className="small-container">
+      <h3>Add New User</h3>
       {isLoading ? (
         <LoadingScreen />
       ) : (
@@ -184,7 +186,7 @@ const Add = ({ setUsers, setIsAdding }) => {
             name="home"
             value={formData.home}
             onChange={handleInputChange}
-            required
+            
           />
 
           <label htmlFor="address">Address</label>
@@ -217,17 +219,17 @@ const Add = ({ setUsers, setIsAdding }) => {
             required
           />
 
-          <label htmlFor="postcode">Eircode</label>
+          <label htmlFor="postcode">Postcode</label>
           <input
             id="postcode"
             type="text"
             name="postcode"
             value={formData.postcode}
             onChange={handleInputChange}
-            pattern="^[A-Za-z0-9]{3} [A-Za-z0-9]{4}$"
+            // pattern="^[A-Za-z0-9]{3} [A-Za-z0-9]{4}$"
             maxLength="8"
-            title="Eircode must be in the format like D02 DX88"
             required
+              title="Postcode must be in the format like D02X88"
           />
 
           <label htmlFor="password">Password</label>

@@ -23,22 +23,23 @@ export default function RegisteredUsers() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   
+  const fetchUsers = async () => {
+    setIsLoading(true);
+    try {
+      const usersCollection = collection(db, "users");
+      const userDocs = await getDocs(usersCollection);
+      const usersData = userDocs.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+      }));
+      setUsers(usersData);
+      setIsLoading(false);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
+  };
+
   useEffect(() => {
-    const fetchUsers = async () => {
-      setIsLoading(true);
-      try {
-        const usersCollection = collection(db, "users");
-        const userDocs = await getDocs(usersCollection);
-        const usersData = userDocs.docs.map((doc) => ({
-          ...doc.data(),
-          id: doc.id,
-        }));
-        setUsers(usersData);
-        setIsLoading(false);
-      } catch (error) {
-        console.error("Error fetching users:", error);
-      }
-    };
 
     fetchUsers();
     handleSearch();
@@ -67,7 +68,6 @@ export default function RegisteredUsers() {
 
   const confirmDelete = async () => {
     setIsLoading(true);
-
     try {
       // Initialize the Cloud Function
       const functionsInstance = getFunctions();
@@ -75,18 +75,14 @@ export default function RegisteredUsers() {
         functionsInstance,
         "deleteUserAccount"
       );
-
       // Call the Cloud Function to delete the user from Firestore and Authentication
-      const result = await deleteFunction({ userId: selectedUserId });
-
-      console.log(result.data);
+      await deleteFunction({ userId: selectedUserId });
 
       // Update the local state
       setUsers((users) => users.filter((user) => user.id !== selectedUserId));
 
       // Close the modal and reset the selected user ID
       setIsDeleteModalOpen(false);
-      setIsLoading(false);
       setSelectedUserId(null);
 
       Swal.fire({
@@ -96,9 +92,9 @@ export default function RegisteredUsers() {
         showConfirmButton: false,
         timer: 2000,
       });
+      fetchUsers();
     } catch (error) {
       console.error("Failed to delete user:", error);
-      setIsLoading(false);
       Swal.fire({
         icon: "error",
         title: "Error!",
@@ -106,6 +102,8 @@ export default function RegisteredUsers() {
         showConfirmButton: false,
         timer: 2000,
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
