@@ -78,7 +78,6 @@ export default function UserRequest() {
       // Send email verification
       await sendEmailVerification(user);
   
-  
       // Step 2: Use the User ID as the document ID in the 'users' collection
       const newUserId = userCredential.user.uid;
       await setDoc(doc(db, "users", newUserId), {

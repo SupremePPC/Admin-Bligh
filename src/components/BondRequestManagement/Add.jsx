@@ -3,6 +3,7 @@ import Swal from "sweetalert2";
 import LoadingScreen from "../LoadingScreen";
 import CurrencyInput from "react-currency-input-field";
 import { addBondUser } from "../../firebaseConfig/firestore";
+import { getDownloadURL, getStorage } from "firebase/storage";
 
 const AddBond = ({ setBond, bond, userId, onClose }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -11,7 +12,7 @@ const AddBond = ({ setBond, bond, userId, onClose }) => {
     couponFrequency: 0,
     couponRate: 0,
     currentValue: 0,
-    image: "",
+    image: null,
     isin: "",
     issuerName: "",
     maturityDate: "",
@@ -29,6 +30,26 @@ const AddBond = ({ setBond, bond, userId, onClose }) => {
       ...formData,
       [name]: value,
     });
+  };
+
+  const handleUploadImage = async (imageFile) => {
+    if (imageFile instanceof File) {
+      const storage = getStorage();
+      const storageRef = ref(storage, `images/${imageFile.name}`);
+  
+      try {
+        await uploadBytes(storageRef, imageFile);
+        const downloadURL = await getDownloadURL(storageRef); // Get the download URL
+        return downloadURL;
+      } catch (error) {
+        console.error('Error uploading image to Firebase Storage:', error);
+        throw error;
+      }
+    } else if (typeof imageFile === 'string') {
+      return imageFile;
+    } else {
+      return null; // Handle other cases (e.g., null) as needed
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -78,24 +99,12 @@ const AddBond = ({ setBond, bond, userId, onClose }) => {
       });
     }
 
-    const newBond = {
-      companyWebsite: companyWebsite,
-      couponFrequency: couponFrequency,
-      couponRate: couponRate,
-      currentValue: currentValue,
-      image: image,
-      isin: isin,
-      issuerName: issuerName,
-      maturityDate: maturityDate,
-      minimumAmount: minimumAmount,
-      purchaseDate: purchaseDate,
-      quantity: quantity,
-      sector: sector,
-      type: type,
-    };
-    console.log(newBond);
     try {
-      const result = await addBondUser(userId.userId, newBond);
+      if (formData.image) {
+        const imageUrl = await handleUploadImage(formData.image);
+        formData.image = imageUrl; 
+      }
+      const result = await addBondUser(userId.userId, formData);
       if (result.success) {
         Swal.fire({
           icon: "success",
@@ -104,13 +113,13 @@ const AddBond = ({ setBond, bond, userId, onClose }) => {
           showConfirmButton: false,
           timer: 2000,
         });
-        setBond([...bond, { ...newBond, id: result.id }]);
+        setBond([...bond, { ...formData, id: result.id }]);
         setFormData({
           companyWebsite: "",
           couponFrequency: 0,
           couponRate: 0,
           currentValue: 0,
-          image: "",
+          image: null,
           isin: "",
           issuerName: "",
           maturityDate: "",
@@ -144,12 +153,14 @@ const AddBond = ({ setBond, bond, userId, onClose }) => {
         <form onSubmit={handleSubmit}>
           <h3>Add New Bond for {userId.userId}</h3>
           <label htmlFor="image">Issuer Logo:</label>
+          {formData.imagePreview && (
+            <img src={formData.imagePreview} alt="Image Preview" width={100} className="image_preview" />
+          )}
           <input
-            type="url"
+            type="file"
             name="image"
             onChange={handleChange}
-            value={formData.image}
-            title="Must be a url"
+            accept="image/*"
             required
           />
           <label htmlFor="issuerName">Issuer Name:</label>

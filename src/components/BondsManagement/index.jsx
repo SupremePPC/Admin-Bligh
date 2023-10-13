@@ -29,9 +29,6 @@ export default function BondsPage() {
     try {
       setIsLoading(true);
       const fetchedBonds = await getAllBonds();
-      if (!fetchedBonds) {
-        console.error("No bonds found");
-      }
       setBonds(fetchedBonds);
     } catch (error) {
       console.error("Error fetching bonds:", error);

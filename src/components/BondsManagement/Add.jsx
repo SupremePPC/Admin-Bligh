@@ -4,7 +4,7 @@ import Swal from "sweetalert2";
 import { addNewBond } from "../../firebaseConfig/firestore";
 import LoadingScreen from "../LoadingScreen";
 import CurrencyInput from "react-currency-input-field";
-import { getStorage, ref, uploadBytes } from "firebase/storage";
+import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 
 const AddNewBond = ({ setIsAdding, refreshBond }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -58,7 +58,6 @@ const AddNewBond = ({ setIsAdding, refreshBond }) => {
     if (imageFile instanceof File) {
       const storage = getStorage();
       const storageRef = ref(storage, `images/${imageFile.name}`);
-  
       try {
         await uploadBytes(storageRef, imageFile);
         const downloadURL = await getDownloadURL(storageRef); // Get the download URL
@@ -69,7 +68,7 @@ const AddNewBond = ({ setIsAdding, refreshBond }) => {
       }
     } else if (typeof imageFile === 'string') {
       // Image is already a URL, no need to re-upload
-      // return imageFile;
+      return imageFile;
     } else {
       return null; // Handle other cases (e.g., null) as needed
     }
@@ -83,7 +82,6 @@ const AddNewBond = ({ setIsAdding, refreshBond }) => {
         const imageUrl = await handleUploadImage(formData.image);
         formData.image = imageUrl; // Update the image field with the Firebase Storage URL
       }
-
       await addNewBond(formData);
       Swal.fire({
         icon: "success",
@@ -97,7 +95,7 @@ const AddNewBond = ({ setIsAdding, refreshBond }) => {
         couponFrequency: 0,
         couponRate: 0,
         currentValue: 0,
-        image: "",
+        image: null,
         isin: "",
         issuerName: "",
         maturityDate: "",
@@ -108,6 +106,7 @@ const AddNewBond = ({ setIsAdding, refreshBond }) => {
         type: "",
       });
       setIsAdding(false);
+      refreshBond();
     } catch (error) {
       console.error(error);
       Swal.fire({
@@ -128,7 +127,7 @@ const AddNewBond = ({ setIsAdding, refreshBond }) => {
         <form onSubmit={handleSubmit}>
           <h1>Add New Bond</h1>
           {formData.imagePreview && (
-            <img src={formData.imagePreview} alt="Image Preview" width={100} />
+            <img src={formData.imagePreview} alt="Image Preview" width={100} className="img_preview" />
           )}
           <input
             type="file"
@@ -210,6 +209,7 @@ const AddNewBond = ({ setIsAdding, refreshBond }) => {
             name="companyWebsite"
             onChange={handleChange}
             value={formData.companyWebsite}
+            title="Please enter a url that starts with http:// or https://"
           />
           <label htmlFor="couponRate">Coupon Rate:</label>
           <input
