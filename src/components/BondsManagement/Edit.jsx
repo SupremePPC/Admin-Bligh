@@ -11,8 +11,6 @@ const Edit = ({ bondToEdit, setIsEditPageOpen, refreshBonds }) => {
   const [errors, setErrors] = useState({});
   const [isLoaing, setIsLoading] = useState(false);
 
-  console.log(formData.image)
-  console.log(formData.imagePreview)
   useEffect(() => {
     // Set the existing image URL in the formData
     setFormData({
@@ -34,7 +32,6 @@ const Edit = ({ bondToEdit, setIsEditPageOpen, refreshBonds }) => {
             ...bondToEdit,
             image: downloadURL, // Set the existing image URL
           });
-          console.log(bondToEdit.imagePreview, bondToEdit.image)
           
         } catch (error) {
           console.error("Error fetching download URL:", error);
@@ -50,7 +47,6 @@ const Edit = ({ bondToEdit, setIsEditPageOpen, refreshBonds }) => {
     fetchData();
   }, [bondToEdit]);
   
-
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
   
@@ -109,15 +105,21 @@ const Edit = ({ bondToEdit, setIsEditPageOpen, refreshBonds }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-
+  
     try {
+      let updatedFormData = { ...formData }; // Create a copy of formData
+      console.log('cl ic ked')
       if (formData.image instanceof File) {
         // New image selected, upload it and update the image URL
         const imageUrl = await handleUploadImage(formData.image);
-        formData.image = imageUrl; // Update the image field with the Firebase Storage URL
+        updatedFormData.image = imageUrl; // Update the image field with the Firebase Storage URL
+      } else if (!formData.image) {
+        // If formData.image is empty, use the original image data
+        updatedFormData.image = originalImageData; // Replace 'originalImageData' with the actual original image data
+        console.log(updatedFormData.image, 'clicked')
       }
-
-      await updateBond(formData.id, formData);
+  
+      await updateBond(updatedFormData.id, updatedFormData);
       Swal.fire({
         icon: "success",
         title: "Updated!",
@@ -140,6 +142,7 @@ const Edit = ({ bondToEdit, setIsEditPageOpen, refreshBonds }) => {
       setIsLoading(false);
     }
   };
+  
 
   return (
     <div className="small-container">
@@ -157,7 +160,6 @@ const Edit = ({ bondToEdit, setIsEditPageOpen, refreshBonds }) => {
             name="image"
             onChange={handleChange}
             accept="image/*"
-            required
           />
           <label htmlFor="issuerName">Issuer Name:</label>
           <input
