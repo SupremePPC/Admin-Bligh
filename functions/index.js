@@ -61,7 +61,13 @@ exports.deleteUserAccount = functions.https.onCall(async (data, context) => {
     return {success: true, message: "User deleted successfully."};
   } catch (error) {
     console.error("Error deleting user:", error);
-    throw new functions.https.HttpsError("unknown", "Failed to delete user.");
+
+    if (error.code === "auth/user-not-found") {
+      //  case where the user doesn't exist in Firebase Authentication.
+      throw new functions.https.HttpsError("not-found", "User not found.");
+    } else {
+      // Handle other errors.
+      throw new functions.https.HttpsError("unknown", "Failed to delete user.");
+    }
   }
 });
-
