@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Swal from "sweetalert2";
 import LoadingScreen from "../LoadingScreen";
+import CurrencyInput from 'react-currency-input-field';
 import { addTransaction } from "../../firebaseConfig/firestore";
 
 const AddTransaction = ({
@@ -139,12 +140,19 @@ const AddTransaction = ({
           </select>
 
           <label htmlFor="amount">Amount</label>
-          <input
-            id="amount"
-            type="number"
-            value={formData.amount}
-            onChange={(e) =>
-              setFormData({ ...formData, amount: e.target.value })}
+          <CurrencyInput
+            decimalSeparator="."
+            prefix="€"
+            name="amount"
+            placeholder="0.00"
+            defaultValue={0.00}
+            decimalsLimit={2}
+            onValueChange={(value, name) => {
+              setFormData((prevState) => ({
+                ...prevState,
+                amount: value,
+              }));
+            }}
           />
 
           <label htmlFor="type">Transaction Type</label>
@@ -163,7 +171,7 @@ const AddTransaction = ({
             id="status"
             value={formData.status}
             onChange={(e) =>
-              setFormData({ ...formData, statuse: e.target.value })
+              setFormData({ ...formData, status: e.target.value })
             }
           >
             <option value="">--Select--</option>

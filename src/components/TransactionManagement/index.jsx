@@ -8,7 +8,6 @@ import {
 import Header from "./Header";
 import Table from "./Table";
 import Modal from "../CustomsModal";
-import AddTransaction from "./Add";
 import { db } from "../../firebaseConfig/firebase";
 import LoadingScreen from "../LoadingScreen";
 import { getAllTransactions } from "../../firebaseConfig/firestore";
@@ -39,7 +38,6 @@ const TransactionDashboard = () => {
         setIsLoading(true);
         const allTransactions = await getAllTransactions();
         if(!allTransactions) {
-          console.error("No transactions found");
           setIsLoading(false);
           return;
         }

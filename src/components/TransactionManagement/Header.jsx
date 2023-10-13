@@ -33,7 +33,7 @@ const Header = ({
       <h1 className="header_title">Transactions Dashboard</h1>
       <div className="header__wrap">
       <div className="addRow_btn">
-        <button onClick={() => setIsAdding(true)}>Add Transaction</button>
+        {/* <button onClick={() => setIsAdding(true)}>Add Transaction</button> */}
       </div>
         <div className="search__field">
           <input
