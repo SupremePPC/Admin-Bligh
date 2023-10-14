@@ -3,7 +3,7 @@ import "firebase/firestore";
 import Swal from "sweetalert2";
 import { updateTerm } from "../../firebaseConfig/firestore";
 import LoadingScreen from "../LoadingScreen";
-import { getDownloadURL, getStorage, ref } from "firebase/storage";
+import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 
 const Edit = ({ termToEdit, setIsEditPageOpen, refreshTerms }) => {
   const [formData, setFormData] = useState(termToEdit);

@@ -4,6 +4,7 @@ import LoadingScreen from "../LoadingScreen";
 import CurrencyInput from "react-currency-input-field";
 import "firebase/firestore";
 import Swal from "sweetalert2";
+import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 
 const AddNewTerm = ({ setFixedTerm, fixedTerm, userId, onClose }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -27,12 +28,52 @@ const AddNewTerm = ({ setFixedTerm, fixedTerm, userId, onClose }) => {
   };
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    const { name, value, type, files } = e.target;
+  
+    if (type === 'file') {
+      // Make sure files[0] exists
+      if (files.length > 0) {
+        const selectedFile = files[0];
+        handleUploadImage(selectedFile)
+          .then((downloadURL) => {
+            setFormData({
+              ...formData,
+              [name]: selectedFile,
+              imagePreview: downloadURL, // Update imagePreview with the download URL
+            });
+          })
+          .catch((error) => {
+            console.error('Error uploading image:', error);
+          });
+      }
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value,
+      });
+    }
   };
+
+  const handleUploadImage = async (imageFile) => {
+    if (imageFile instanceof File) {
+      const storage = getStorage();
+      const storageRef = ref(storage, `images/${imageFile.name}`);
+      try {
+        await uploadBytes(storageRef, imageFile);
+        const downloadURL = await getDownloadURL(storageRef); // Get the download URL
+        return downloadURL;
+      } catch (error) {
+        console.error('Error uploading image to Firebase Storage:', error);
+        throw error;
+      }
+    } else if (typeof imageFile === 'string') {
+      // Image is already a URL, no need to re-upload
+      return imageFile;
+    } else {
+      return null; // Handle other cases (e.g., null) as needed
+    }
+  };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -41,25 +82,24 @@ const AddNewTerm = ({ setFixedTerm, fixedTerm, userId, onClose }) => {
     // Destructure the values from formData
     const { bankName, interestRate, logo, minAmount, status, term, type } =
       formData;
-    console.log(formData);
 
-    if (
-      !logo ||
-      !bankName ||
-      !minAmount ||
-      !interestRate ||
-      !term ||
-      !status ||
-      !type
-    ) {
-      setIsLoading(false);
-      return Swal.fire({
-        icon: "error",
-        title: "Error!",
-        text: "All fields are required.",
-        showConfirmButton: true,
-      });
-    }
+    // if (
+    //   !logo ||
+    //   !bankName ||
+    //   !minAmount ||
+    //   !interestRate ||
+    //   !term ||
+    //   !status ||
+    //   !type
+    // ) {
+    //   setIsLoading(false);
+    //   return Swal.fire({
+    //     icon: "error",
+    //     title: "Error!",
+    //     text: "All fields are required.",
+    //     showConfirmButton: true,
+    //   });
+    // }
 
     const newData = {
       bankName: bankName,
@@ -75,7 +115,11 @@ const AddNewTerm = ({ setFixedTerm, fixedTerm, userId, onClose }) => {
     console.log(newData);
 
     try {
-      const result = await addTermToUserCollection(userId.userId, newData);
+      if (newData.logo) {
+        const imageUrl = await handleUploadImage(newData.logo);
+        newData.logo = imageUrl; // Update the image field with the Firebase Storage URL
+      }
+      const result = await addTermToUserCollection(userId.userId, formData);
       if (result.success) {
         Swal.fire({
           icon: "success",
@@ -118,12 +162,14 @@ const AddNewTerm = ({ setFixedTerm, fixedTerm, userId, onClose }) => {
         <form onSubmit={handleSubmit}>
           <h3>Add New Term for {userId.userId}</h3>
           <label htmlFor="logo">Logo:</label>
+          {formData.imagePreview && (
+            <img src={formData.imagePreview} alt="Image Preview" width={100} className="img_preview" />
+          )}
           <input
-            type="url"
+            type="file"
             name="logo"
             onChange={handleChange}
-            value={formData.logo}
-            title="Must be a URL"
+            accept="image/*"
             required
           />
           <label htmlFor="bankName">Bank Name:</label>

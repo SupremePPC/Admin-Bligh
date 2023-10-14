@@ -4,12 +4,12 @@ import Swal from "sweetalert2";
 import { addNewTerm } from "../../firebaseConfig/firestore";
 import LoadingScreen from "../LoadingScreen";
 import CurrencyInput from 'react-currency-input-field';
-import { getDownloadURL, getStorage, ref } from "firebase/storage";
+import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 
 const AddNewTerm = ({ setIsAdding, refreshTerm }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
-    logo: null,
+    logo: "",
     bankName: "",
     minAmount: 0,
     interestRate: 0,
@@ -111,12 +111,14 @@ const AddNewTerm = ({ setIsAdding, refreshTerm }) => {
         <form onSubmit={handleSubmit}>
           <h1>Add New Term</h1>
           <label htmlFor="logo">Logo:</label>
+          {formData.imagePreview && (
+            <img src={formData.imagePreview} alt="Image Preview" width={100} className="img_preview" />
+          )}
           <input
-            type="url"
+            type="file"
             name="logo"
             onChange={handleChange}
-            value={formData.logo}
-            title="Must be a url"
+            accept="image/*"
             required
           />
           <label htmlFor="bankName">Bank Name:</label>

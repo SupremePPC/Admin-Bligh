@@ -3,7 +3,7 @@ import "firebase/firestore";
 import Swal from "sweetalert2";
 import { updateIpo } from "../../firebaseConfig/firestore";
 import LoadingScreen from "../LoadingScreen";
-import { getDownloadURL, getStorage } from "firebase/storage";
+import { getDownloadURL, getStorage, uploadBytes } from "firebase/storage";
 
 const Edit = ({ ipoToEdit, setIsEditPageOpen, refreshIpos }) => {
   const [formData, setFormData] = useState(ipoToEdit || {});
