@@ -3,7 +3,7 @@ import "firebase/firestore";
 import Swal from "sweetalert2";
 import { updateIpo } from "../../firebaseConfig/firestore";
 import LoadingScreen from "../LoadingScreen";
-import { getDownloadURL, getStorage } from "firebase/storage";
+import { getDownloadURL, getStorage, uploadBytes } from "firebase/storage";
 
 const Edit = ({ ipoToEdit, setIsEditPageOpen, refreshIpos }) => {
   const [formData, setFormData] = useState(ipoToEdit || {});
@@ -14,7 +14,7 @@ const Edit = ({ ipoToEdit, setIsEditPageOpen, refreshIpos }) => {
     // Set the existing image URL in the formData
     setFormData({
       ...ipoToEdit,
-      image: ipoToEdit.image, // Set the existing image URL
+      image: ipoToEdit.logo, // Set the existing image URL
     });
   }, [ipoToEdit]);
 
@@ -103,7 +103,7 @@ const Edit = ({ ipoToEdit, setIsEditPageOpen, refreshIpos }) => {
         const imageUrl = await handleUploadImage(formData.logo);
         updatedFormData.logo = imageUrl; // Update the image field with the Firebase Storage URL
       } else if (!formData.logo) {
-        // If formData.image is empty, use the original image data
+        // If formData.logo is empty, use the original image data
         updatedFormData.logo = originalImageData; // Replace 'originalImageData' with the actual original image data
         console.log(updatedFormData.logo, "clicked");
       }
