@@ -137,9 +137,18 @@ export async function addBankingDetails(
   accountName,
   bankName,
   branch,
-  iban,
-  swiftCode
+  bsbNumber,
+  accountNumber
 ) {
+  console.log(
+    USERS_COLLECTION,
+    uid,
+    BANKING_DETAILS_SUB_COLLECTION,
+    accountName,
+    bankName,
+    branch,
+    bsbNumber,
+    accountNumber,)
   const bankingDetailsRef = collection(
     db,
     USERS_COLLECTION,
@@ -151,8 +160,8 @@ export async function addBankingDetails(
     accountName,
     bankName,
     branch,
-    iban,
-    swiftCode,
+    bsbNumber,
+    accountNumber,
   });
 }
 
@@ -161,8 +170,8 @@ export async function updateBankingDetails(
   accountName,
   bankName,
   branch,
-  iban,
-  swiftCode
+  bsbNumber,
+  accountNumber
 ) {
 
   const bankingDetailsRef = collection(
@@ -178,7 +187,7 @@ export async function updateBankingDetails(
     return setDoc(
       doc(
         db,
-        ADMINUSERS_COLLECTION,
+        ADMINUSER_COLLECTION,
         uid,
         BANKING_DETAILS_SUB_COLLECTION,
         docId
@@ -187,8 +196,8 @@ export async function updateBankingDetails(
         accountName,
         bankName,
         branch,
-        iban,
-        swiftCode,
+        bsbNumber,
+        accountNumber,
       }
     );
   } else {
@@ -198,7 +207,7 @@ export async function updateBankingDetails(
 
 export async function getBankingDetails(uid) {
   const bankingDetailsQuery = query(
-    collection(db, ADMINUSERS_COLLECTION, uid, BANKING_DETAILS_SUB_COLLECTION)
+    collection(db, USERS_COLLECTION, uid, BANKING_DETAILS_SUB_COLLECTION)
   );
   const querySnapshot = await getDocs(bankingDetailsQuery);
 
@@ -379,7 +388,7 @@ export async function deleteRequestFromFirestore(userId, requestId, newStatus) {
   await deleteDoc(requestDocPath);
 }
 
-// Function to fetch data from a specific request
+// Function to fetch bond data from a specific request
 export async function fetchRequestData(userId, requestId) {
   const requestDocPath = doc(
     db,

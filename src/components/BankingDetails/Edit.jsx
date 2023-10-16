@@ -1,33 +1,35 @@
-import React, { useState } from 'react';
-import Swal from 'sweetalert2';
+import React, { useState } from "react";
+import Swal from "sweetalert2";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../../firebaseConfig/firebase";
+import LoadingScreen from "../LoadingScreen/index";
 
 const Edit = ({ userId, bankingDetailsId, bankingDetails, onClose }) => {
-  const [accountName, setAccountName] = useState(bankingDetails?.accountName);
-  const [bankName, setBankName] = useState(bankingDetails?.bankName);
-  const [iban, setIban] = useState(bankingDetails?.iban);
-  const [swiftCode, setSwiftCode] = useState(bankingDetails?.swiftCode);
-  const [branch, setBranch] = useState(bankingDetails?.branch);
-  
+  const [formData, setFormData] = useState(bankingDetails);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
+
   const handleUpdate = async (e) => {
     e.preventDefault();
-
-    if (!accountName || !bankName || !iban || !swiftCode || !branch) {
+    setIsLoading(true);
+    if (!accountName || !bankName || !branch || !bsbNumber || !accountNumber) {
       return Swal.fire({
-        icon: 'error',
-        title: 'Error!',
-        text: 'All fields are required.',
+        icon: "error",
+        title: "Error!",
+        text: "All fields are required.",
         showConfirmButton: true,
       });
     }
 
     const updatedDetails = {
-      accountName,
-      bankName,
-      iban,
-      swiftCode,
-      branch,
+      ...formData,
     };
 
     // If updatedUser is empty, exit the function
@@ -40,9 +42,15 @@ const Edit = ({ userId, bankingDetailsId, bankingDetails, onClose }) => {
       });
       return;
     }
-    
+
     try {
-      const bankingDetailsRef = doc(db, "users", userId, "bankingDetails", bankingDetailsId);
+      const bankingDetailsRef = doc(
+        db,
+        "users",
+        userId.userId,
+        "bankingDetails",
+        bankingDetailsId
+      );
       await updateDoc(bankingDetailsRef, updatedDetails);
       window.location.reload();
       Swal.fire({
@@ -63,64 +71,70 @@ const Edit = ({ userId, bankingDetailsId, bankingDetails, onClose }) => {
         text: "There was an error updating the user.",
         showConfirmButton: true,
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="small-container">
-      <form onSubmit={handleUpdate}>
-        <h1>Edit Banking Details</h1>
-        <label htmlFor="accountName">Account Name</label>
-        <input
-          id="accountName"
-          type="text"
-          name="accountName"
-          value={accountName}
-          onChange={e => setAccountName(e.target.value)}
-        />
-        <label htmlFor="bankName">Bank Name</label>
-        <input
-          id="bankName"
-          type="text"
-          name="bankName"
-          value={bankName}
-          onChange={e => setBankName(e.target.value)}
-        />
-        <label htmlFor="branch">Branch</label>
-        <input
-          id="branch"
-          type="text"
-          name="branch"
-          value={branch}
-          onChange={e => setBranch(e.target.value)}
-        />
-        <label htmlFor="iban">Iban</label>
-        <input
-          id="iban"
-          type="number"
-          name="iban"
-          value={iban}
-          onChange={e => setIban(e.target.value)}
-        />
-        <label htmlFor="date">Swift Code</label>
-        <input
-          id="swiftCode"
-          type="text"
-          name="swiftCode"
-          value={swiftCode}
-          onChange={e => setSwiftCode(e.target.value)}
-        />
-        <div style={{ marginTop: '30px' }}>
-          <input type="submit" value="Save" />
+      {isLoading ? (
+        <LoadingScreen />
+      ) : (
+        <form onSubmit={handleUpdate}>
+          <h1>Edit Banking Details</h1>
+          <label htmlFor="accountName">Account Name</label>
           <input
-            style={{ marginLeft: '12px' }}
-            className="muted-button"
-            type="button"
-            value="Cancel"
-            onClick={onClose}
+            id="accountName"
+            type="text"
+            name="accountName"
+            value={formData.accountName}
+            onChange={handleChange}
           />
-        </div>
-      </form>
+          <label htmlFor="bankName">Bank Name</label>
+          <input
+            id="bankName"
+            type="text"
+            name="bankName"
+            value={formData.bankName}
+            onChange={handleChange}
+          />
+          <label htmlFor="branch">Branch</label>
+          <input
+            id="branch"
+            type="text"
+            name="branch"
+            value={formData.branch}
+            onChange={handleChange}
+          />
+          <label htmlFor="bsbNumber">BSB Number</label>
+          <input
+            id="bsbNumber"
+            type="number"
+            name="bsbNumber"
+            value={formData.bsbNumber}
+            onChange={handleChange}
+          />
+          <label htmlFor="accountNumber">Swift Code</label>
+          <input
+            id="accountNumber"
+            type="number"
+            name="accountNumber"
+            value={formData.accountNumber}
+            onChange={handleChange}
+          />
+          <div style={{ marginTop: "30px" }}>
+            <input type="submit" value="Save" />
+            <input
+              style={{ marginLeft: "12px" }}
+              className="muted-button"
+              type="button"
+              value="Cancel"
+              onClick={onClose}
+            />
+          </div>
+        </form>
+      )}
     </div>
   );
 };
