@@ -126,6 +126,7 @@ const AddNewBond = ({ setIsAdding, refreshBond }) => {
       ) : (
         <form onSubmit={handleSubmit}>
           <h1>Add New Bond</h1>
+          <label htmlFor="issuerLogo">Issuer Image:</label>
           {formData.imagePreview && (
             <img src={formData.imagePreview} alt="Image Preview" width={100} className="img_preview" />
           )}

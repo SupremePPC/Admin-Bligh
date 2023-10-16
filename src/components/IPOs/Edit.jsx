@@ -138,7 +138,7 @@ const Edit = ({ ipoToEdit, setIsEditPageOpen, refreshIpos }) => {
       ) : (
         <form onSubmit={handleSubmit}>
           <h1>Edit IPO</h1>
-          <label htmlFor="logo"> Logo:</label>
+          <label htmlFor="logo">Upload Logo:</label>
           {formData.logo && (
             <img
               src={formData.logo}

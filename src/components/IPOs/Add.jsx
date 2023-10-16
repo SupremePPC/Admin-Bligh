@@ -117,7 +117,7 @@ const AddNewIpos = ({ setIsAdding, refreshIpos }) => {
       ) : (
         <form onSubmit={handleSubmit}>
           <h1>Add New IPOs</h1>
-          <label htmlFor="logo"> Logo:</label>
+          <label htmlFor="logo">Upload Logo:</label>
           {formData.imagePreview && (
             <img src={formData.imagePreview} alt="Image Preview" width={100} className="img_preview" />
           )}
