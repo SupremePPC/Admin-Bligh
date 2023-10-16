@@ -800,7 +800,6 @@ export const addNewIpos = async (ipoData) => {
 
 //Delete
 export const deleteIpos = async (ipoId) => {
-  console.log(ipoId);
   const ipoRef = doc(db, IPOS_COLLECTION, ipoId);
   try {
     await deleteDoc(ipoRef);

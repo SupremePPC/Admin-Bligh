@@ -68,6 +68,13 @@ const AddNewIpos = ({ setIsAdding, refreshIpos }) => {
     }
   };
 
+  const handleCurrencyChange = (value, name) => {
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -148,13 +155,10 @@ const AddNewIpos = ({ setIsAdding, refreshIpos }) => {
             prefix="$"
             name="expListingPrice"
             placeholder="0.00"
-            defaultValue={0.00}
-            decimalsLimit={2}
+            value={formData.expListingPrice} 
             onValueChange={(value) => {
-              setFormData({
-                ...formData,
-                expListingPrice: parseFloat(value), // Convert the value to a float
-              });
+              const formattedValue = parseFloat(value).toFixed(2);
+              handleCurrencyChange(formattedValue, "expListingPrice");
             }}
           />
           <label htmlFor="expectedDate">Expected Date:</label>
@@ -170,13 +174,10 @@ const AddNewIpos = ({ setIsAdding, refreshIpos }) => {
             prefix="$"
             name="minInvestment"
             placeholder="0.00"
-            defaultValue={0.00}
-            decimalsLimit={2}
+            value={formData.minInvestment} 
             onValueChange={(value) => {
-              setFormData({
-                ...formData,
-                minInvestment: parseFloat(value), // Convert the value to a float
-              });
+              const formattedValue = parseFloat(value).toFixed(2);
+              handleCurrencyChange(formattedValue, "minInvestment");
             }}
           />
           <label htmlFor="preAllocation">Pre Allocation:</label>
@@ -193,12 +194,10 @@ const AddNewIpos = ({ setIsAdding, refreshIpos }) => {
             name="preSharePrice"
             placeholder="0.00"
             defaultValue={0.00}
-            decimalsLimit={2}
+            value={formData.preSharePrice} 
             onValueChange={(value) => {
-              setFormData({
-                ...formData,
-                preSharePrice: parseFloat(value), // Convert the value to a float
-              });
+              const formattedValue = parseFloat(value).toFixed(2);
+              handleCurrencyChange(formattedValue, "preSharePrice");
             }}
           />
           <label htmlFor="sharePrice">Share Price:</label>
@@ -208,12 +207,10 @@ const AddNewIpos = ({ setIsAdding, refreshIpos }) => {
             name="sharePrice"
             placeholder="0.00"
             defaultValue={0.00}
-            decimalsLimit={2}
+            value={formData.sharePrice} 
             onValueChange={(value) => {
-              setFormData({
-                ...formData,
-                sharePrice: parseFloat(value), // Convert the value to a float
-              });
+              const formattedValue = parseFloat(value).toFixed(2);
+              handleCurrencyChange(formattedValue, "sharePrice");
             }}
           />
           <div style={{ marginTop: "30px" }}>

@@ -4,6 +4,7 @@ import Swal from "sweetalert2";
 import { updateTerm } from "../../firebaseConfig/firestore";
 import LoadingScreen from "../LoadingScreen";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
+import CurrencyInput from "react-currency-input-field";
 
 const Edit = ({ termToEdit, setIsEditPageOpen, refreshTerms }) => {
   const [formData, setFormData] = useState(termToEdit);
@@ -72,6 +73,13 @@ const Edit = ({ termToEdit, setIsEditPageOpen, refreshTerms }) => {
     }
   };
 
+  const handleCurrencyChange = (value, name) => {
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
+
   const handleUploadImage = async (imageFile) => {
     if (imageFile instanceof File) {
       const storage = getStorage();
@@ -130,11 +138,10 @@ const Edit = ({ termToEdit, setIsEditPageOpen, refreshTerms }) => {
 
   return (
     <div className="small-container">
-      {
-        isLoaing ? (
-          <LoadingScreen/>
-        ): (
-          <form onSubmit={handleSubmit}>
+      {isLoaing ? (
+        <LoadingScreen />
+      ) : (
+        <form onSubmit={handleSubmit}>
           <h1>Add New Term</h1>
           <label htmlFor="logo">Upload Logo:</label>
           {formData.logo && (
@@ -176,6 +183,17 @@ const Edit = ({ termToEdit, setIsEditPageOpen, refreshTerms }) => {
             value={formData.minAmount}
             required
           />
+          <CurrencyInput
+            decimalSeparator="."
+            prefix="$"
+            name="expListingPrice"
+            placeholder="0.00"
+            value={formData.expListingPrice} 
+            onValueChange={(value) => {
+              const formattedValue = parseFloat(value).toFixed(2);
+              handleCurrencyChange(formattedValue, "expListingPrice");
+            }}
+          />
           <label htmlFor="interestRate">Interest Rate:</label>
           <input
             type="number"
@@ -185,23 +203,22 @@ const Edit = ({ termToEdit, setIsEditPageOpen, refreshTerms }) => {
             required
           />
           <div style={{ marginTop: "30px" }}>
-          <input type="submit" value="Save" />
-          <input
-            style={{ marginLeft: "12px" }}
-            className="muted-button"
-            type="button"
-            value="Cancel"
-            onClick={() => {
-              setIsEditPageOpen(false);
-              refreshTerms();
-            }}
-          />
-        </div>
+            <input type="submit" value="Save" />
+            <input
+              style={{ marginLeft: "12px" }}
+              className="muted-button"
+              type="button"
+              value="Cancel"
+              onClick={() => {
+                setIsEditPageOpen(false);
+                refreshTerms();
+              }}
+            />
+          </div>
           {errors.isin && <div>{errors.isin}</div>}
           {errors.issuerName && <div>{errors.issuerName}</div>}
         </form>
-        )
-      }
+      )}
     </div>
   );
 };

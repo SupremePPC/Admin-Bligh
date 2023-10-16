@@ -18,7 +18,7 @@
     border-radius: 10px;
     width: 100%;
     max-width: 500px;
-    height: fit-content;
+    height: 590px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     margin: 0.5rem;
     animation: scaleUp 0.3s forwards;
@@ -29,12 +29,12 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
 }
 
 .section_header .logo {
-    width: 150px;
-    height: 150px;
+    width: 100px;
+    height: 100px;
     object-fit: contain;
 }
 
@@ -65,7 +65,7 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 1rem;
+    gap: .5rem;
 }
   
 .section_body .more_dets {
@@ -91,7 +91,7 @@
     display: flex;
     flex-direction: column;
     width: 100%;
-    margin-top: 1rem;
+    /* margin-top: 1rem; */
     margin-bottom: .5rem;
     gap: .35rem;
 }
@@ -131,15 +131,15 @@
 .buttons_wrap .submit_btn {
     max-width: 200px;
     color: var(--white);
-    font-size: var(--font-eighteen);
+    font-size: var(--font-sixteen);
     font-weight: 400;
     width: 49%;
-    height: 3rem;
+    height: 2rem;
     font-weight: 400;
-    padding: 0.75rem;
+    padding: .35rem 0.75rem;
     border: none;
     border-radius: 10px;
-    margin-top: 1rem;
+    margin-top: .5rem;
     background-color: var(--green);
     cursor: pointer;
     transition: all 0.3s ease-in-out;
@@ -148,15 +148,15 @@
 .buttons_wrap .cancel_btn {
     max-width: 200px;
     color: var(--white);
-    font-size: var(--font-eighteen);
+    font-size: var(--font-sixteen);
     font-weight: 400;
     width: 49%;
-    height: 3rem;
+    height: 2rem;
     font-weight: 400;
-    padding: 0.75rem;
+    padding: .35rem 0.75rem;
     border: none;
     border-radius: 10px;
-    margin-top: 1rem;
+    margin-top: .5rem;
     background-color: var(--red);
     cursor: pointer;
     transition: all 0.3s ease-in-out;
