@@ -247,8 +247,6 @@ const UserOverview = () => {
                 <div className="dropdown_btn">
                 <button
                       style={{ marginLeft: "12px" }}
-                      className="mutedButton"
-                      type="button"
                       onClick={() => handleOpenModal("isEditUserDetailsOpen")}
                       >
                       Edit User Details
@@ -352,7 +350,7 @@ const UserOverview = () => {
                   No Transaction has been carried out yet.
                 </p>
               ) : (
-                <table className="transaction_table">
+                <table className="overview_table">
                   <thead>
                     <tr>
                       <th className="bold_text">Deposit amount</th>
@@ -453,31 +451,9 @@ const UserOverview = () => {
                         <span className="reg_text">{item.issuerName}</span>
                       </div>
                       <div className="text_wrap">
-                        <p className="bold_text">Company Website:</p>
-                        <span className="reg_text">{item.companyWebsite}</span>
-                      </div>
-                      <div className="text_wrap">
-                        <p className="bold_text">Coupon Frequency:</p>
-                        <span className="reg_text">{item.couponFrequency}</span>
-                      </div>
-                      <div className="text_wrap">
-                        <p className="bold_text">Coupon Rate:</p>
-                        <span className="reg_text">{item.couponRate}%</span>
-                      </div>
-                      <div className="text_wrap">
                         <p className="bold_text">Current Value:</p>
                         <span className="reg_text">$ {item.currentValue}</span>
                       </div>
-                      <div className="text_wrap">
-                        <p className="bold_text">ISIN:</p>
-                        <span className="reg_text">{item.isin}</span>
-                      </div>
-
-                      <div className="text_wrap">
-                        <p className="bold_text">Minimum Amount:</p>
-                        <span className="reg_text">$ {item.minimumAmount}</span>
-                      </div>
-
                       <div className="text_wrap">
                         <p className="bold_text">Maturity Date:</p>
                         <span className="reg_text">{formattedMaturity}</span>
@@ -489,15 +465,6 @@ const UserOverview = () => {
                       <div className="text_wrap">
                         <p className="bold_text">Quantity:</p>
                         <span className="reg_text">{item.quantity}</span>
-                      </div>
-                      <div className="text_wrap">
-                        <p className="bold_text">Sector:</p>
-                        <span className="reg_text">{item.sector}</span>
-                      </div>
-
-                      <div className="text_wrap">
-                        <p className="bold_text">Type:</p>
-                        <span className="reg_text">{item.type}</span>
                       </div>
                     </div>
                   );
@@ -513,7 +480,7 @@ const UserOverview = () => {
             {/* Fixed Term Table */}
             <div className="user_details">
               <h3>Fixed Term Deposits</h3>
-              <table className="term_table">
+              <table className="overview_table">
                 {fixedTerm.length > 0 ? (
                   <>
                     <thead>
@@ -579,7 +546,7 @@ const UserOverview = () => {
             {/* IPOs  */}
             <div className="user_details">
               <h3>IPOs</h3>
-              <table className="term_table">
+              <table className="overview_table">
                 {ipos.length > 0 ? (
                   <>
                     <thead>

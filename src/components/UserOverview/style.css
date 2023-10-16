@@ -7,14 +7,14 @@
   gap: 0.5rem;
 }
 
-.term_table {
+.overview_table {
   width: 100%;
   border-collapse: collapse;
   border-radius: 8px;
 }
 
-.term_table td,
-.term_table th {
+.overview_table td,
+.overview_table th {
   border: 1px solid #cccccc80;
   padding: 10px;
   text-align: left;
@@ -22,7 +22,7 @@
 }
 
 /* Style the buttons */
-.term_table button {
+.overview_table button {
   cursor: pointer;
   border: none;
   border-radius: 5px;
@@ -30,7 +30,7 @@
 }
 
 /* Use a grid layout for the buttons */
-.term_table td > div.button_grid {
+.overview_table td > div.button_grid {
   display: flex;
   flex-direction: row;
   gap: 5px;
@@ -52,7 +52,7 @@
 .sell_button {
   background-color: transparent;
   color: #c12c21;
-  border: 1px solid var(--setermary);
+  border: 1px solid var(--seoverviewary);
 }
 
 .details_button {
@@ -91,20 +91,41 @@ td .holding_dropdown .dropdown_row {
   width: 100%;
 }
 
-td .holding_dropdown .dropdown_row .bold_text {
+.userOverview_container .text_wrap{
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.userOverview_container .bold_text {
   font-size: var(--font-fourteen);
   font-weight: 500;
   color: var(--white);
 }
 
-td .holding_dropdown .dropdown_row .reg_text {
+.userOverview_container .reg_text {
   font-size: var(--font-fourteen);
   font-weight: 400;
   color: var(--white);
 }
 
-.userOverview_container .term_table td,
-.userOverview_container .term_table th,
-.userOverview_container .term_table p {
+.userOverview_container td,
+.userOverview_container th,
+.userOverview_container p,
+.userOverview_container span {
   color: var(--white);
+}
+
+.userOverview_container .dropdown_btn {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.userOverview_container .dropdown_btn button {
+  background-color: var(--white);
+  border: none;
+  color: var(--black);
+  font-size: var(--font-fourteen);
+  font-weight: 500;
+  cursor: pointer;
 }
