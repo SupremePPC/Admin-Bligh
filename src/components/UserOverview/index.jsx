@@ -249,20 +249,20 @@ const UserOverview = () => {
                         <span className="reg_text">{item.bankName}</span>
                       </div>
                       <div className="text_wrap">
-                        <p className="bold_text"> IBAN :</p>
-                        <span className="reg_text">{item.iban}</span>
-                      </div>
-                      <div className="text_wrap">
-                        <p className="bold_text">Swift Code:</p>
-                        <span className="reg_text">{item.swiftCode}</span>
+                        <p className="bold_text">Account Name: </p>
+                        <span className="reg_text">{item.accountName}</span>
                       </div>
                       <div className="text_wrap">
                         <p className="bold_text"> Branch:</p>
                         <span className="reg_text">{item.branch}</span>
                       </div>
                       <div className="text_wrap">
-                        <p className="bold_text">Account Name: </p>
-                        <span className="reg_text">{item.accountName}</span>
+                        <p className="bold_text"> BSB Number :</p>
+                        <span className="reg_text">{item.bsbNumber}</span>
+                      </div>
+                      <div className="text_wrap">
+                        <p className="bold_text">Account Number:</p>
+                        <span className="reg_text">{item.accountNumber}</span>
                       </div>
                     </div>
                     <div className="dropdown_btn">
@@ -633,6 +633,9 @@ const UserOverview = () => {
             setSelectedUserForAdd(null);
           }}
           userId={user}
+          refreshDetails={() => {
+            fetchSubCollection("bankingDetails", setBankingDetails);
+          }}
         />
       )}
       {modalState.isEditUserDetailsOpen && (
@@ -652,6 +655,9 @@ const UserOverview = () => {
           userId={user}
           bankingDetailsId={bankingDetails[0].id}
           bankingDetails={bankingDetails[0]}
+          refreshDetails={() => {
+            fetchSubCollection("bankingDetails", setBankingDetails);
+          }}
         />
       )}
       {modalState.isAddTransactionOpen && (

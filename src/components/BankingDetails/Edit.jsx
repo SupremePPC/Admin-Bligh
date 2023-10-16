@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import Swal from "sweetalert2";
-import { doc, updateDoc } from "firebase/firestore";
-import { db } from "../../firebaseConfig/firebase";
+// import { doc, updateDoc } from "firebase/firestore";
+// import { db } from "../../firebaseConfig/firebase";
 import LoadingScreen from "../LoadingScreen/index";
+import { updateBankingDetails } from "../../firebaseConfig/firestore";
 
-const Edit = ({ userId, bankingDetailsId, bankingDetails, onClose }) => {
+const Edit = ({ userId, bankingDetailsId, bankingDetails, onClose, refreshDetails }) => {
   const [formData, setFormData] = useState(bankingDetails);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -19,6 +20,10 @@ const Edit = ({ userId, bankingDetailsId, bankingDetails, onClose }) => {
   const handleUpdate = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+  
+    // Destructure the values from formData
+    const { accountName, bankName, branch, bsbNumber, accountNumber } = formData;
+  
     if (!accountName || !bankName || !branch || !bsbNumber || !accountNumber) {
       return Swal.fire({
         icon: "error",
@@ -27,13 +32,10 @@ const Edit = ({ userId, bankingDetailsId, bankingDetails, onClose }) => {
         showConfirmButton: true,
       });
     }
-
-    const updatedDetails = {
-      ...formData,
-    };
-
-    // If updatedUser is empty, exit the function
-    if (Object.keys(updatedDetails).length === 0) {
+  
+  
+    // If formData is empty, exit the function
+    if (Object.keys(formData).length === 0) {
       Swal.fire({
         icon: "info",
         title: "No Changes",
@@ -42,26 +44,19 @@ const Edit = ({ userId, bankingDetailsId, bankingDetails, onClose }) => {
       });
       return;
     }
-
+  
     try {
-      const bankingDetailsRef = doc(
-        db,
-        "users",
-        userId.userId,
-        "bankingDetails",
-        bankingDetailsId
-      );
-      await updateDoc(bankingDetailsRef, updatedDetails);
-      window.location.reload();
+      const uid = userId.userId;
+      await updateBankingDetails(uid, bankingDetailsId, formData);
+  
       Swal.fire({
         icon: "success",
         title: "Updated!",
-        text: `${updatedDetails.accountName}'s data has been updated.`,
+        text: `${formData.accountName}'s data has been updated.`,
         showConfirmButton: false,
         timer: 2000,
       });
-
-      // Close the edit form
+      refreshDetails();
       onClose();
     } catch (error) {
       console.error("Error updating user:", error);
@@ -69,12 +64,14 @@ const Edit = ({ userId, bankingDetailsId, bankingDetails, onClose }) => {
         icon: "error",
         title: "Error!",
         text: "There was an error updating the user.",
-        showConfirmButton: true,
+        showConfirmButton: false,
+        timer: 2000,
       });
     } finally {
       setIsLoading(false);
     }
   };
+  
 
   return (
     <div className="small-container">
@@ -115,7 +112,7 @@ const Edit = ({ userId, bankingDetailsId, bankingDetails, onClose }) => {
             value={formData.bsbNumber}
             onChange={handleChange}
           />
-          <label htmlFor="accountNumber">Swift Code</label>
+          <label htmlFor="accountNumber">Account Number</label>
           <input
             id="accountNumber"
             type="number"

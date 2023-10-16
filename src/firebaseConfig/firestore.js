@@ -167,41 +167,42 @@ export async function addBankingDetails(
 
 export async function updateBankingDetails(
   uid,
-  accountName,
-  bankName,
-  branch,
-  bsbNumber,
-  accountNumber
+  bankingDetailsId,
+  formData
 ) {
 
-  const bankingDetailsRef = collection(
-    db,
-    USERS_COLLECTION,
-    uid,
-    BANKING_DETAILS_SUB_COLLECTION
-  );
-  const snapshot = await getDocs(bankingDetailsRef);
+  const updateUserRef = doc(db, USERS_COLLECTION, uid);
+  const addBankingDetailsRef = collection(updateUserRef, BANKING_DETAILS_SUB_COLLECTION);
 
-  if (!snapshot.empty) {
-    const docId = snapshot.docs[0].id;
-    return setDoc(
-      doc(
-        db,
-        ADMINUSER_COLLECTION,
-        uid,
-        BANKING_DETAILS_SUB_COLLECTION,
-        docId
-      ),
-      {
-        accountName,
-        bankName,
-        branch,
-        bsbNumber,
-        accountNumber,
-      }
-    );
+  if (bankingDetailsId) {
+    // If bankingDetailsId exists, update the existing document
+    const updateBankingDetailsRef = doc(db, USERS_COLLECTION, uid, BANKING_DETAILS_SUB_COLLECTION, bankingDetailsId);
+
+    try {
+      await updateDoc(updateBankingDetailsRef, {
+        accountName: formData.accountName,
+        bankName: formData.bankName,
+        branch: formData.branch,
+        bsbNumber: formData.bsbNumber,
+        accountNumber: formData.accountNumber,
+      });
+    } catch (error) {
+      throw error; // You may want to handle this error in the calling function.
+    }
   } else {
-    console.error("No banking details found to update!");
+    // If bankingDetailsId doesn't exist, add a new document
+    try {
+      await addDoc(addBankingDetailsRef, {
+        accountName: formData.accountName,
+        bankName: formData.bankName,
+        branch: formData.branch,
+        bsbNumber: formData.bsbNumber,
+        accountNumber: formData.accountNumber,
+      });
+    } catch (error) {
+      console.error("Error adding banking details:", error);
+      throw error; // You may want to handle this error in the calling function.
+    }
   }
 }
 

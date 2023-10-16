@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import Swal from "sweetalert2";
-import { addBankingDetails } from "../../firebaseConfig/firestore";
+import { addBankingDetails, updateBankingDetails } from "../../firebaseConfig/firestore";
 import LoadingScreen from "../LoadingScreen/index";
 
-const Add = ({ userId, onClose }) => {
+const Add = ({ userId, onClose, refreshDetails }) => {
   const[isLoading, setIsLoading] = useState(false);
     const [formData, setFormData] = useState({
       accountName: "",
@@ -36,8 +36,8 @@ const Add = ({ userId, onClose }) => {
       }
   
       try {
-        await addBankingDetails(userId.userId, accountName, bankName, branch, bsbNumber, accountNumber);
-        
+        const uid = userId.userId;
+        await updateBankingDetails(uid, accountName, bankName, branch, bsbNumber, accountNumber);
         Swal.fire({
           icon: "success",
           title: "Added!",
@@ -47,6 +47,7 @@ const Add = ({ userId, onClose }) => {
         });
   
         onClose();
+        refreshDetails();
       } catch (error) {
         console.error("Error adding banking details:", error);
         Swal.fire({
