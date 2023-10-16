@@ -47,7 +47,7 @@ const Edit = ({ userId, bankingDetailsId, bankingDetails, onClose, refreshDetail
   
     try {
       const uid = userId.userId;
-      await updateBankingDetails(uid, bankingDetailsId, formData);
+      await updateBankingDetails(uid, formData, bankingDetailsId, );
   
       Swal.fire({
         icon: "success",

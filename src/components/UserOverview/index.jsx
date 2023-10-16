@@ -14,6 +14,7 @@ import AddDocument from "../DocumentManagement/Add";
 import Swal from "sweetalert2";
 import "./style.css";
 import EditDocument from "../DocumentManagement/Edit";
+import { deleteBankingDetails } from "../../firebaseConfig/firestore";
 
 const UserOverview = () => {
   const user = useParams();
@@ -27,6 +28,7 @@ const UserOverview = () => {
   const [fixedTerm, setFixedTerm] = useState([]);
   const [selectedUserForAdd, setSelectedUserForAdd] = useState(null);
   const [selectedDocument, setSelectedDocument] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const [modalState, setModalState] = useState({
     isAddTransactionOpen: false,
@@ -60,6 +62,35 @@ const UserOverview = () => {
   const handleEditDocument = (document) => {
     setSelectedDocument(document);
     handleOpenModal("isEditDocumentOpen");
+  };
+
+  const handleDelete = async (bankingDetailsId) => {
+    setIsLoading(true);
+    console.log(user);
+    const uid = user.userId;
+    try {
+      await deleteBankingDetails(uid, bankingDetailsId);
+      Swal.fire({
+        icon: "success",
+        title: "Deleted!",
+        text: `Banking Details deleted successfully.`,
+        showConfirmButton: false,
+        timer: 2000,
+      });
+      fetchSubCollection("bankingDetails", setBankingDetails);
+    } catch (error) {
+      console.error("Failed to delete Banking Details:", error);
+
+      Swal.fire({
+        icon: "error",
+        title: "Error!",
+        text: `Error in deleting Banking Details.`,
+        showConfirmButton: false,
+        timer: 2000,
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const fetchSubCollection = async (subCollectionName, setFunction) => {
@@ -215,11 +246,13 @@ const UserOverview = () => {
                   <span className="reg_text">{userDetails.postcode}</span>
                 </div>
                 <div className="dropdown_btn">
-                  <button
-                    onClick={() => handleOpenModal("isEditUserDetailsOpen")}
-                  >
-                    Edit User Details
-                  </button>
+                <input
+                      style={{ marginLeft: "12px" }}
+                      className="mutedButton"
+                      type="button"
+                      value="Edit User Details"
+                      onClick={() => handleOpenModal("isEditUserDetailsOpen")}
+                    />
                 </div>
               </div>
             )}
@@ -233,46 +266,55 @@ const UserOverview = () => {
                     This user hasn't added any banking details yet.
                   </p>
                   <div className="dropdown_btn">
-                    <button
+                    <input
+                      style={{ marginLeft: "12px" }}
+                      className="mutedButton"
+                      type="button"
+                      value="Add Details"
                       onClick={() => handleOpenModal("isAddBankingDetails")}
-                    >
-                      Add Banking Details
-                    </button>
+                    />
                   </div>
                 </>
               ) : (
                 bankingDetails.map((item, index) => (
-                  <>
-                    <div className="user_wrap" key={index}>
-                      <div className="text_wrap">
-                        <p className="bold_text"> Bank Name :</p>
-                        <span className="reg_text">{item.bankName}</span>
-                      </div>
-                      <div className="text_wrap">
-                        <p className="bold_text">Account Name: </p>
-                        <span className="reg_text">{item.accountName}</span>
-                      </div>
-                      <div className="text_wrap">
-                        <p className="bold_text"> Branch:</p>
-                        <span className="reg_text">{item.branch}</span>
-                      </div>
-                      <div className="text_wrap">
-                        <p className="bold_text"> BSB Number :</p>
-                        <span className="reg_text">{item.bsbNumber}</span>
-                      </div>
-                      <div className="text_wrap">
-                        <p className="bold_text">Account Number:</p>
-                        <span className="reg_text">{item.accountNumber}</span>
-                      </div>
+                  <div className="user_wrap" key={index}>
+                    <div className="text_wrap">
+                      <p className="bold_text"> Bank Name :</p>
+                      <span className="reg_text">{item.bankName}</span>
                     </div>
-                    <div className="dropdown_btn">
-                      <button
+                    <div className="text_wrap">
+                      <p className="bold_text">Account Name: </p>
+                      <span className="reg_text">{item.accountName}</span>
+                    </div>
+                    <div className="text_wrap">
+                      <p className="bold_text"> Branch:</p>
+                      <span className="reg_text">{item.branch}</span>
+                    </div>
+                    <div className="text_wrap">
+                      <p className="bold_text"> BSB Number :</p>
+                      <span className="reg_text">{item.bsbNumber}</span>
+                    </div>
+                    <div className="text_wrap">
+                      <p className="bold_text">Account Number:</p>
+                      <span className="reg_text">{item.accountNumber}</span>
+                    </div>
+
+                    <div style={{ marginTop: "30px" }} className="dropdown_btn">
+                      <input
+                        type="submit"
+                        value="Delete Details"
+                        onClick={() => handleDelete(bankingDetails[0].id)}
+                      />
+                      {isLoading && <div className="spinner"></div>}
+                      <input
+                        style={{ marginLeft: "12px" }}
+                        className="mutedButton"
+                        type="button"
+                        value="Edit Details"
                         onClick={() => handleOpenModal("isEditBankingDetails")}
-                      >
-                        Edit Banking Details
-                      </button>
+                      />
                     </div>
-                  </>
+                  </div>
                 ))
               )}
             </div>

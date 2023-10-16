@@ -22,6 +22,7 @@ import {
   query,
   setDoc,
   updateDoc,
+  where,
 } from "firebase/firestore";
 import { db } from "./firebase";
 import { ref, deleteObject, getStorage, getDownloadURL, uploadBytesResumable } from "firebase/storage";
@@ -140,15 +141,6 @@ export async function addBankingDetails(
   bsbNumber,
   accountNumber
 ) {
-  console.log(
-    USERS_COLLECTION,
-    uid,
-    BANKING_DETAILS_SUB_COLLECTION,
-    accountName,
-    bankName,
-    branch,
-    bsbNumber,
-    accountNumber,)
   const bankingDetailsRef = collection(
     db,
     USERS_COLLECTION,
@@ -156,53 +148,53 @@ export async function addBankingDetails(
     BANKING_DETAILS_SUB_COLLECTION
   );
 
-  return addDoc(bankingDetailsRef, {
-    accountName,
-    bankName,
-    branch,
-    bsbNumber,
-    accountNumber,
-  });
+  // Create a query to check for existing documents with the same details
+  const dets = query(
+    bankingDetailsRef,
+    where('accountName', '==', accountName),
+    where('bankName', '==', bankName),
+    where('branch', '==', branch),
+    where('bsbNumber', '==', bsbNumber),
+    where('accountNumber', '==', accountNumber)
+  );
+
+  // Execute the query to check for existing documents
+  const querySnapshot = await getDocs(dets);
+
+  // Check if any documents were found
+  if (!querySnapshot.empty) {
+    // Documents with the same details already exist
+    throw new Error('Details already exist. Proceed to the edit page to edit them.');
+  } else {
+    // No matching documents found, proceed to add a new document
+    return addDoc(bankingDetailsRef, {
+      accountName,
+      bankName,
+      branch,
+      bsbNumber,
+      accountNumber,
+    });
+  }
 }
+
 
 export async function updateBankingDetails(
   uid,
+  formData,
   bankingDetailsId,
-  formData
 ) {
 
-  const updateUserRef = doc(db, USERS_COLLECTION, uid);
-  const addBankingDetailsRef = collection(updateUserRef, BANKING_DETAILS_SUB_COLLECTION);
-
-  if (bankingDetailsId) {
-    // If bankingDetailsId exists, update the existing document
-    const updateBankingDetailsRef = doc(db, USERS_COLLECTION, uid, BANKING_DETAILS_SUB_COLLECTION, bankingDetailsId);
-
-    try {
-      await updateDoc(updateBankingDetailsRef, {
-        accountName: formData.accountName,
-        bankName: formData.bankName,
-        branch: formData.branch,
-        bsbNumber: formData.bsbNumber,
-        accountNumber: formData.accountNumber,
-      });
-    } catch (error) {
-      throw error; // You may want to handle this error in the calling function.
-    }
-  } else {
-    // If bankingDetailsId doesn't exist, add a new document
-    try {
-      await addDoc(addBankingDetailsRef, {
-        accountName: formData.accountName,
-        bankName: formData.bankName,
-        branch: formData.branch,
-        bsbNumber: formData.bsbNumber,
-        accountNumber: formData.accountNumber,
-      });
-    } catch (error) {
-      console.error("Error adding banking details:", error);
-      throw error; // You may want to handle this error in the calling function.
-    }
+  const updateBankingDetailsRef = doc(db, USERS_COLLECTION, uid, BANKING_DETAILS_SUB_COLLECTION, bankingDetailsId);
+  try {
+    await updateDoc(updateBankingDetailsRef, {
+      accountName: formData.accountName,
+      bankName: formData.bankName,
+      branch: formData.branch,
+      bsbNumber: formData.bsbNumber,
+      accountNumber: formData.accountNumber,
+    });
+  } catch (error) {
+    throw error; 
   }
 }
 

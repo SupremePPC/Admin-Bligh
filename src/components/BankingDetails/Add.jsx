@@ -37,7 +37,7 @@ const Add = ({ userId, onClose, refreshDetails }) => {
   
       try {
         const uid = userId.userId;
-        await updateBankingDetails(uid, accountName, bankName, branch, bsbNumber, accountNumber);
+        await addBankingDetails(uid, accountName, bankName, branch, bsbNumber, accountNumber);
         Swal.fire({
           icon: "success",
           title: "Added!",
