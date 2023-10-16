@@ -1,0 +1,44 @@
+.bonds_dropdownCol {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    /* margin-left: 1.5rem; */
+  }
+  
+  .bonds_dropdownRow {
+    width: 100%;
+    margin-bottom: 1rem;
+    display: flex;
+    gap: .35rem;
+  }
+  
+  .bonds_dropdownRow .bonds_bold-text {
+    font-size: var(--font-fourteen);
+    font-weight: 500;
+    color: var(--black);
+  }
+  
+  .bonds_dropdownRow .bonds_reg-text {
+    font-size: var(--font-fourteen);
+    font-weight: 400;
+    color: var(--black);
+  }
+  
+  .bonds_dropdownBtn {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+  .bonds_dropdownBtn button {
+    border-radius: 8px;
+    background-color: #fff;
+    border: 1px solid #fff;
+    color: #000;
+    width: 200px;
+    padding: 10px 0rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  

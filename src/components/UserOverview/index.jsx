@@ -66,7 +66,6 @@ const UserOverview = () => {
 
   const handleDelete = async (bankingDetailsId) => {
     setIsLoading(true);
-    console.log(user);
     const uid = user.userId;
     try {
       await deleteBankingDetails(uid, bankingDetailsId);
@@ -246,13 +245,14 @@ const UserOverview = () => {
                   <span className="reg_text">{userDetails.postcode}</span>
                 </div>
                 <div className="dropdown_btn">
-                <input
+                <button
                       style={{ marginLeft: "12px" }}
                       className="mutedButton"
                       type="button"
-                      value="Edit User Details"
                       onClick={() => handleOpenModal("isEditUserDetailsOpen")}
-                    />
+                      >
+                      Edit User Details
+                      </button>
                 </div>
               </div>
             )}
@@ -266,13 +266,13 @@ const UserOverview = () => {
                     This user hasn't added any banking details yet.
                   </p>
                   <div className="dropdown_btn">
-                    <input
+                    <button
                       style={{ marginLeft: "12px" }}
                       className="mutedButton"
                       type="button"
-                      value="Add Details"
                       onClick={() => handleOpenModal("isAddBankingDetails")}
-                    />
+                    > Add Details
+                    </button>
                   </div>
                 </>
               ) : (
@@ -300,19 +300,18 @@ const UserOverview = () => {
                     </div>
 
                     <div style={{ marginTop: "30px" }} className="dropdown_btn">
-                      <input
+                      <button
                         type="submit"
-                        value="Delete Details"
                         onClick={() => handleDelete(bankingDetails[0].id)}
-                      />
+                      >Delete Details</button>
                       {isLoading && <div className="spinner"></div>}
-                      <input
+                      <button
                         style={{ marginLeft: "12px" }}
                         className="mutedButton"
                         type="button"
-                        value="Edit Details"
-                        onClick={() => handleOpenModal("isEditBankingDetails")}
-                      />
+                        onClick={() => handleOpenModal("isEditBankingDetails")}>
+                        Edit Details
+                </button>
                     </div>
                   </div>
                 ))

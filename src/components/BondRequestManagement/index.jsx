@@ -15,6 +15,7 @@ import { db } from "../../firebaseConfig/firebase";
 import { getDoc, doc } from "firebase/firestore";
 import Header from "./Header";
 import Swal from "sweetalert2";
+import "./style.css";
 
 const BondsRequestTable = () => {
   const [bondRequests, setBondRequests] = useState([]);
@@ -85,7 +86,6 @@ const BondsRequestTable = () => {
     }
 };
 
-
   useEffect(() => {
     const fetchBondRequests = async () => {
       try {
@@ -114,7 +114,6 @@ const BondsRequestTable = () => {
     fetchBondRequests();
   }, []);
   
-
   return (
     <div className="container">
 

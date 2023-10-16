@@ -107,8 +107,9 @@ export default function InvestIpoModal({ isOpen, onClose, ipo, userId }) {
               decimalsLimit={2}
               onValueChange={(value) => {
                 const formattedValue = parseFloat(value).toFixed(2);
-                setInvestmentAmount(formattedValue);
+                setInvestmentAmount(parseFloat(formattedValue)); // Store as a number
               }}
+              
             />
           </div>
         </div>
