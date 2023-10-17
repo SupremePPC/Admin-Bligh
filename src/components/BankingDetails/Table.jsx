@@ -11,8 +11,8 @@ const Table = ({ bankingDetails, handleEdit, handleDelete }) => {
             <th>Full Name</th>
             <th>Bank Name</th>
             <th>Branch Address</th>
-            <th>IBAN</th>
-            <th>Swift Code</th>
+            <th>BSB Number</th>
+            <th>Account Number</th>
             <th colSpan={2} className="text-center">
               Actions
             </th>
@@ -26,8 +26,8 @@ const Table = ({ bankingDetails, handleEdit, handleDelete }) => {
                 <td>{detail.accountName}</td>
                 <td>{detail.bankName}</td>
                 <td>{detail.branch}</td>
-                <td>{detail.iban} </td>
-                <td>{detail.swiftCode} </td>
+                <td>{detail.bsbNumber} </td>
+                <td>{detail.accountNumber} </td>
                 <td className="text-right">
                   <button
                     onClick={() => handleEdit(detail.id)}
