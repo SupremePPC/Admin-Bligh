@@ -14,7 +14,7 @@ const EditDocument = ({ docs, setDocs, onClose, userId }) => {
 
   const storage = getStorage();
   const storageRef = ref(storage, `${userId.userId}/${docs?.name}/`);
-  console.log(storageRef);
+  
   // Fetch the file URL when the component mounts
   useEffect(() => {
     getDownloadURL(storageRef)

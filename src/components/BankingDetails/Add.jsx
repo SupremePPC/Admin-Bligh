@@ -1,15 +1,15 @@
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
 import Swal from "sweetalert2";
-import { doc, updateDoc } from "firebase/firestore";
-import { db } from "../../firebaseConfig/firebase";
+import { addBankingDetails, updateBankingDetails } from "../../firebaseConfig/firestore";
+import LoadingScreen from "../LoadingScreen/index";
 
-const Add = ({ userId, onClose }) => {
+const Add = ({ userId, onClose, refreshDetails }) => {
+  const[isLoading, setIsLoading] = useState(false);
     const [formData, setFormData] = useState({
       accountName: "",
       bankName: "",
-      iban: "",
-      swiftCode: "",
+      bsbNumber: "",
+      accountNumber: "",
       branch: "",
     });
   
@@ -23,10 +23,10 @@ const Add = ({ userId, onClose }) => {
   
     const handleSubmit = async (e) => {
       e.preventDefault();
+      setIsLoading(true);
+      const { accountName, bankName, bsbNumber, accountNumber, branch } = formData;
   
-      const { accountName, bankName, iban, swiftCode, branch } = formData;
-  
-      if (!accountName || !bankName || !iban || !swiftCode || !branch) {
+      if (!accountName || !bankName || !bsbNumber || !accountNumber || !branch) {
         return Swal.fire({
           icon: 'error',
           title: 'Error!',
@@ -36,8 +36,8 @@ const Add = ({ userId, onClose }) => {
       }
   
       try {
-        await addBankingDetails(userId, accountName, bankName, branch, iban, swiftCode);
-        
+        const uid = userId.userId;
+        await addBankingDetails(uid, accountName, bankName, branch, bsbNumber, accountNumber);
         Swal.fire({
           icon: "success",
           title: "Added!",
@@ -47,6 +47,7 @@ const Add = ({ userId, onClose }) => {
         });
   
         onClose();
+        refreshDetails();
       } catch (error) {
         console.error("Error adding banking details:", error);
         Swal.fire({
@@ -55,12 +56,17 @@ const Add = ({ userId, onClose }) => {
           text: "There was an error adding the banking details.",
           showConfirmButton: true,
         });
+      } finally {
+        setIsLoading(false);
       }
     };
   
 
   return (
     <div className="small-container">
+        {
+          isLoading ? ( <LoadingScreen /> ) :
+        (
       <form onSubmit={handleSubmit}>
         <h1>Add Banking Details</h1>
         <label htmlFor="accountName">Account Name</label>
@@ -87,20 +93,20 @@ const Add = ({ userId, onClose }) => {
           value={formData.branch}
           onChange={handleInputChange}
         />
-        <label htmlFor="iban">Iban</label>
+        <label htmlFor="bsbNumber">BSB Number</label>
         <input
-          id="iban"
+          id="bsbNumber"
           type="number"
-          name="iban"
-          value={formData.iban}
+          name="bsbNumber"
+          value={formData.bsbNumber}
           onChange={handleInputChange}
         />
-        <label htmlFor="date">Swift Code</label>
+        <label htmlFor="accountNumber">Account Number</label>
         <input
-          id="swiftCode"
+          id="accountNumber"
           type="text"
-          name="swiftCode"
-          value={formData.swiftCode}
+          name="accountNumber"
+          value={formData.accountNumber}
           onChange={handleInputChange}
         />
         <div style={{ marginTop: "30px" }}>
@@ -114,6 +120,7 @@ const Add = ({ userId, onClose }) => {
           />
         </div>
       </form>
+        )}
     </div>
   );
 };

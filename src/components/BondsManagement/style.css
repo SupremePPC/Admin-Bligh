@@ -230,6 +230,9 @@
   border: 1px solid black;
     border-radius: 8px;
     object-fit: contain;
+    height: 5rem;
+    margin-right: 1rem;
+    background-color: var(--white);
 }
 
 @media screen and (max-width: 1024px) {

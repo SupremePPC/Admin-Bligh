@@ -69,7 +69,7 @@ function Sidebar() {
             to="/dashboard/bonds"
           >
             <BsCardChecklist  size={18} />
-            {!collapsed && "Bonds Request"}
+            {!collapsed && "Bonds"}
           </Link>
         </li>
         <li className="menu_list">

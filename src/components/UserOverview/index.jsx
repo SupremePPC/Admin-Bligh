@@ -14,6 +14,7 @@ import AddDocument from "../DocumentManagement/Add";
 import Swal from "sweetalert2";
 import "./style.css";
 import EditDocument from "../DocumentManagement/Edit";
+import { deleteBankingDetails } from "../../firebaseConfig/firestore";
 
 const UserOverview = () => {
   const user = useParams();
@@ -27,6 +28,7 @@ const UserOverview = () => {
   const [fixedTerm, setFixedTerm] = useState([]);
   const [selectedUserForAdd, setSelectedUserForAdd] = useState(null);
   const [selectedDocument, setSelectedDocument] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const [modalState, setModalState] = useState({
     isAddTransactionOpen: false,
@@ -60,6 +62,34 @@ const UserOverview = () => {
   const handleEditDocument = (document) => {
     setSelectedDocument(document);
     handleOpenModal("isEditDocumentOpen");
+  };
+
+  const handleDelete = async (bankingDetailsId) => {
+    setIsLoading(true);
+    const uid = user.userId;
+    try {
+      await deleteBankingDetails(uid, bankingDetailsId);
+      Swal.fire({
+        icon: "success",
+        title: "Deleted!",
+        text: `Banking Details deleted successfully.`,
+        showConfirmButton: false,
+        timer: 2000,
+      });
+      fetchSubCollection("bankingDetails", setBankingDetails);
+    } catch (error) {
+      console.error("Failed to delete Banking Details:", error);
+
+      Swal.fire({
+        icon: "error",
+        title: "Error!",
+        text: `Error in deleting Banking Details.`,
+        showConfirmButton: false,
+        timer: 2000,
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const fetchSubCollection = async (subCollectionName, setFunction) => {
@@ -215,11 +245,12 @@ const UserOverview = () => {
                   <span className="reg_text">{userDetails.postcode}</span>
                 </div>
                 <div className="dropdown_btn">
-                  <button
-                    onClick={() => handleOpenModal("isEditUserDetailsOpen")}
-                  >
-                    Edit User Details
-                  </button>
+                <button
+                      style={{ marginLeft: "12px" }}
+                      onClick={() => handleOpenModal("isEditUserDetailsOpen")}
+                      >
+                      Edit User Details
+                      </button>
                 </div>
               </div>
             )}
@@ -234,45 +265,53 @@ const UserOverview = () => {
                   </p>
                   <div className="dropdown_btn">
                     <button
+                      style={{ marginLeft: "12px" }}
+                      className="mutedButton"
+                      type="button"
                       onClick={() => handleOpenModal("isAddBankingDetails")}
-                    >
-                      Add Banking Details
+                    > Add Details
                     </button>
                   </div>
                 </>
               ) : (
                 bankingDetails.map((item, index) => (
-                  <>
-                    <div className="user_wrap" key={index}>
-                      <div className="text_wrap">
-                        <p className="bold_text"> Bank Name :</p>
-                        <span className="reg_text">{item.bankName}</span>
-                      </div>
-                      <div className="text_wrap">
-                        <p className="bold_text"> IBAN :</p>
-                        <span className="reg_text">{item.iban}</span>
-                      </div>
-                      <div className="text_wrap">
-                        <p className="bold_text">Swift Code:</p>
-                        <span className="reg_text">{item.swiftCode}</span>
-                      </div>
-                      <div className="text_wrap">
-                        <p className="bold_text"> Branch:</p>
-                        <span className="reg_text">{item.branch}</span>
-                      </div>
-                      <div className="text_wrap">
-                        <p className="bold_text">Account Name: </p>
-                        <span className="reg_text">{item.accountName}</span>
-                      </div>
+                  <div className="user_wrap" key={index}>
+                    <div className="text_wrap">
+                      <p className="bold_text"> Bank Name :</p>
+                      <span className="reg_text">{item.bankName}</span>
                     </div>
-                    <div className="dropdown_btn">
+                    <div className="text_wrap">
+                      <p className="bold_text">Account Name: </p>
+                      <span className="reg_text">{item.accountName}</span>
+                    </div>
+                    <div className="text_wrap">
+                      <p className="bold_text"> Branch:</p>
+                      <span className="reg_text">{item.branch}</span>
+                    </div>
+                    <div className="text_wrap">
+                      <p className="bold_text"> BSB Number :</p>
+                      <span className="reg_text">{item.bsbNumber}</span>
+                    </div>
+                    <div className="text_wrap">
+                      <p className="bold_text">Account Number:</p>
+                      <span className="reg_text">{item.accountNumber}</span>
+                    </div>
+
+                    <div style={{ marginTop: "30px" }} className="dropdown_btn">
                       <button
-                        onClick={() => handleOpenModal("isEditBankingDetails")}
-                      >
-                        Edit Banking Details
-                      </button>
+                        type="submit"
+                        onClick={() => handleDelete(bankingDetails[0].id)}
+                      >Delete Details</button>
+                      {isLoading && <div className="spinner"></div>}
+                      <button
+                        style={{ marginLeft: "12px" }}
+                        className="mutedButton"
+                        type="button"
+                        onClick={() => handleOpenModal("isEditBankingDetails")}>
+                        Edit Details
+                </button>
                     </div>
-                  </>
+                  </div>
                 ))
               )}
             </div>
@@ -311,7 +350,7 @@ const UserOverview = () => {
                   No Transaction has been carried out yet.
                 </p>
               ) : (
-                <table className="transaction_table">
+                <table className="overview_table">
                   <thead>
                     <tr>
                       <th className="bold_text">Deposit amount</th>
@@ -412,31 +451,9 @@ const UserOverview = () => {
                         <span className="reg_text">{item.issuerName}</span>
                       </div>
                       <div className="text_wrap">
-                        <p className="bold_text">Company Website:</p>
-                        <span className="reg_text">{item.companyWebsite}</span>
-                      </div>
-                      <div className="text_wrap">
-                        <p className="bold_text">Coupon Frequency:</p>
-                        <span className="reg_text">{item.couponFrequency}</span>
-                      </div>
-                      <div className="text_wrap">
-                        <p className="bold_text">Coupon Rate:</p>
-                        <span className="reg_text">{item.couponRate}%</span>
-                      </div>
-                      <div className="text_wrap">
                         <p className="bold_text">Current Value:</p>
                         <span className="reg_text">$ {item.currentValue}</span>
                       </div>
-                      <div className="text_wrap">
-                        <p className="bold_text">ISIN:</p>
-                        <span className="reg_text">{item.isin}</span>
-                      </div>
-
-                      <div className="text_wrap">
-                        <p className="bold_text">Minimum Amount:</p>
-                        <span className="reg_text">$ {item.minimumAmount}</span>
-                      </div>
-
                       <div className="text_wrap">
                         <p className="bold_text">Maturity Date:</p>
                         <span className="reg_text">{formattedMaturity}</span>
@@ -448,15 +465,6 @@ const UserOverview = () => {
                       <div className="text_wrap">
                         <p className="bold_text">Quantity:</p>
                         <span className="reg_text">{item.quantity}</span>
-                      </div>
-                      <div className="text_wrap">
-                        <p className="bold_text">Sector:</p>
-                        <span className="reg_text">{item.sector}</span>
-                      </div>
-
-                      <div className="text_wrap">
-                        <p className="bold_text">Type:</p>
-                        <span className="reg_text">{item.type}</span>
                       </div>
                     </div>
                   );
@@ -472,7 +480,7 @@ const UserOverview = () => {
             {/* Fixed Term Table */}
             <div className="user_details">
               <h3>Fixed Term Deposits</h3>
-              <table className="term_table">
+              <table className="overview_table">
                 {fixedTerm.length > 0 ? (
                   <>
                     <thead>
@@ -538,7 +546,7 @@ const UserOverview = () => {
             {/* IPOs  */}
             <div className="user_details">
               <h3>IPOs</h3>
-              <table className="term_table">
+              <table className="overview_table">
                 {ipos.length > 0 ? (
                   <>
                     <thead>
@@ -633,6 +641,9 @@ const UserOverview = () => {
             setSelectedUserForAdd(null);
           }}
           userId={user}
+          refreshDetails={() => {
+            fetchSubCollection("bankingDetails", setBankingDetails);
+          }}
         />
       )}
       {modalState.isEditUserDetailsOpen && (
@@ -652,6 +663,9 @@ const UserOverview = () => {
           userId={user}
           bankingDetailsId={bankingDetails[0].id}
           bankingDetails={bankingDetails[0]}
+          refreshDetails={() => {
+            fetchSubCollection("bankingDetails", setBankingDetails);
+          }}
         />
       )}
       {modalState.isAddTransactionOpen && (

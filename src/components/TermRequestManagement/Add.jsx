@@ -161,7 +161,7 @@ const AddNewTerm = ({ setFixedTerm, fixedTerm, userId, onClose }) => {
       ) : (
         <form onSubmit={handleSubmit}>
           <h3>Add New Term for {userId.userId}</h3>
-          <label htmlFor="logo">Logo:</label>
+          <label htmlFor="logo">Upload Logo:</label>
           {formData.imagePreview && (
             <img src={formData.imagePreview} alt="Image Preview" width={100} className="img_preview" />
           )}

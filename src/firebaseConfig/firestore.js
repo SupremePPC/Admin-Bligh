@@ -22,6 +22,7 @@ import {
   query,
   setDoc,
   updateDoc,
+  where,
 } from "firebase/firestore";
 import { db } from "./firebase";
 import { ref, deleteObject, getStorage, getDownloadURL, uploadBytesResumable } from "firebase/storage";
@@ -137,8 +138,8 @@ export async function addBankingDetails(
   accountName,
   bankName,
   branch,
-  iban,
-  swiftCode
+  bsbNumber,
+  accountNumber
 ) {
   const bankingDetailsRef = collection(
     db,
@@ -147,58 +148,59 @@ export async function addBankingDetails(
     BANKING_DETAILS_SUB_COLLECTION
   );
 
-  return addDoc(bankingDetailsRef, {
-    accountName,
-    bankName,
-    branch,
-    iban,
-    swiftCode,
-  });
+  // Create a query to check for existing documents with the same details
+  const dets = query(
+    bankingDetailsRef,
+    where('accountName', '==', accountName),
+    where('bankName', '==', bankName),
+    where('branch', '==', branch),
+    where('bsbNumber', '==', bsbNumber),
+    where('accountNumber', '==', accountNumber)
+  );
+
+  // Execute the query to check for existing documents
+  const querySnapshot = await getDocs(dets);
+
+  // Check if any documents were found
+  if (!querySnapshot.empty) {
+    // Documents with the same details already exist
+    throw new Error('Details already exist. Proceed to the edit page to edit them.');
+  } else {
+    // No matching documents found, proceed to add a new document
+    return addDoc(bankingDetailsRef, {
+      accountName,
+      bankName,
+      branch,
+      bsbNumber,
+      accountNumber,
+    });
+  }
 }
+
 
 export async function updateBankingDetails(
   uid,
-  accountName,
-  bankName,
-  branch,
-  iban,
-  swiftCode
+  formData,
+  bankingDetailsId,
 ) {
 
-  const bankingDetailsRef = collection(
-    db,
-    USERS_COLLECTION,
-    uid,
-    BANKING_DETAILS_SUB_COLLECTION
-  );
-  const snapshot = await getDocs(bankingDetailsRef);
-
-  if (!snapshot.empty) {
-    const docId = snapshot.docs[0].id;
-    return setDoc(
-      doc(
-        db,
-        ADMINUSERS_COLLECTION,
-        uid,
-        BANKING_DETAILS_SUB_COLLECTION,
-        docId
-      ),
-      {
-        accountName,
-        bankName,
-        branch,
-        iban,
-        swiftCode,
-      }
-    );
-  } else {
-    console.error("No banking details found to update!");
+  const updateBankingDetailsRef = doc(db, USERS_COLLECTION, uid, BANKING_DETAILS_SUB_COLLECTION, bankingDetailsId);
+  try {
+    await updateDoc(updateBankingDetailsRef, {
+      accountName: formData.accountName,
+      bankName: formData.bankName,
+      branch: formData.branch,
+      bsbNumber: formData.bsbNumber,
+      accountNumber: formData.accountNumber,
+    });
+  } catch (error) {
+    throw error; 
   }
 }
 
 export async function getBankingDetails(uid) {
   const bankingDetailsQuery = query(
-    collection(db, ADMINUSERS_COLLECTION, uid, BANKING_DETAILS_SUB_COLLECTION)
+    collection(db, USERS_COLLECTION, uid, BANKING_DETAILS_SUB_COLLECTION)
   );
   const querySnapshot = await getDocs(bankingDetailsQuery);
 
@@ -379,7 +381,7 @@ export async function deleteRequestFromFirestore(userId, requestId, newStatus) {
   await deleteDoc(requestDocPath);
 }
 
-// Function to fetch data from a specific request
+// Function to fetch bond data from a specific request
 export async function fetchRequestData(userId, requestId) {
   const requestDocPath = doc(
     db,
@@ -798,7 +800,6 @@ export const addNewIpos = async (ipoData) => {
 
 //Delete
 export const deleteIpos = async (ipoId) => {
-  console.log(ipoId);
   const ipoRef = doc(db, IPOS_COLLECTION, ipoId);
   try {
     await deleteDoc(ipoRef);

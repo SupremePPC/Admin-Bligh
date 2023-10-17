@@ -4,6 +4,7 @@ import Swal from "sweetalert2";
 import { updateIpo } from "../../firebaseConfig/firestore";
 import LoadingScreen from "../LoadingScreen";
 import { getDownloadURL, getStorage, uploadBytes } from "firebase/storage";
+import CurrencyInput from "react-currency-input-field";
 
 const Edit = ({ ipoToEdit, setIsEditPageOpen, refreshIpos }) => {
   const [formData, setFormData] = useState(ipoToEdit || {});
@@ -72,6 +73,13 @@ const Edit = ({ ipoToEdit, setIsEditPageOpen, refreshIpos }) => {
     }
   };
 
+  const handleCurrencyChange = (value, name) => {
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
+
   const handleUploadImage = async (imageFile) => {
     if (imageFile instanceof File) {
       const storage = getStorage();
@@ -105,7 +113,6 @@ const Edit = ({ ipoToEdit, setIsEditPageOpen, refreshIpos }) => {
       } else if (!formData.logo) {
         // If formData.logo is empty, use the original image data
         updatedFormData.logo = originalImageData; // Replace 'originalImageData' with the actual original image data
-        console.log(updatedFormData.logo, "clicked");
       }
       await updateIpo(formData.id, updatedFormData);
       Swal.fire({
@@ -138,7 +145,7 @@ const Edit = ({ ipoToEdit, setIsEditPageOpen, refreshIpos }) => {
       ) : (
         <form onSubmit={handleSubmit}>
           <h1>Edit IPO</h1>
-          <label htmlFor="logo"> Logo:</label>
+          <label htmlFor="logo">Upload Logo:</label>
           {formData.logo && (
             <img
               src={formData.logo}
@@ -168,12 +175,16 @@ const Edit = ({ ipoToEdit, setIsEditPageOpen, refreshIpos }) => {
             value={formData.description}
           />
           <label htmlFor="expListingPrice">Expected Listing Price:</label>
-          <input
-            type="number"
-            min={0}
+          <CurrencyInput
+            decimalSeparator="."
+            prefix="$"
             name="expListingPrice"
-            onChange={handleChange}
-            value={formData.expListingPrice}
+            placeholder="0.00"
+            value={formData.expListingPrice} 
+            onValueChange={(value) => {
+              const formattedValue = parseFloat(value).toFixed(2);
+              handleCurrencyChange(formattedValue, "expListingPrice");
+            }}
           />
           <label htmlFor="expectedDate">Expected IPO Date:</label>
           <input
@@ -183,12 +194,16 @@ const Edit = ({ ipoToEdit, setIsEditPageOpen, refreshIpos }) => {
             value={formData.expectedDate}
           />
           <label htmlFor="minInvestment">Minimum Investment:</label>
-          <input
-            type="number"
-            min={0}
+          <CurrencyInput
+            decimalSeparator="."
+            prefix="$"
             name="minInvestment"
-            onChange={handleChange}
-            value={formData.minInvestment}
+            placeholder="0.00"
+            value={formData.minInvestment} 
+            onValueChange={(value) => {
+              const formattedValue = parseFloat(value).toFixed(2);
+              handleCurrencyChange(formattedValue, "minInvestment");
+            }}
           />
           <label htmlFor="preAllocation">Pre Allocation:</label>
           <input
@@ -198,18 +213,28 @@ const Edit = ({ ipoToEdit, setIsEditPageOpen, refreshIpos }) => {
             value={formData.preAllocation}
           />
           <label htmlFor="preSharePrice">Pre Share Price:</label>
-          <input
-            type="number"
+          <CurrencyInput
+            decimalSeparator="."
+            prefix="$"
             name="preSharePrice"
-            onChange={handleChange}
-            value={formData.preSharePrice}
+            placeholder="0.00"
+            value={formData.preSharePrice} 
+            onValueChange={(value) => {
+              const formattedValue = parseFloat(value).toFixed(2);
+              handleCurrencyChange(formattedValue, "preSharePrice");
+            }}
           />
           <label htmlFor="sharePrice">Share Price:</label>
-          <input
-            type="number"
+          <CurrencyInput
+            decimalSeparator="."
+            prefix="$"
             name="sharePrice"
-            onChange={handleChange}
-            value={formData.sharePrice}
+            placeholder="0.00"
+            value={formData.sharePrice} 
+            onValueChange={(value) => {
+              const formattedValue = parseFloat(value).toFixed(2);
+              handleCurrencyChange(formattedValue, "sharePrice");
+            }}
           />
           <div style={{ marginTop: "30px" }}>
             <input type="submit" value="Save" />

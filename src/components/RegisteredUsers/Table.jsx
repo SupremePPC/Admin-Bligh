@@ -31,12 +31,12 @@ export default function Table({
                 <td>{user.fullName}</td>
                 <td>{user.email}</td>
                 <td>{user.mobilePhone}</td>
-                <td>
+                <td className="text-right">
                   <Link to={`/dashboard/user-overview/${user.id}`} className="button muted-button" >
                     View
                   </Link>
                 </td>
-                <td className="text-right">
+                <td className="text-center">
                   <button
                     onClick={() => handleEdit(user)}
                     className="button muted-button"

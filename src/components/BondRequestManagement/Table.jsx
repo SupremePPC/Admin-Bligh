@@ -48,7 +48,7 @@ function Table({ bondRequests, handleUpdateRequest }) {
                         Approve
                       </button>
                     </td>
-                    <td className="text-left">
+                    <td className="text-center">
                       <button
                       className="button muted-button"
                         onClick={() =>
@@ -62,7 +62,7 @@ function Table({ bondRequests, handleUpdateRequest }) {
                         Decline
                       </button>
                     </td>
-                    <td>
+                    <td className="text-left">
                       {" "}
                       {viewDetailId === request.id ? (
                         <button onClick={() => handleViewClick(request.id)}>
@@ -77,52 +77,44 @@ function Table({ bondRequests, handleUpdateRequest }) {
                   </tr>
                   {viewDetailId === request.id && (
                     <tr>
-                      <td colSpan={5}>
-                        <div className="dropdown_col">
-                          <div className="dropdown_row">
-                            <p className="bold_text">Issuer Name :</p>
-                            <span className="reg_text">
-                              {" "}
-                              {request.issuerName}{" "}
-                            </span>
-                          </div>
-                          <div className="dropdown_row">
-                            <p className="bold_text">Sector :</p>
-                            <span className="reg_text"> {request.sector} </span>
-                          </div>
-                          <div className="dropdown_row">
-                            <p className="bold_text">Company Website :</p>
-                            <span className="reg_text">
-                              {" "}
-                              {request.companyWebsite}{" "}
-                            </span>
-                          </div>
-                          <div className="dropdown_row">
-                            <p className="bold_text">ISIN :</p>
-                            <span className="reg_text"> {request.isin} </span>
-                          </div>
-                          {/* <div className="dropdown_row">
-                            <p className="bold_text">Ticker :</p>
-                            <span className="reg_text"> {request.ticker} </span>
-                          </div> */}
-                          <div className="dropdown_row">
-                            <p className="bold_text">Coupon Frequency :</p>
-                            <span className="reg_text">
-                              {" "}
-                              {request.couponFrequency}{" "}
-                            </span>
-                          </div>
-                          <div className="dropdown_row">
-                            <p className="bold_text">
-                              Minimum Investment Amount :
-                            </p>
-                            <span className="reg_text">
-                              $ {request.minimumAmount}{" "}
-                            </span>
-                          </div>
+                    <td colSpan={5}>
+                      <div className="bonds_dropdownCol">
+                        <div className="bonds_dropdownRow">
+                          <p className="bonds_bold-text">Issuer Name :</p>
+                          <span className="bonds_reg-text">
+                            {request.issuerName}
+                          </span>
                         </div>
-                      </td>
-                    </tr>
+                        <div className="bonds_dropdownRow">
+                          <p className="bonds_bold-text">Sector :</p>
+                          <span className="bonds_reg-text">{request.sector}</span>
+                        </div>
+                        <div className="bonds_dropdownRow">
+                          <p className="bonds_bold-text">Company Website :</p>
+                          <span className="bonds_reg-text">
+                            {request.companyWebsite}
+                          </span>
+                        </div>
+                        <div className="bonds_dropdownRow">
+                          <p className="bonds_bold-text">ISIN :</p>
+                          <span className="bonds_reg-text">{request.isin}</span>
+                        </div>
+                        <div className="bonds_dropdownRow">
+                          <p className="bonds_bold-text">Coupon Frequency :</p>
+                          <span className="bonds_reg-text">
+                            {request.couponFrequency}
+                          </span>
+                        </div>
+                        <div className="bonds_dropdownRow">
+                          <p className="bonds_bold-text">Minimum Investment Amount :</p>
+                          <span className="bonds_reg-text">
+                            $ {request.minimumAmount}
+                          </span>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                  
                   )}
                 </>
               ))}
