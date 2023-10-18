@@ -130,6 +130,21 @@ export async function editTransaction(userId, transactionId, updatedFields) {
   return { success: true };
 }
 
+export async function deleteTransaction(userId, transactionId) {
+  const transactionRef = doc(
+    db, 
+    USERS_COLLECTION,
+    userId,
+    TRANSACTIONS_SUB_COLLECTION,
+    transactionId
+  );
+
+  await deleteDoc(transactionRef);
+
+  return { success: true };
+}
+
+
 //Account Types
 export async function addToAccount(userId, label, amount) {
   const accountTypeRef = collection(db, "users", userId, "accountTypes");

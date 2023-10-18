@@ -298,7 +298,7 @@ const TransactionDashboard = () => {
 
   return (
     <div className="container">
-      {!isAdding && !isEditPageOpen && (
+      {!isEditPageOpen && (
         <>
           <Header
             setIsAdding={setIsAdding}
@@ -354,6 +354,7 @@ const TransactionDashboard = () => {
             setIsEditPageOpen(false);
             setTransactionForEdit(null);
           }}
+          handleDelete={handleDelete}
         />
       )}
     </div>

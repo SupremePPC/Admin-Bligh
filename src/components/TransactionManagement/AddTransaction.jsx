@@ -27,6 +27,8 @@ const AddTransaction = ({
   const [isLoading, setIsLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
+  const [transactionId, setTransactionId] = useState(null);
+
 
   const handleAdd = async (e) => {
     e.preventDefault();
@@ -126,7 +128,7 @@ const AddTransaction = ({
       if (result.success) {
         // Successfully added the transaction, store the ID in a variable
         const newTransactionId = result.id;
-        console.log("newTransactionId", newTransactionId);
+        console.log(newTransactionId, newTransaction);
         // Successfully added the transaction, now update the Firestore accountTypes subcollection
 
         Swal.fire({
@@ -149,9 +151,9 @@ const AddTransaction = ({
           status: "",
           date: "",
         });
-        onClose();
         setIsEditing(true);
-        setSelectedTransaction(newTransactionId);
+        setSelectedTransaction(newTransaction);
+        setTransactionId(newTransactionId);
       } else {
         throw new Error(result.error);
       }
@@ -170,105 +172,116 @@ const AddTransaction = ({
   };
 
   return (
-    <div className="small-container">
-      {isLoading ? (
-        <LoadingScreen />
-      ) : (
-        <form onSubmit={handleAdd}>
-          <h1>Add Transaction</h1>
-          <div className="text_wrap">
-            <label>
-              Total Balance: {totalBalance === "0.00" ? "0.00" : totalBalance}
-            </label>
-          </div>
-          <label htmlFor="accountType">Account Type</label>
-          <select
-            id="accountType"
-            value={formData.accountType}
-            onChange={(e) =>
-              setFormData({ ...formData, accountType: e.target.value })
-            }
-          >
-            <option value="">--Select--</option>
-            <option value="Easy Access">Easy Access</option>
-            <option value="1 Year Fixed Saver">1 Year Fixed Saver</option>
-            <option value="3 Year Fixed Saver">3 Year Fixed Saver</option>
-            <option value="5 Year Fixed Saver">5 Year Fixed Saver</option>
-          </select>
+    <>
+      {!isEditing && (
+        <div className="small-container">
+          {isLoading ? (
+            <LoadingScreen />
+          ) : (
+            <form onSubmit={handleAdd}>
+              <h1>Add Transaction</h1>
+              <div className="text_wrap">
+                <label>
+                  Total Balance:{" "}
+                  {totalBalance === "0.00" ? "0.00" : totalBalance}
+                </label>
+              </div>
+              <label htmlFor="accountType">Account Type</label>
+              <select
+                id="accountType"
+                value={formData.accountType}
+                onChange={(e) =>
+                  setFormData({ ...formData, accountType: e.target.value })
+                }
+              >
+                <option value="">--Select--</option>
+                <option value="Easy Access">Easy Access</option>
+                <option value="1 Year Fixed Saver">1 Year Fixed Saver</option>
+                <option value="3 Year Fixed Saver">3 Year Fixed Saver</option>
+                <option value="5 Year Fixed Saver">5 Year Fixed Saver</option>
+              </select>
 
-          <label htmlFor="type">Transaction Type</label>
-          <select
-            id="type"
-            value={formData.type}
-            onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-          >
-            <option value="">--Select--</option>
-            <option value="Deposit">Deposit</option>
-            <option value="Withdrawal">Withdrawal</option>
-          </select>
+              <label htmlFor="type">Transaction Type</label>
+              <select
+                id="type"
+                value={formData.type}
+                onChange={(e) =>
+                  setFormData({ ...formData, type: e.target.value })
+                }
+              >
+                <option value="">--Select--</option>
+                <option value="Deposit">Deposit</option>
+                <option value="Withdrawal">Withdrawal</option>
+              </select>
 
-          <label htmlFor="amount">Amount</label>
-          <CurrencyInput
-            decimalSeparator="."
-            prefix="$"
-            name="amount"
-            placeholder="0.00"
-            defaultValue={0.0}
-            decimalsLimit={2}
-            onValueChange={(value) => {
-              setFormData((prevState) => ({
-                ...prevState,
-                amount: value,
-              }));
-            }}
-          />
+              <label htmlFor="amount">Amount</label>
+              <CurrencyInput
+                decimalSeparator="."
+                prefix="$"
+                name="amount"
+                placeholder="0.00"
+                defaultValue={0.0}
+                decimalsLimit={2}
+                onValueChange={(value) => {
+                  setFormData((prevState) => ({
+                    ...prevState,
+                    amount: value,
+                  }));
+                }}
+              />
 
-          <label htmlFor="status">Status</label>
-          <select
-            id="status"
-            value={formData.status}
-            onChange={(e) =>
-              setFormData({ ...formData, status: e.target.value })
-            }
-          >
-            <option value="">--Select--</option>
-            <option value="Pending">Pending</option>
-            <option value="Approved">Approved</option>
-            <option value="Declined">Declined</option>
-          </select>
-          <label htmlFor="date">Date</label>
-          <input
-            id="date"
-            type="date"
-            value={formData.date}
-            onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-          />
-          <div style={{ marginTop: "30px" }}>
-            <input type="submit" value="Add" />
-            <input
-              style={{ marginLeft: "12px" }}
-              className="muted-button"
-              type="button"
-              value="Cancel"
-              onClick={onClose}
-            />
-          </div>
-        </form>
+              <label htmlFor="status">Status</label>
+              <select
+                id="status"
+                value={formData.status}
+                onChange={(e) =>
+                  setFormData({ ...formData, status: e.target.value })
+                }
+              >
+                <option value="">--Select--</option>
+                <option value="Pending">Pending</option>
+                <option value="Approved">Approved</option>
+                <option value="Declined">Declined</option>
+              </select>
+              <label htmlFor="date">Date</label>
+              <input
+                id="date"
+                type="date"
+                value={formData.date}
+                onChange={(e) =>
+                  setFormData({ ...formData, date: e.target.value })
+                }
+              />
+              <div style={{ marginTop: "30px" }}>
+                <input type="submit" value="Add" />
+                <input
+                  style={{ marginLeft: "12px" }}
+                  className="muted-button"
+                  type="button"
+                  value="Cancel"
+                  onClick={onClose}
+                />
+              </div>
+            </form>
+          )}
+        </div>
       )}
-      {isEditing && (
+      {isEditing && selectedTransaction &&(
         <EditTransaction
           onClose={() => {
             setIsEditing(false);
             setSelectedTransaction(null);
+            onClose();
           }}
           selectedTransaction={selectedTransaction}
           setTransactions={setTransactions}
-          userId={user}
+          userId={userId}
           totalBalance={totalBalance}
           refreshDetails={refreshDetails}
+          transactionId={selectedTransaction}
         />
       )}
-    </div>
+    </>
   );
 };
 

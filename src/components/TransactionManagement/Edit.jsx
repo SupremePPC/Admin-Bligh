@@ -1,6 +1,11 @@
 import React, { useState } from "react";
 import Swal from "sweetalert2";
-import { editTransaction } from "../../firebaseConfig/firestore";
+import {
+  addToAccount,
+  deleteTransaction,
+  editTransaction,
+  getAccountTypes,
+} from "../../firebaseConfig/firestore";
 import { collection, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { db } from "../../firebaseConfig/firebase";
 import LoadingScreen from "../LoadingScreen";
@@ -12,8 +17,8 @@ const EditTransaction = ({
   totalBalance,
   userId,
   refreshDetails,
+  transactionId,
 }) => {
-  const transactionId = selectedTransaction.id;
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     amount: selectedTransaction.amount,
@@ -24,6 +29,68 @@ const EditTransaction = ({
   });
 
   const { amount, accountType, type, status, date } = formData;
+
+  const handleDelete = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+  
+    try {
+      const result = await deleteTransaction(userId.userId, transactionId);
+      const accountTypes = await getAccountTypes(userId.userId);
+      const targetAccount = accountTypes.find(
+        (acc) => acc.label === selectedTransaction.accountType
+      );
+  
+      if (!targetAccount) {
+        setIsLoading(false);
+        return Swal.fire({
+          icon: "error",
+          title: "Error!",
+          text: "This account does not exist.",
+          showConfirmButton: true,
+        });
+      }
+  
+      if (result.success) {
+        if (selectedTransaction.amount > targetAccount.amount) {
+          // If the transaction amount is greater than the accountTypes.amount, set the accountTypes.amount to 0
+          await addToAccount(userId.userId, targetAccount.label, 0);
+        } else if (targetAccount.label === selectedTransaction.accountType) {
+          if (selectedTransaction.type === "Deposit") {
+            // Add the selectedTransaction.amount to the accountTypes.amount
+            const updatedAmount = targetAccount.amount - selectedTransaction.amount;
+            await addToAccount(userId.userId, targetAccount.label, updatedAmount);
+          } else if (selectedTransaction.type === "Withdrawal") {
+            // Subtract the selectedTransaction.amount from the accountTypes.amount
+            const updatedAmount = targetAccount.amount - selectedTransaction.amount;
+            await addToAccount(userId.userId, targetAccount.label, updatedAmount);
+          }
+        }
+  
+        Swal.fire({
+          icon: "success",
+          title: "Deleted!",
+          text: "Transaction has been deleted.",
+          showConfirmButton: false,
+          timer: 2000,
+        });
+      }
+      refreshDetails();
+      onClose();
+    } catch (error) {
+      console.error(error);
+      Swal.fire({
+        icon: "error",
+        title: "Error!",
+        text: `Error deleting transaction: ${error}`,
+        showConfirmButton: false,
+        timer: 2000,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
 
   const handleCurrencyChange = (value, name) => {
     setFormData({
@@ -67,7 +134,7 @@ const EditTransaction = ({
         if (docSnap.exists()) {
           const existingData = docSnap.data();
           let existingAmount = existingData.amount;
-        
+
           if (status !== "Approved") {
             // If status is not "Approved," don't update the transaction amount in the doc
             existingAmount = existingData.amount;
@@ -77,7 +144,7 @@ const EditTransaction = ({
             } else if (type === "Withdrawal") {
               existingAmount -= updatedTransaction.amount; // Subtract from the existing amount for withdrawals
             }
-        
+
             // Check if the label has changed and update it
             if (existingData.label !== accountType) {
               await updateDoc(docRef, {
@@ -95,7 +162,6 @@ const EditTransaction = ({
             amount: updatedTransaction.amount,
           });
         }
-        
 
         console.log({
           label: accountType,
@@ -137,7 +203,7 @@ const EditTransaction = ({
             Total Balance: {totalBalance === "0.00" ? "0.00" : totalBalance}
           </label>
         </div>
-        
+
         <label htmlFor="accountType">Account Type</label>
         <select
           id="accountType"
@@ -152,7 +218,7 @@ const EditTransaction = ({
           <option value="3 Year Fixed Saver">3 Year Fixed Saver</option>
           <option value="5 Year Fixed Saver">5 Year Fixed Saver</option>
         </select>
-        
+
         <label htmlFor="amount">Amount</label>
         <CurrencyInput
           decimalSeparator="."
@@ -194,7 +260,13 @@ const EditTransaction = ({
         />
         <div style={{ marginTop: "30px" }}>
           <input type="submit" value="Save" />
-          <input type="submit" value="Delete" style={{ marginLeft: "12px" }} />
+          <input
+            type="submit"
+            value="Delete"
+            style={{ marginLeft: "12px" }}
+            onClick={handleDelete}
+            className="reject_btn"
+          />
           <input
             style={{ marginLeft: "12px" }}
             className="muted-button"

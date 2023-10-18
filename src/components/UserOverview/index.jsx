@@ -202,16 +202,6 @@ const UserOverview = () => {
       ? new Date(timestamp.seconds * 1000).toLocaleDateString()
       : "";
   };
-
-  // // Modify openEdit to accept a transactionId parameter
-  // const openEdit = (id) => {
-  //   setSelectedTransaction(id);
-  //   handleOpenModal("isEditTransactionOpen", id);
-  //   setSelectedUserForAdd(user);
-  //   // Pass the transactionId to the EditTransaction component
-  //   console.log(id);
-  // };
-
   return (
     <div className="container">
       {!modalState.isAddBondOpen &&
@@ -744,6 +734,7 @@ const UserOverview = () => {
             fetchSubCollection("transactions", setTransactions);
             fetchSubCollection("accountTypes", setAccountTypes);
           }}
+          openEdit={openEdit}
         />
       )}
 
@@ -761,6 +752,7 @@ const UserOverview = () => {
             fetchSubCollection("transactions", setTransactions);
             fetchSubCollection("accountTypes", setAccountTypes);
           }}
+          transactionId={selectedTransaction.id}
         />
       )}
 
@@ -773,10 +765,7 @@ const UserOverview = () => {
           bond={bondsHoldings}
           setBond={setBondsHoldings}
           userId={user}
-          openEdit={() => {
-            handleOpenModal("isEditBondOpen");
-            setSelectedUserForAdd(user);
-          }}
+          
         />
       )}
 
