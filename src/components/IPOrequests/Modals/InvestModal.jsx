@@ -5,7 +5,7 @@ import CurrencyInput from "react-currency-input-field";
 import Swal from "sweetalert2";
 import "./style.css";
 
-export default function InvestIpoModal({ isOpen, onClose, ipo, userId, openEdit }) {
+export default function InvestIpoModal({ isOpen, onClose, ipo, userId }) {
   const [investmentAmount, setInvestmentAmount] = useState(0);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -33,7 +33,6 @@ export default function InvestIpoModal({ isOpen, onClose, ipo, userId, openEdit 
       minInvestment: ipo.minInvestment,
       numberOfShares: numberOfShares,
     };
-    console.log(investmentData);
     setIsLoading(true);
     try {
       await addIposToUserCollection(userId.userId, investmentData);
@@ -46,7 +45,6 @@ export default function InvestIpoModal({ isOpen, onClose, ipo, userId, openEdit 
       });
       setInvestmentAmount(0);
       onClose();
-      openEdit();
     } catch (error) {
       setError(
         `There was an issue sending your investment request. Try again later.`

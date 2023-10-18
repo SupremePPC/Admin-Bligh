@@ -202,6 +202,18 @@ const UserOverview = () => {
       ? new Date(timestamp.seconds * 1000).toLocaleDateString()
       : "";
   };
+
+  function formatNumber(
+    number,
+    options = {
+      style: "decimal",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }
+  ) {
+    return number.toLocaleString("en-US", options);
+  }
+
   return (
     <div className="container">
       {!modalState.isAddBondOpen &&
@@ -339,7 +351,7 @@ const UserOverview = () => {
             {/* Account types and balances*/}
             <div className="user_details">
               <h3>
-                Account Types and Balance with Total Balance of ${totalBalance}
+                Account Types and Balance with Total Balance of ${formatNumber(totalBalance)}
               </h3>
               {accountTypes.length === 0 ? (
                 <p className="bold_text">
@@ -350,7 +362,7 @@ const UserOverview = () => {
                   {accountTypes.map((item, index) => (
                     <li key={index} className="text_wrap">
                       <p className="bold_text">{item.label} :</p>
-                      <span className="reg_text">$ {item.amount || 0}</span>
+                      <span className="reg_text">$ {formatNumber(item.amount) || 0}</span>
                     </li>
                   ))}
                 </ul>
@@ -403,7 +415,7 @@ const UserOverview = () => {
                                     {deposits[i].status}
                                   </span>{" "}
                                   <span className="reg_text">
-                                    ${deposits[i].amount}
+                                    ${formatNumber(deposits[i].amount)}
                                   </span>
                                   <span> in </span>
                                   <span className="bold_text">
@@ -415,18 +427,18 @@ const UserOverview = () => {
                             <td>
                               {withdrawals[i] && (
                                 <div
-                                onClick={() =>
-                                  handleOpenModal(
-                                    "isEditTransactionOpen",
-                                    withdrawals[i]
-                                  )
-                                }
-                              >
+                                  onClick={() =>
+                                    handleOpenModal(
+                                      "isEditTransactionOpen",
+                                      withdrawals[i]
+                                    )
+                                  }
+                                >
                                   <span className="bold_text">
                                     {withdrawals[i].status}
                                   </span>{" "}
                                   <span className="reg_text">
-                                    ${withdrawals[i].amount}
+                                    ${formatNumber(withdrawals[i].amount)}
                                   </span>
                                   <span> in </span>
                                   <span className="bold_text">
@@ -553,12 +565,12 @@ const UserOverview = () => {
                       <tbody key={index}>
                         <tr>
                           <td>
-                            <div className="button_grid">
+                            <div className="button_grid" onClick={() => handleOpenModal("isEditTermOpen", term.id)}>
                               <img src={term.logo} alt="logo" />
                               <p>{term.bankName}</p>
                             </div>
                           </td>
-                          <td>$ {term.principalAmount}</td>
+                          <td>$ {formatNumber(term.principalAmount)}</td>
                           <td>{term.term}</td>
                           <td>{term.interestRate} %</td>
                           <td>
@@ -615,7 +627,7 @@ const UserOverview = () => {
                             </div>
                           </td>
                           <td>{firestoreTimestampToDate(ipos.date)}</td>
-                          <td>$ {ipos.amountInvested}</td>
+                          <td>$ {formatNumber(ipos.amountInvested)}</td>
                           <td>{ipos.numberOfShares}</td>
                           <td>$ {ipos.sharePrice}</td>
                         </tr>
@@ -734,7 +746,6 @@ const UserOverview = () => {
             fetchSubCollection("transactions", setTransactions);
             fetchSubCollection("accountTypes", setAccountTypes);
           }}
-          openEdit={openEdit}
         />
       )}
 
@@ -765,7 +776,6 @@ const UserOverview = () => {
           bond={bondsHoldings}
           setBond={setBondsHoldings}
           userId={user}
-          
         />
       )}
 

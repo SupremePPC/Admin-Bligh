@@ -5,9 +5,13 @@ import CurrencyInput from "react-currency-input-field";
 import "firebase/firestore";
 import Swal from "sweetalert2";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
+import Edit from "./Edit";
 
 const AddNewTerm = ({ setFixedTerm, fixedTerm, userId, onClose }) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [selectedTerm, setSelectedTerm] = useState(null);
+  const [selecetedTermId, setSelectedTermId] = useState(null); 
   const [errors, setErrors] = useState({});
   const [formData, setFormData] = useState({
     bankName: "",
@@ -29,7 +33,6 @@ const AddNewTerm = ({ setFixedTerm, fixedTerm, userId, onClose }) => {
 
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
-  
     if (type === 'file') {
       // Make sure files[0] exists
       if (files.length > 0) {
@@ -78,48 +81,32 @@ const AddNewTerm = ({ setFixedTerm, fixedTerm, userId, onClose }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-
-    // Destructure the values from formData
-    const { bankName, interestRate, logo, minAmount, status, term, type } =
-      formData;
-
-    // if (
-    //   !logo ||
-    //   !bankName ||
-    //   !minAmount ||
-    //   !interestRate ||
-    //   !term ||
-    //   !status ||
-    //   !type
-    // ) {
-    //   setIsLoading(false);
-    //   return Swal.fire({
-    //     icon: "error",
-    //     title: "Error!",
-    //     text: "All fields are required.",
-    //     showConfirmButton: true,
-    //   });
-    // }
-
-    const newData = {
-      bankName: bankName,
-      date: getCurrentDate(),
-      interestRate: parseFloat(interestRate.replace(/,/g, "")), // Convert to a float
-      logo: logo,
-      principalAmount: parseFloat(minAmount.replace(/,/g, "")), // Convert to a float
-      status: status,
-      term: term,
-      type: type,
-      userId: userId.userId,
-    };
-    console.log(newData);
-
+  
     try {
+      // Validate form data
+      if (!formData.logo || !formData.bankName || !formData.minAmount || !formData.interestRate || !formData.term || !formData.status || !formData.type) {
+        throw new Error("All fields are required.");
+      }
+  
+      const newData = {
+        bankName: formData.bankName,
+        date: getCurrentDate(),
+        interestRate: parseFloat(formData.interestRate.replace(/,/g, "")),
+        logo: formData.logo,
+        principalAmount: parseFloat(formData.minAmount.replace(/,/g, "")),
+        status: formData.status,
+        term: formData.term,
+        type: formData.type,
+        userId: userId.userId,
+      };
+  
+      // Handle image upload
       if (newData.logo) {
         const imageUrl = await handleUploadImage(newData.logo);
-        newData.logo = imageUrl; // Update the image field with the Firebase Storage URL
+        newData.logo = imageUrl;
       }
-      const result = await addTermToUserCollection(userId.userId, formData);
+  
+      const result = await addTermToUserCollection(userId.userId, newData);
       if (result.success) {
         Swal.fire({
           icon: "success",
@@ -128,17 +115,21 @@ const AddNewTerm = ({ setFixedTerm, fixedTerm, userId, onClose }) => {
           showConfirmButton: false,
           timer: 2000,
         });
-        // Reset the form data
+  
+        // Reset the form data and update the state
         setFormData({
           bankName: "",
           interestRate: 0,
           logo: "",
-          minAmount: "0.00", // Reset to string
+          minAmount: "0.00",
           status: "",
           term: "",
           type: "",
         });
         setFixedTerm([...fixedTerm, { ...newData, id: result.id }]);
+        setIsEditing(false);
+        selecetedTermId(result.id);
+        selectedTerm(newData);
       } else {
         throw new Error(result.error);
       }
@@ -147,18 +138,23 @@ const AddNewTerm = ({ setFixedTerm, fixedTerm, userId, onClose }) => {
       Swal.fire({
         icon: "error",
         title: "Error!",
-        text: `Error adding term: ${error}`,
+        text: `Error adding term: ${error.message}`,
         showConfirmButton: true,
       });
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
+  
 
   return (
+    <>
+    {
+      !isEditing && (
     <div className="small-container">
-      {isLoading ? (
+      {isLoading && (
         <LoadingScreen />
-      ) : (
+      )}
         <form onSubmit={handleSubmit}>
           <h3>Add New Term for {userId.userId}</h3>
           <label htmlFor="logo">Upload Logo:</label>
@@ -245,8 +241,22 @@ const AddNewTerm = ({ setFixedTerm, fixedTerm, userId, onClose }) => {
           {errors.isin && <div>{errors.isin}</div>}
           {errors.issuerName && <div>{errors.issuerName}</div>}
         </form>
-      )}
     </div>
+    )}
+    {
+      isEditing && (
+        <Edit
+          fixedTerm={fixedTerm}
+          setFixedTerm={setFixedTerm}
+          userId={userId}
+          onClose={() => {
+            setIsEditing(false);
+          }}
+          term={selectedTerm}
+          termId={selecetedTermId}
+        />
+    )}
+    </>
   );
 };
 

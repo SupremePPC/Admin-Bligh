@@ -15,7 +15,6 @@ const AddUserIpos = ({ userId, onClose, openEdit }) => {
       setIsLoading(true);
       const fetchedIpos = await getAllIpos();
       setIpos(fetchedIpos);
-      console.log(fetchedIpos);
     } catch (error) {
       console.error("Error fetching ipos:", error);
     } finally {

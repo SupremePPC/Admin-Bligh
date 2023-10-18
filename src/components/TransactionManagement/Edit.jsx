@@ -102,7 +102,7 @@ const EditTransaction = ({
   const handleUpdate = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-
+  
     const updatedTransaction = {
       amount: parseFloat(amount), // Convert the amount to a float
       accountType,
@@ -110,15 +110,34 @@ const EditTransaction = ({
       status,
       date,
     };
-
+  
     const uid = userId.userId;
 
+    if (
+      formData.amount === updatedTransaction.amount && 
+      formData.label === accountType &&
+      formData.type === type &&
+      formData.status === status &&
+      formData.date === date
+      
+    ) {
+      // If status is not "Approved" or no changes were made, display a warning message
+      Swal.fire({
+        icon: "warning",
+        title: "No changes were made",
+        text: "No updates were performed as no changes were detected.",
+        showConfirmButton: false,
+        timer: 2000,
+      });
+    }
+  
     try {
       const result = await editTransaction(
         uid,
         transactionId,
         updatedTransaction
       );
+  
       if (result.success) {
         const accountTypeRef = collection(
           db,
@@ -127,24 +146,34 @@ const EditTransaction = ({
           "accountTypes"
         );
         const docRef = doc(accountTypeRef, accountType);
-
+  
         // Check if the document exists before updating
         const docSnap = await getDoc(docRef);
-
+  
         if (docSnap.exists()) {
           const existingData = docSnap.data();
           let existingAmount = existingData.amount;
 
-          if (status !== "Approved") {
-            // If status is not "Approved," don't update the transaction amount in the doc
-            existingAmount = existingData.amount;
+          
+
+          if (
+            status !== "Approved"
+          ) {
+            // If status is not "Approved" or no changes were made, display a warning message
+            Swal.fire({
+              icon: "warning",
+              title: "No changes were made",
+              text: "No updates were performed as no changes were detected.",
+              showConfirmButton: false,
+              timer: 2000,
+            });
           } else {
             if (type === "Deposit") {
               existingAmount += updatedTransaction.amount; // Add to the existing amount for deposits
             } else if (type === "Withdrawal") {
               existingAmount -= updatedTransaction.amount; // Subtract from the existing amount for withdrawals
             }
-
+  
             // Check if the label has changed and update it
             if (existingData.label !== accountType) {
               await updateDoc(docRef, {
@@ -162,15 +191,18 @@ const EditTransaction = ({
             amount: updatedTransaction.amount,
           });
         }
-
+  
         console.log({
           label: accountType,
           amount: updatedTransaction.amount,
         });
+  
+        // If no changes were made, the form will not be updated and the function will return here
+  
         Swal.fire({
           icon: "success",
           title: "Updated!",
-          text: `Transaction has been updated.`,
+          text: "Transaction has been updated.",
           showConfirmButton: false,
           timer: 2000,
         });
@@ -192,6 +224,7 @@ const EditTransaction = ({
       setIsLoading(false);
     }
   };
+  
 
   return (
     <div className="small-container">
