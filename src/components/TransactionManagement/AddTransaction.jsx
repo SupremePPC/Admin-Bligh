@@ -3,6 +3,8 @@ import Swal from "sweetalert2";
 import LoadingScreen from "../LoadingScreen";
 import CurrencyInput from 'react-currency-input-field';
 import { addTransaction } from "../../firebaseConfig/firestore";
+import { addDoc, collection, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { db } from "../../firebaseConfig/firebase";
 
 const AddTransaction = ({
   transactions,
@@ -10,6 +12,7 @@ const AddTransaction = ({
   userId,
   onClose,
   totalBalance,
+  openEdit,
 }) => {
   const [formData, setFormData] = useState({
     amount: "0.00",
@@ -23,9 +26,9 @@ const AddTransaction = ({
   const handleAdd = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-
+  
     const { amount, accountType, type, status, date } = formData;
-
+  
     if (!amount || !accountType || !type || !status || !date) {
       setIsLoading(false);
       return Swal.fire({
@@ -35,7 +38,7 @@ const AddTransaction = ({
         showConfirmButton: true,
       });
     }
-
+  
     if (type === "Withdrawal" && amount > totalBalance) {
       setIsLoading(false);
       return Swal.fire({
@@ -45,10 +48,10 @@ const AddTransaction = ({
         showConfirmButton: true,
       });
     }
-
+  
     // Format the amount with commas and two decimal places
     const formattedAmount = parseFloat(amount.replace(/,/g, "")).toFixed(2);
-
+  
     const newTransaction = {
       amount: formattedAmount,
       accountType,
@@ -56,10 +59,37 @@ const AddTransaction = ({
       status,
       date,
     };
-
+  
     try {
       const result = await addTransaction(userId.userId, newTransaction);
       if (result.success) {
+        // Successfully added the transaction, now update the Firestore subcollection
+        const accountTypeRef = collection(db, "users", userId.userId, "accountTypes");
+        const docRef = doc(accountTypeRef, accountType);
+  
+        // Check if the document exists before updating
+        const docSnap = await getDoc(docRef);
+  
+        if (docSnap.exists()) {
+          // Document exists, update the amount based on transaction type
+          const existingData = docSnap.data();
+          let updatedAmount = existingData.amount;
+  
+          if (type === "Deposit") {
+            updatedAmount += formattedAmount;
+          } else if (type === "Withdrawal") {
+            updatedAmount -= formattedAmount;
+          }
+  
+          await updateDoc(docRef, { amount: updatedAmount });
+        } else {
+          // Document doesn't exist, create a new one
+          await setDoc(docRef, {
+            label: accountType,
+            amount: formattedAmount,
+          });
+        }
+  
         Swal.fire({
           icon: "success",
           title: "Added!",
@@ -67,6 +97,8 @@ const AddTransaction = ({
           showConfirmButton: false,
           timer: 3000,
         });
+  
+        // Update the state and form data
         setTransactions([...transactions, { ...newTransaction, id: result.id }]);
         setFormData({
           amount: "0.00",
@@ -75,6 +107,8 @@ const AddTransaction = ({
           status: "",
           date: "",
         });
+        onClose();
+        openEdit();
       } else {
         throw new Error(result.error);
       }
@@ -91,26 +125,26 @@ const AddTransaction = ({
       setIsLoading(false);
     }
   };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-  console.log("click")
-    if (name === "amount") {
-      // Format the value with commas and two decimal places
-      const formattedValue = parseFloat(value.replace(/,/g, "")).toFixed(2);
-      setFormData({
-        ...formData,
-        [name]: formattedValue,
-      });
-    } else {
-      setFormData({
-        ...formData,
-        [name]: value,
-      });
-    }
-  };
   
 
+  // const handleChange = (e) => {
+  //   const { name, value } = e.target;
+  // console.log("click")
+  //   if (name === "amount") {
+  //     // Format the value with commas and two decimal places
+  //     const formattedValue = parseFloat(value.replace(/,/g, "")).toFixed(2);
+  //     setFormData({
+  //       ...formData,
+  //       [name]: formattedValue,
+  //     });
+  //   } else {
+  //     setFormData({
+  //       ...formData,
+  //       [name]: value,
+  //     });
+  //   }
+  // };
+  
   return (
     <div className="small-container">
       {isLoading ? (

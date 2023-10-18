@@ -200,7 +200,7 @@ export async function updateBankingDetails(
 
 export async function getBankingDetails(uid) {
   const bankingDetailsQuery = query(
-    collection(db, USERS_COLLECTION, uid, BANKING_DETAILS_SUB_COLLECTION)
+    doc(db, USERS_COLLECTION, uid), BANKING_DETAILS_SUB_COLLECTION
   );
   const querySnapshot = await getDocs(bankingDetailsQuery);
 

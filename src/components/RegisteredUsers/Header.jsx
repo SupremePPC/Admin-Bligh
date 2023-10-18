@@ -30,7 +30,7 @@ const Header = ({
       <h1 className="header_title">All Registered Users</h1>
       <div className="header__wrap">
         <div className="addRow_btn">
-          <button onClick={() => setIsAdding(true)}>Add User</button>
+          <button onClick={() => setIsAdding(true)}>Add New User</button>
         </div>
         <div className="search__field">
           <input

@@ -6,7 +6,8 @@ const EditTransaction = ({
   transactions,
   selectedTransactions,
   setTransactions,
-  setIsEditing,
+  totalBalance,
+  // setIsEditing,
   // transactionId,
   // userId,
   onClose
@@ -59,7 +60,7 @@ const EditTransaction = ({
           t.id === transactionId ? { ...t, ...updatedTransaction } : t
         );
         setTransactions(updatedTransactions);
-        setIsEditing(false);
+        // setIsEditing(false);
         Swal.fire({
           icon: 'success',
           title: 'Updated!',
@@ -85,13 +86,12 @@ const EditTransaction = ({
     <div className="small-container">
       <form onSubmit={handleUpdate}>
         <h1>Edit Transaction</h1>
-        <label htmlFor="fullName">Full Name</label>
-        <input
-          id="fullName"
-          type="text"
-          value={fullName}
-          onChange={(e) => setFullName(e.target.value)}
-        />
+        <div className="text_wrap">
+            <label>
+              Total Balance: {" "}
+              {totalBalance === "0.00" ? "0.00" : totalBalance}
+            </label>
+          </div>
         <label htmlFor="amount">Amount</label>
         <input
           id="amount"

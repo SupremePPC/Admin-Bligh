@@ -5,7 +5,7 @@ import CurrencyInput from "react-currency-input-field";
 import Swal from "sweetalert2";
 import "./style.css";
 
-export default function InvestIpoModal({ isOpen, onClose, ipo, userId }) {
+export default function InvestIpoModal({ isOpen, onClose, ipo, userId, openEdit }) {
   const [investmentAmount, setInvestmentAmount] = useState(0);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -46,6 +46,7 @@ export default function InvestIpoModal({ isOpen, onClose, ipo, userId }) {
       });
       setInvestmentAmount(0);
       onClose();
+      openEdit();
     } catch (error) {
       setError(
         `There was an issue sending your investment request. Try again later.`

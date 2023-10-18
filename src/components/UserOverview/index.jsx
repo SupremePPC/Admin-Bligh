@@ -15,6 +15,7 @@ import Swal from "sweetalert2";
 import "./style.css";
 import EditDocument from "../DocumentManagement/Edit";
 import { deleteBankingDetails } from "../../firebaseConfig/firestore";
+import Edit from "../BankingDetails/Edit";
 
 const UserOverview = () => {
   const user = useParams();
@@ -37,6 +38,7 @@ const UserOverview = () => {
     isAddBankingDetails: false,
     isEditBankingDetails: false,
     isEditTransactionOpen: false,
+    isEditBondOpen: false,
     isUserDetailsOpen: false,
     isAddTransactionOpen: false,
     isEditUserDetailsOpen: false,
@@ -107,21 +109,22 @@ const UserOverview = () => {
     setFunction(subCollectionData);
   };
 
+  const fetchUserDetails = async () => {
+    const userRef = doc(db, "users", user.userId);
+    const userSnapshot = await getDoc(userRef);
+    if (userSnapshot.exists()) {
+      setUserDetails(userSnapshot.data());
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "User not found",
+        text: "The specified user does not exist.",
+      });
+    }
+  };
+
   useEffect(() => {
     if (user && user.userId) {
-      const fetchUserDetails = async () => {
-        const userRef = doc(db, "users", user.userId);
-        const userSnapshot = await getDoc(userRef);
-        if (userSnapshot.exists()) {
-          setUserDetails(userSnapshot.data());
-        } else {
-          Swal.fire({
-            icon: "error",
-            title: "User not found",
-            text: "The specified user does not exist.",
-          });
-        }
-      };
 
       fetchUserDetails();
       fetchSubCollection("accountTypes", setAccountTypes);
@@ -141,10 +144,15 @@ const UserOverview = () => {
     }
   }, [user ? user.userId : null]);
 
-  const totalBalance = accountTypes.reduce(
-    (total, item) => total + parseFloat(item.balance),
-    0
-  );
+  const totalDeposit = transactions
+  .filter(item => item.type === 'Deposit')
+  .reduce((total, item) => total + parseFloat(item.amount), 0);
+
+const totalWithdrawal = transactions
+  .filter(item => item.type === 'Withdrawal')
+  .reduce((total, item) => total + parseFloat(item.amount), 0);
+
+const totalBalance = totalDeposit - totalWithdrawal;
 
   const calculateMaturityAmount = (principal, interestRate, term) => {
     // Parse principal and interestRate to float numbers
@@ -203,6 +211,8 @@ const UserOverview = () => {
         !modalState.isEditUserDetailsOpen &&
         !modalState.isEditTransactionOpen &&
         !modalState.isEditBankingDetails &&
+        !modalState.isEditBondOpen &&
+        !modalState.isEditBankingDetails &&
         !modalState.isAddNewTermOpen &&
         !modalState.isAddNewIpos &&
         !modalState.isAddNewDocumentOpen &&
@@ -215,6 +225,10 @@ const UserOverview = () => {
                 <div className="text_wrap">
                   <p className="bold_text">Title :</p>
                   <span className="reg_text">{userDetails.title}</span>
+                </div>
+                <div className="text_wrap">
+                  <p className="bold_text">Full Name :</p>
+                  <span className="reg_text">{userDetails.fullName}</span>
                 </div>
                 <div className="text_wrap">
                   <p className="bold_text">Email :</p>
@@ -327,8 +341,8 @@ const UserOverview = () => {
                 <ul className="user_wrap">
                   {accountTypes.map((item, index) => (
                     <li key={index} className="text_wrap">
-                      <p className="bold_text">{item.type} :</p>
-                      <span className="reg_text">$ {item.balance} </span>
+                      <p className="bold_text">{item.label} :</p>
+                      <span className="reg_text">$ {item.amount} </span>
                     </li>
                   ))}
                 </ul>
@@ -634,6 +648,7 @@ const UserOverview = () => {
             </div>
           </div>
         )}
+
       {modalState.isAddBankingDetails && (
         <AddBankingDetails
           onClose={() => {
@@ -646,14 +661,18 @@ const UserOverview = () => {
           }}
         />
       )}
+
       {modalState.isEditUserDetailsOpen && (
         <EditUser
           onClose={() => {
             handleCloseModal("isEditUserDetailsOpen");
           }}
-          user={userDetails}
+          user={user}
+          details={userDetails}
+          refreshDetails={fetchUserDetails}
         />
       )}
+
       {modalState.isEditBankingDetails && (
         <EditBankingDetails
           onClose={() => {
@@ -668,6 +687,7 @@ const UserOverview = () => {
           }}
         />
       )}
+
       {modalState.isAddTransactionOpen && (
         <AddTransaction
           onClose={() => {
@@ -678,8 +698,13 @@ const UserOverview = () => {
           transactions={transactions}
           totalBalance={totalBalance}
           userId={user}
+          openEdit={() => {
+            handleOpenModal("isEditTransactionOpen");
+            setSelectedUserForAdd(user);
+          }}
         />
       )}
+
       {modalState.isEditTransactionOpen && (
         <EditTransaction
           onClose={() => {
@@ -689,10 +714,11 @@ const UserOverview = () => {
           transactionId={transactions[0].id}
           selectedTransactions={transactions[0]}
           setTransactions={setTransactions}
-          setIsEditing={setIsEditing}
           userId={user}
+          totalBalance={totalBalance}
         />
       )}
+
       {modalState.isAddBondOpen && (
         <AddBond
           onClose={() => {
@@ -702,8 +728,26 @@ const UserOverview = () => {
           bond={bondsHoldings}
           setBond={setBondsHoldings}
           userId={user}
+          openEdit={() => {
+            handleOpenModal("isEditBondOpen");
+            setSelectedUserForAdd(user);
+          }}
         />
       )}
+
+      {modalState.isEditBondOpen && (
+          <EditBond 
+            onClose={() => {
+              handleCloseModal("isEditBondOpen");
+              setSelectedUserForAdd(null);
+            }}
+            bond= {bondsHoldings}
+            setBond={setBondsHoldings}
+            selectedBonds={bondsHoldings[0]}
+            userId={user}
+          />
+        )}
+
       {modalState.isAddNewTermOpen && (
         <AddNewTerm
           onClose={() => {
@@ -715,6 +759,7 @@ const UserOverview = () => {
           userId={user}
         />
       )}
+
       {modalState.isAddNewIpos && (
         <AddUserIpos
           onClose={() => {
@@ -739,6 +784,7 @@ const UserOverview = () => {
           userId={user}
         />
       )}
+
       {modalState.isEditDocumentOpen && (
         <EditDocument
           onClose={() => {

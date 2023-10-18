@@ -4,7 +4,7 @@ import { getAllIpos } from "../../firebaseConfig/firestore";
 import LoadingScreen from "../LoadingScreen";
 import InvestIpoModal from "./Modals/InvestModal";
 
-const AddUserIpos = ({ userId, onClose }) => {
+const AddUserIpos = ({ userId, onClose, openEdit }) => {
   const [ipos, setIpos] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [iposModalOpen, setIposModalOpen] = useState(false);
@@ -117,6 +117,7 @@ const AddUserIpos = ({ userId, onClose }) => {
                     }}
                     ipo={selectedIpo}
                     userId={userId}
+                    openEdit={openEdit}
                   />
                 </div>
               </div>

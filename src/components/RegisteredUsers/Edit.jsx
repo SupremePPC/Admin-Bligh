@@ -3,18 +3,17 @@ import Swal from "sweetalert2";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../../firebaseConfig/firebase";
 
-const Edit = ({ user, onClose }) => {
-  const id = user.id;
-
-  const [title, setTitle] = useState(user.title);
-  const [fullName, setFullName] = useState(user.fullName);
-  const [email, setEmail] = useState(user.email);
-  const [mobile, setMobile] = useState(user.mobilePhone);
-  const [home, setHome] = useState(user.homePhone);
-  const [address, setAddress] = useState(user.address);
-  const [city, setCity] = useState(user.city);
-  const [country, setCountry] = useState(user.country);
-  const [postcode, setPostcode] = useState(user.postcode);
+const Edit = ({ user, onClose, details, refreshDetails }) => {
+  const id = user.userId;
+  const [title, setTitle] = useState(details.title);
+  const [fullName, setFullName] = useState(details.fullName);
+  const [email, setEmail] = useState(details.email);
+  const [mobile, setMobile] = useState(details.mobilePhone);
+  const [home, setHome] = useState(details.homePhone);
+  const [address, setAddress] = useState(details.address);
+  const [city, setCity] = useState(details.city);
+  const [country, setCountry] = useState(details.country);
+  const [postcode, setPostcode] = useState(details.postcode);
   if (!user) return null;
 
   const handleUpdate = async (e) => {
@@ -45,7 +44,7 @@ const Edit = ({ user, onClose }) => {
     updatedUser = Object.fromEntries(
       Object.entries(updatedUser).filter(([_, value]) => value)
     );
-
+      console.log(updatedUser);
     // If updatedUser is empty, exit the function
     if (Object.keys(updatedUser).length === 0) {
       Swal.fire({
@@ -71,7 +70,7 @@ const Edit = ({ user, onClose }) => {
 
       // Close the edit form
       onClose();
-      // refreshUsers();
+      refreshDetails();
     } catch (error) {
       console.error("Error updating user:", error);
       Swal.fire({
