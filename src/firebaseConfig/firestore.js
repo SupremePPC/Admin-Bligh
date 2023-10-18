@@ -130,6 +130,50 @@ export async function editTransaction(userId, transactionId, updatedFields) {
   return { success: true };
 }
 
+//Account Types
+export async function addToAccount(userId, label, amount) {
+  const accountTypeRef = collection(db, "users", userId, "accountTypes");
+  const docRef = doc(accountTypeRef, label);
+  console.log(amount)
+  try {
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+
+          await updateDoc(docRef, { amount: amount });
+      } else {
+          await setDoc(docRef, {
+              label: label,
+              amount: amount,
+          });
+      }
+
+      return { success: true };
+  } catch (error) {
+      console.error("Error adding to account:", error);
+      return { success: false, error: error.message };
+  }
+}
+
+export async function getAccountTypes(userId) {
+  const accountTypeRef = collection(db, "users", userId, "accountTypes");
+
+  try {
+      const querySnapshot = await getDocs(accountTypeRef);
+      const accountTypes = [];
+
+      querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          accountTypes.push({ id: doc.id, label: data.label, amount: data.amount });
+      });
+
+      return accountTypes;
+  } catch (error) {
+      console.error("Error getting account types:", error);
+      return [];
+  }
+}
+
 // Banking Details
 const BANKING_DETAILS_SUB_COLLECTION = "bankingDetails";
 

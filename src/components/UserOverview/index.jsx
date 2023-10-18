@@ -52,10 +52,10 @@ const UserOverview = () => {
       ...prevState,
       [modalType]: true,
     }));
-  
-    setSelectedTransaction(selectedId); 
+
+    setSelectedTransaction(selectedId);
   };
-  
+
   const handleCloseModal = (modalType) => {
     setModalState({
       ...modalState,
@@ -147,7 +147,7 @@ const UserOverview = () => {
   }, [user ? user.userId : null]);
 
   const totalDeposit = transactions
-    .filter((item) => item.type === "Deposit")
+    .filter((item) => item.type === "Deposit" && item.status === "Approved")
     .reduce((total, item) => total + parseFloat(item.amount), 0);
 
   const totalWithdrawal = transactions
@@ -202,6 +202,15 @@ const UserOverview = () => {
       ? new Date(timestamp.seconds * 1000).toLocaleDateString()
       : "";
   };
+
+  // // Modify openEdit to accept a transactionId parameter
+  // const openEdit = (id) => {
+  //   setSelectedTransaction(id);
+  //   handleOpenModal("isEditTransactionOpen", id);
+  //   setSelectedUserForAdd(user);
+  //   // Pass the transactionId to the EditTransaction component
+  //   console.log(id);
+  // };
 
   return (
     <div className="container">
@@ -390,11 +399,17 @@ const UserOverview = () => {
                       for (let i = 0; i < maxLength; i++) {
                         rows.push(
                           <tr key={i}>
-                              <td>
+                            <td>
                               {deposits[i] && (
-                            <div onClick={() => handleOpenModal('isEditTransactionOpen', deposits[i])}
-                            >
-                               <span className="bold_text">
+                                <div
+                                  onClick={() =>
+                                    handleOpenModal(
+                                      "isEditTransactionOpen",
+                                      deposits[i]
+                                    )
+                                  }
+                                >
+                                  <span className="bold_text">
                                     {deposits[i].status}
                                   </span>{" "}
                                   <span className="reg_text">
@@ -404,26 +419,32 @@ const UserOverview = () => {
                                   <span className="bold_text">
                                     {deposits[i].accountType}
                                   </span>
-                              </div>
+                                </div>
                               )}
-                                </td>
-                                <td>
-                            {withdrawals[i] && (
-                            <div onClick={() => handleOpenModal('isEditTransactionOpen', deposits[i])}
-                            >
-                              <span className="bold_text">
-                                  {withdrawals[i].status}
-                                </span>{" "}
-                                <span className="reg_text">
-                                  ${withdrawals[i].amount}
-                                </span>
-                                <span> in </span>
-                                <span className="bold_text">
-                                  {withdrawals[i].accountType}
-                                </span>
-                            </div>
-                            )}
-                              </td>
+                            </td>
+                            <td>
+                              {withdrawals[i] && (
+                                <div
+                                onClick={() =>
+                                  handleOpenModal(
+                                    "isEditTransactionOpen",
+                                    withdrawals[i]
+                                  )
+                                }
+                              >
+                                  <span className="bold_text">
+                                    {withdrawals[i].status}
+                                  </span>{" "}
+                                  <span className="reg_text">
+                                    ${withdrawals[i].amount}
+                                  </span>
+                                  <span> in </span>
+                                  <span className="bold_text">
+                                    {withdrawals[i].accountType}
+                                  </span>
+                                </div>
+                              )}
+                            </td>
                           </tr>
                         );
                       }
@@ -719,8 +740,9 @@ const UserOverview = () => {
           transactions={transactions}
           totalBalance={totalBalance}
           userId={user}
-          openEdit={() => {
-            handleOpenModal("isEditTransactionOpen");
+          refreshDetails={() => {
+            fetchSubCollection("transactions", setTransactions);
+            fetchSubCollection("accountTypes", setAccountTypes);
           }}
         />
       )}
@@ -737,7 +759,8 @@ const UserOverview = () => {
           totalBalance={totalBalance}
           refreshDetails={() => {
             fetchSubCollection("transactions", setTransactions);
-          } }
+            fetchSubCollection("accountTypes", setAccountTypes);
+          }}
         />
       )}
 
