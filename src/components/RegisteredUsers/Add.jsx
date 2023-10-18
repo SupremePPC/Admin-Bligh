@@ -100,7 +100,7 @@ const Add = ({ setUsers, setIsAdding }) => {
       };
       const usersRef = doc(db, "users", newUser.uid);
       await setDoc(usersRef, newUser);
-      console.log("User added to Firestore");
+      // console.log("User added to Firestore");
       // Update state
       setUsers((prevUsers) => [...prevUsers, newUser]);
       setIsAdding(false);
@@ -115,7 +115,7 @@ const Add = ({ setUsers, setIsAdding }) => {
         showConfirmButton: false,
         timer: 2000,
       });
-      window.location.reload();
+      // window.location.reload();
     } catch (error) {
       console.error("Error adding user:", error);
       Swal.fire({

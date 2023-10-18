@@ -15,23 +15,7 @@ const BankingDetails = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const fetchBankingDetails = async () => {
-    setIsLoading(true);
-    try {
-      const uid = "your_user_id"; // Replace with the user's ID
-      const allBankingDetails = await getBankingDetails(uid);
-
-      if (allBankingDetails) {
-        setBankingDetails(allBankingDetails);
-      } else {
-        console.error("No banking details found");
-      }
-    } catch (error) {
-      console.error("Error fetching banking details:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  j
 
   useEffect(() => {
     fetchBankingDetails();
