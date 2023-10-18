@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import {
-//   addIposToUserCollection,
 getSpecificIpoRequest,
-  deleteDocument,
   deleteIposRequestStatus,
   getIposRequests,
   handleIpoApproval,
@@ -83,17 +81,14 @@ const IposRequestPage = () => {
  
   return (
     <div className="container">
-      {isLoading ? (
+      {isLoading && (
         <LoadingScreen />
-      ) : (
-        <>
+      )}
           <Header />
           <Table
             ipoRequests={ipoRequests}
             handleUpdateRequest={handleUpdateRequest}
           />
-        </>
-      )}
     </div>
   );
 };

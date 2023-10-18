@@ -1,73 +1,101 @@
 import React, { useState } from "react";
 import Swal from "sweetalert2";
 import { editTransaction } from "../../firebaseConfig/firestore";
+import { collection, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { db } from "../../firebaseConfig/firebase";
+import LoadingScreen from "../LoadingScreen";
 
 const EditTransaction = ({
-  transactions,
-  selectedTransactions,
-  setTransactions,
+  selectedTransaction,
+  onClose,
   totalBalance,
-  // setIsEditing,
-  // transactionId,
-  // userId,
-  onClose
+  userId,
+  refreshDetails,
 }) => {
+  const transactionId = selectedTransaction.id;
+    const [isLoading, setIsLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    amount: selectedTransaction.amount,
+    accountType: selectedTransaction.accountType,
+    type: selectedTransaction.type,
+    status: selectedTransaction.status,
+    date: selectedTransaction.date,
+  });
 
   const {
-    id: transactionId,
-    userId,
-    fullName: initFullName,
-    amount: initAmount,
-    accountType: initAccountType,
-    type: initType,
-    status: initStatus,
-    date: initDate,
-  } = selectedTransactions;
-
-  const [fullName, setFullName] = useState(initFullName);
-  const [amount, setAmount] = useState(initAmount);
-  const [accountType, setAccountType] = useState(initAccountType);
-  const [type, setType] = useState(initType);
-  const [status, setStatus] = useState(initStatus);
-  const [date, setDate] = useState(initDate);
+    amount,
+    accountType,
+    type,
+    status,
+    date,
+  } = formData;
+  
 
   const handleUpdate = async (e) => {
     e.preventDefault();
-
-    if (!fullName || !amount || !accountType || !type || !status || !date) {
-      return Swal.fire({
-        icon: "error",
-        title: "Error!",
-        text: "All fields are required.",
-        showConfirmButton: true,
-      });
-    }
-
-       const updatedTransaction = {
-      fullName,
-      amount,
+    setIsLoading(true);
+  
+    const updatedTransaction = {
+      amount: parseFloat(amount), // Convert the amount to a float
       accountType,
       type,
       status,
       date,
     };
-
+  
+    const uid = userId.userId;
+  
     try {
-      const result = await editTransaction(userId, transactionId, updatedTransaction);
-      
+      const result = await editTransaction(uid, transactionId, updatedTransaction);
       if (result.success) {
-        const updatedTransactions = transactions.map(t => 
-          t.id === transactionId ? { ...t, ...updatedTransaction } : t
-        );
-        setTransactions(updatedTransactions);
-        // setIsEditing(false);
+        const accountTypeRef = collection(db, "users", userId.userId, "accountTypes");
+        const docRef = doc(accountTypeRef, accountType);
+  
+        // Check if the document exists before updating
+        const docSnap = await getDoc(docRef);
+  
+        if (docSnap.exists()) {
+          // Document exists, update the amount based on transaction type and status
+          const existingData = docSnap.data();
+          let updatedAmount = existingData.amount;
+  
+          if (type === "Deposit") {
+            updatedAmount + updatedTransaction.amount;
+          } else if (type === "Withdrawal") {
+            updatedAmount - updatedTransaction.amount;
+          }
+  
+          if (status !== "Approved") {
+            // If status is not "Approved," don't update the transaction amount in the doc
+            updatedAmount = existingData.amount;
+          }
+  
+          // Check if the label has changed and update it
+          if (existingData.label !== accountType) {
+            await updateDoc(docRef, {
+              label: accountType,
+              amount: updatedAmount,
+            });
+          } else {
+            await updateDoc(docRef, { amount: updatedAmount });
+          }
+        } else {
+          // Document doesn't exist, create a new one
+          await setDoc(docRef, {
+            label: accountType,
+            amount: updatedTransaction.amount,
+          });
+        }
+  
         Swal.fire({
-          icon: 'success',
-          title: 'Updated!',
-          text: `Transaction for ${fullName} has been updated.`,
+          icon: "success",
+          title: "Updated!",
+          text: `Transaction has been updated.`,
           showConfirmButton: false,
           timer: 2000,
         });
+        refreshDetails();
+        onClose();
       } else {
         throw new Error("Failed to update the transaction");
       }
@@ -77,33 +105,41 @@ const EditTransaction = ({
         icon: "error",
         title: "Error!",
         text: `Error updating transaction: ${error}`,
-        showConfirmButton: true,
+        showConfirmButton: false,
+        timer: 2000,
       });
+    } finally {
+      setIsLoading(false);
     }
   };
+  
 
   return (
     <div className="small-container">
       <form onSubmit={handleUpdate}>
         <h1>Edit Transaction</h1>
+        {
+          isLoading && ( <LoadingScreen /> )
+        }
         <div className="text_wrap">
-            <label>
-              Total Balance: {" "}
-              {totalBalance === "0.00" ? "0.00" : totalBalance}
-            </label>
-          </div>
+          <label>
+            Total Balance: {totalBalance === "0.00" ? "0.00" : totalBalance}
+          </label>
+        </div>
         <label htmlFor="amount">Amount</label>
         <input
           id="amount"
           type="number"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
+          value={formData.amount}
+          onChange={(e) =>
+            setFormData({ ...formData, amount: e.target.value })
+          }
         />
         <label htmlFor="accountType">Account Type</label>
         <select
           id="accountType"
-          value={accountType}
-          onChange={(e) => setAccountType(e.target.value)}
+          value={formData.accountType}
+          onChange={(e) => setFormData({ ...formData, accountType: e.target.value })}
         >
           <option value="">--Select--</option>
           <option value="Easy Access">Easy Access</option>
@@ -114,8 +150,8 @@ const EditTransaction = ({
         <label htmlFor="type">Transaction Type</label>
         <select
           id="type"
-          value={type}
-          onChange={(e) => setType(e.target.value)}
+          value={formData.type}
+          onChange={(e) => setFormData({ ...formData, type: e.target.value })}
         >
           <option value="">--Select--</option>
           <option value="Deposit">Deposit</option>
@@ -124,8 +160,8 @@ const EditTransaction = ({
         <label htmlFor="status">Status</label>
         <select
           id="status"
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
+          value={formData.status}
+          onChange={(e) => setFormData({ ...formData, status: e.target.value })}
         >
           <option value="">--Select--</option>
           <option value="Pending">Pending</option>
@@ -136,8 +172,8 @@ const EditTransaction = ({
         <input
           id="date"
           type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
+          value={formData.date}
+          onChange={(e) => setFormData({ ...formData, date: e.target.value })}
         />
         <div style={{ marginTop: "30px" }}>
           <input type="submit" value="Save" />

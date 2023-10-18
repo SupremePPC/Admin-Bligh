@@ -3,7 +3,7 @@ import Swal from "sweetalert2";
 import LoadingScreen from "../LoadingScreen";
 import CurrencyInput from 'react-currency-input-field';
 import { addTransaction } from "../../firebaseConfig/firestore";
-import { addDoc, collection, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { collection, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { db } from "../../firebaseConfig/firebase";
 
 const AddTransaction = ({
@@ -63,7 +63,7 @@ const AddTransaction = ({
     try {
       const result = await addTransaction(userId.userId, newTransaction);
       if (result.success) {
-        // Successfully added the transaction, now update the Firestore subcollection
+        // Successfully added the transaction, now update the Firestore accountTypes subcollection
         const accountTypeRef = collection(db, "users", userId.userId, "accountTypes");
         const docRef = doc(accountTypeRef, accountType);
   
@@ -80,6 +80,13 @@ const AddTransaction = ({
           } else if (type === "Withdrawal") {
             updatedAmount -= formattedAmount;
           }
+
+          if(status === "Approved") {
+            updatedAmount = updatedAmount;
+          } else {
+            //do not add the transaction to the doc
+            updatedAmount = existingData.amount;
+          } 
   
           await updateDoc(docRef, { amount: updatedAmount });
         } else {
@@ -107,8 +114,8 @@ const AddTransaction = ({
           status: "",
           date: "",
         });
-        onClose();
         openEdit();
+        onClose();
       } else {
         throw new Error(result.error);
       }
@@ -125,25 +132,6 @@ const AddTransaction = ({
       setIsLoading(false);
     }
   };
-  
-
-  // const handleChange = (e) => {
-  //   const { name, value } = e.target;
-  // console.log("click")
-  //   if (name === "amount") {
-  //     // Format the value with commas and two decimal places
-  //     const formattedValue = parseFloat(value.replace(/,/g, "")).toFixed(2);
-  //     setFormData({
-  //       ...formData,
-  //       [name]: formattedValue,
-  //     });
-  //   } else {
-  //     setFormData({
-  //       ...formData,
-  //       [name]: value,
-  //     });
-  //   }
-  // };
   
   return (
     <div className="small-container">

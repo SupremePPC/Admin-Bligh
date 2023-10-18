@@ -30,6 +30,7 @@ const UserOverview = () => {
   const [selectedUserForAdd, setSelectedUserForAdd] = useState(null);
   const [selectedDocument, setSelectedDocument] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] = useState(null);
 
   const [modalState, setModalState] = useState({
     isAddTransactionOpen: false,
@@ -46,13 +47,15 @@ const UserOverview = () => {
     isAddNewIpos: false,
   });
 
-  const handleOpenModal = (modalType) => {
-    setModalState({
-      ...modalState,
+  const handleOpenModal = (modalType, selectedId) => {
+    setModalState((prevState) => ({
+      ...prevState,
       [modalType]: true,
-    });
+    }));
+  
+    setSelectedTransaction(selectedId); 
   };
-
+  
   const handleCloseModal = (modalType) => {
     setModalState({
       ...modalState,
@@ -125,7 +128,6 @@ const UserOverview = () => {
 
   useEffect(() => {
     if (user && user.userId) {
-
       fetchUserDetails();
       fetchSubCollection("accountTypes", setAccountTypes);
       fetchSubCollection("bankingDetails", setBankingDetails);
@@ -145,14 +147,14 @@ const UserOverview = () => {
   }, [user ? user.userId : null]);
 
   const totalDeposit = transactions
-  .filter(item => item.type === 'Deposit')
-  .reduce((total, item) => total + parseFloat(item.amount), 0);
+    .filter((item) => item.type === "Deposit")
+    .reduce((total, item) => total + parseFloat(item.amount), 0);
 
-const totalWithdrawal = transactions
-  .filter(item => item.type === 'Withdrawal')
-  .reduce((total, item) => total + parseFloat(item.amount), 0);
+  const totalWithdrawal = transactions
+    .filter((item) => item.type === "Withdrawal" && item.status === "Approved")
+    .reduce((total, item) => total + parseFloat(item.amount), 0);
 
-const totalBalance = totalDeposit - totalWithdrawal;
+  const totalBalance = totalDeposit - totalWithdrawal;
 
   const calculateMaturityAmount = (principal, interestRate, term) => {
     // Parse principal and interestRate to float numbers
@@ -259,12 +261,12 @@ const totalBalance = totalDeposit - totalWithdrawal;
                   <span className="reg_text">{userDetails.postcode}</span>
                 </div>
                 <div className="dropdown_btn">
-                <button
-                      style={{ marginLeft: "12px" }}
-                      onClick={() => handleOpenModal("isEditUserDetailsOpen")}
-                      >
-                      Edit User Details
-                      </button>
+                  <button
+                    style={{ marginLeft: "12px" }}
+                    onClick={() => handleOpenModal("isEditUserDetailsOpen")}
+                  >
+                    Edit User Details
+                  </button>
                 </div>
               </div>
             )}
@@ -283,7 +285,9 @@ const totalBalance = totalDeposit - totalWithdrawal;
                       className="mutedButton"
                       type="button"
                       onClick={() => handleOpenModal("isAddBankingDetails")}
-                    > Add Details
+                    >
+                      {" "}
+                      Add Details
                     </button>
                   </div>
                 </>
@@ -315,15 +319,18 @@ const totalBalance = totalDeposit - totalWithdrawal;
                       <button
                         type="submit"
                         onClick={() => handleDelete(bankingDetails[0].id)}
-                      >Delete Details</button>
+                      >
+                        Delete Details
+                      </button>
                       {isLoading && <div className="spinner"></div>}
                       <button
                         style={{ marginLeft: "12px" }}
                         className="mutedButton"
                         type="button"
-                        onClick={() => handleOpenModal("isEditBankingDetails")}>
+                        onClick={() => handleOpenModal("isEditBankingDetails")}
+                      >
                         Edit Details
-                </button>
+                      </button>
                     </div>
                   </div>
                 ))
@@ -332,7 +339,9 @@ const totalBalance = totalDeposit - totalWithdrawal;
 
             {/* Account types and balances*/}
             <div className="user_details">
-              <h3>Account Types and Balance</h3>
+              <h3>
+                Account Types and Balance with Total Balance of ${totalBalance}
+              </h3>
               {accountTypes.length === 0 ? (
                 <p className="bold_text">
                   This user has no account or balance at the moment.
@@ -342,18 +351,11 @@ const totalBalance = totalDeposit - totalWithdrawal;
                   {accountTypes.map((item, index) => (
                     <li key={index} className="text_wrap">
                       <p className="bold_text">{item.label} :</p>
-                      <span className="reg_text">$ {item.amount} </span>
+                      <span className="reg_text">$ {item.amount || 0}</span>
                     </li>
                   ))}
                 </ul>
               )}
-              <div className="text_wrap">
-                <p className="bold_text">Total Balance :</p>
-                <span className="reg_text">$ {totalBalance}</span>
-              </div>
-              {/* <div className="dropdown_btn">
-              <button onClick={() => handleOpenModal("isAddAccountOpen")}>Add to Account</button>
-            </div> */}
             </div>
 
             {/* Transactions List */}
@@ -388,20 +390,40 @@ const totalBalance = totalDeposit - totalWithdrawal;
                       for (let i = 0; i < maxLength; i++) {
                         rows.push(
                           <tr key={i}>
-                            <td>
+                              <td>
                               {deposits[i] && (
-                                <span className="reg_text">
-                                  $ {deposits[i].amount}
-                                </span>
+                            <div onClick={() => handleOpenModal('isEditTransactionOpen', deposits[i])}
+                            >
+                               <span className="bold_text">
+                                    {deposits[i].status}
+                                  </span>{" "}
+                                  <span className="reg_text">
+                                    ${deposits[i].amount}
+                                  </span>
+                                  <span> in </span>
+                                  <span className="bold_text">
+                                    {deposits[i].accountType}
+                                  </span>
+                              </div>
                               )}
-                            </td>
-                            <td>
-                              {withdrawals[i] && (
+                                </td>
+                                <td>
+                            {withdrawals[i] && (
+                            <div onClick={() => handleOpenModal('isEditTransactionOpen', deposits[i])}
+                            >
+                              <span className="bold_text">
+                                  {withdrawals[i].status}
+                                </span>{" "}
                                 <span className="reg_text">
-                                  $ {withdrawals[i].amount}
+                                  ${withdrawals[i].amount}
                                 </span>
-                              )}
-                            </td>
+                                <span> in </span>
+                                <span className="bold_text">
+                                  {withdrawals[i].accountType}
+                                </span>
+                            </div>
+                            )}
+                              </td>
                           </tr>
                         );
                       }
@@ -649,6 +671,17 @@ const totalBalance = totalDeposit - totalWithdrawal;
           </div>
         )}
 
+      {modalState.isEditUserDetailsOpen && (
+        <EditUser
+          onClose={() => {
+            handleCloseModal("isEditUserDetailsOpen");
+          }}
+          user={user}
+          details={userDetails}
+          refreshDetails={fetchUserDetails}
+        />
+      )}
+
       {modalState.isAddBankingDetails && (
         <AddBankingDetails
           onClose={() => {
@@ -662,17 +695,6 @@ const totalBalance = totalDeposit - totalWithdrawal;
         />
       )}
 
-      {modalState.isEditUserDetailsOpen && (
-        <EditUser
-          onClose={() => {
-            handleCloseModal("isEditUserDetailsOpen");
-          }}
-          user={user}
-          details={userDetails}
-          refreshDetails={fetchUserDetails}
-        />
-      )}
-
       {modalState.isEditBankingDetails && (
         <EditBankingDetails
           onClose={() => {
@@ -680,7 +702,7 @@ const totalBalance = totalDeposit - totalWithdrawal;
             setSelectedUserForAdd(null);
           }}
           userId={user}
-          bankingDetailsId={bankingDetails[0].id}
+          bankingDetailsId={bankingDetails.id}
           bankingDetails={bankingDetails[0]}
           refreshDetails={() => {
             fetchSubCollection("bankingDetails", setBankingDetails);
@@ -692,7 +714,6 @@ const totalBalance = totalDeposit - totalWithdrawal;
         <AddTransaction
           onClose={() => {
             handleCloseModal("isAddTransactionOpen");
-            setSelectedUserForAdd(null);
           }}
           setTransactions={setTransactions}
           transactions={transactions}
@@ -700,7 +721,6 @@ const totalBalance = totalDeposit - totalWithdrawal;
           userId={user}
           openEdit={() => {
             handleOpenModal("isEditTransactionOpen");
-            setSelectedUserForAdd(user);
           }}
         />
       )}
@@ -711,11 +731,13 @@ const totalBalance = totalDeposit - totalWithdrawal;
             handleCloseModal("isEditTransactionOpen");
             setSelectedUserForAdd(null);
           }}
-          transactionId={transactions[0].id}
-          selectedTransactions={transactions[0]}
+          selectedTransaction={selectedTransaction}
           setTransactions={setTransactions}
           userId={user}
           totalBalance={totalBalance}
+          refreshDetails={() => {
+            fetchSubCollection("transactions", setTransactions);
+          } }
         />
       )}
 
@@ -736,17 +758,17 @@ const totalBalance = totalDeposit - totalWithdrawal;
       )}
 
       {modalState.isEditBondOpen && (
-          <EditBond 
-            onClose={() => {
-              handleCloseModal("isEditBondOpen");
-              setSelectedUserForAdd(null);
-            }}
-            bond= {bondsHoldings}
-            setBond={setBondsHoldings}
-            selectedBonds={bondsHoldings[0]}
-            userId={user}
-          />
-        )}
+        <EditBond
+          onClose={() => {
+            handleCloseModal("isEditBondOpen");
+            setSelectedUserForAdd(null);
+          }}
+          bond={bondsHoldings}
+          setBond={setBondsHoldings}
+          selectedBonds={bondsHoldings[0]}
+          userId={user}
+        />
+      )}
 
       {modalState.isAddNewTermOpen && (
         <AddNewTerm

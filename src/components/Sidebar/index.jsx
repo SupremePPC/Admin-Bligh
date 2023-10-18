@@ -16,7 +16,7 @@ import Modal from "../CustomsModal";
 import "./style.css";
 
 function Sidebar() {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
   const location = useLocation();
   const isActive = (path) => location.pathname === path;
   const [isLoading, setIsLoading] = useState(false);

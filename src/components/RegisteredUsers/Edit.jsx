@@ -44,7 +44,6 @@ const Edit = ({ user, onClose, details, refreshDetails }) => {
     updatedUser = Object.fromEntries(
       Object.entries(updatedUser).filter(([_, value]) => value)
     );
-      console.log(updatedUser);
     // If updatedUser is empty, exit the function
     if (Object.keys(updatedUser).length === 0) {
       Swal.fire({

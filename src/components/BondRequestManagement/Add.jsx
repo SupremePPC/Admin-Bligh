@@ -147,9 +147,9 @@ const AddBond = ({ setBond, bond, userId, onClose }) => {
 
   return (
     <div className="small-container">
-      {isLoading ? (
+      {isLoading && (
         <LoadingScreen />
-      ) : (
+      )}
         <form onSubmit={handleSubmit}>
           <h3>Add New Bond for {userId.userId}</h3>
           <label htmlFor="image">Issuer Logo:</label>
@@ -269,7 +269,7 @@ const AddBond = ({ setBond, bond, userId, onClose }) => {
           {errors.isin && <div>{errors.isin}</div>}
           {errors.issuerName && <div>{errors.issuerName}</div>}
         </form>
-      )}
+      
     </div>
   );
 };

@@ -312,10 +312,10 @@ const TransactionDashboard = () => {
             handleFilter={handleStatusFilter}
             statusFilter={statusFilter}
           />
-          {isLoading ? (
+          {isLoading && (
             <LoadingScreen />
-          ) : (
-            <>
+          )}
+           
               <Table
                 transactions={transactions}
                 handleApproval={showApprovalModal}
@@ -346,16 +346,6 @@ const TransactionDashboard = () => {
                 />
               )}
             </>
-          )}
-        </>
-      )}
-      {isAdding && (
-        <AddTransaction
-          onClose={() => setIsAdding(false)}
-          setIsAdding={setIsAdding}
-          setTransactions={setTransactions}
-
-        />
       )}
       {isEditPageOpen && (
         <EditTransaction
