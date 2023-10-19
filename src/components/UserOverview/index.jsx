@@ -707,7 +707,7 @@ const UserOverview = () => {
                               <p>{ipos.name}</p>
                             </div>
                           </td>
-                          <td>{firestoreTimestampToDate(ipos.date)}</td>
+                          <td>{ipos.date}</td>
                           <td>$ {formatNumber(ipos.amountInvested)}</td>
                           <td>{ipos.numberOfShares}</td>
                           <td>$ {ipos.sharePrice}</td>
@@ -868,6 +868,20 @@ const UserOverview = () => {
           ipos={ipos}
           setIpos={setIpos}
           userId={user}
+        />
+      )}
+
+      {modalState.isEditIpos && (
+        <Edit
+          onClose={() => {
+            handleCloseModal("isEditIpos");
+            setSelectedForEdit(null);
+          }}
+          ipos={ipos}
+          setIpos={setIpos}
+          userId={user}
+          selectedForEdit={selectedForEdit}
+          iposId={selectedForEdit.id}
         />
       )}
 

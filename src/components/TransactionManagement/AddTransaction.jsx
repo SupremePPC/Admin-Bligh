@@ -127,7 +127,6 @@ const AddTransaction = ({
       if (result.success) {
         // Successfully added the transaction, store the ID in a variable
         const newTransactionId = result.id;
-        console.log(newTransactionId, newTransaction);
         // Successfully added the transaction, now update the Firestore accountTypes subcollection
 
         Swal.fire({
@@ -277,7 +276,7 @@ const AddTransaction = ({
           userId={userId}
           totalBalance={totalBalance}
           refreshDetails={refreshDetails}
-          transactionId={selectedTransaction}
+          transactionId={transactionId}
         />
       )}
     </>

@@ -1,20 +1,19 @@
-import React, { useState } from "react";
-import { addIposToUserCollection, getCurrentDate } from "../../../firebaseConfig/firestore";
-import CurrencyInput from "react-currency-input-field";
-import Swal from "sweetalert2";
-import "./style.css";
-import EditIposUser from "../Edit";
+import React from "react";
 
-export default function InvestIpoModal({ isOpen, onClose, ipo, userId }) {
+export default function EditIposUser({
+  ipos,
+  iposId,
+  selectedForEdit,
+  onClose,
+  userId,
+}) {
+  console.log(ipos, iposId, selectedForEdit, userId);
   const [investmentAmount, setInvestmentAmount] = useState(0);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedForEdit, setSelectedForEdit] = useState(false);
-  const [selectedId, setSelectedId] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
 
-  const handleInvestInIpo = async () => {
+  const handleUpdate = async () => {
     if (!investmentAmount || investmentAmount < ipo.minInvestment) {
       Swal.fire({
         icon: "error",
@@ -38,7 +37,7 @@ export default function InvestIpoModal({ isOpen, onClose, ipo, userId }) {
     };
     setIsLoading(true);
     try {
-      const result = await addIposToUserCollection(userId.userId, investmentData);
+      await addIposToUserCollection(userId.userId, investmentData);
       Swal.fire({
         icon: "success",
         title: "Success!",
@@ -47,8 +46,6 @@ export default function InvestIpoModal({ isOpen, onClose, ipo, userId }) {
         timer: 2000,
       });
       setInvestmentAmount(0);
-      setSelectedForEdit(investmentData)
-      setSelectedId(result.id);
       onClose();
     } catch (error) {
       setError(
@@ -67,9 +64,7 @@ export default function InvestIpoModal({ isOpen, onClose, ipo, userId }) {
   const numberOfShares = Math.ceil((investmentAmount / ipo.sharePrice) * 100) / 100;
 
   return (
-    <>
-   {!isEditing &&
-     <div className="invest_ipo_overlay" onClick={(e) => e.stopPropagation()}>
+    <div className="invest_ipo_overlay" onClick={(e) => e.stopPropagation()}>
       <div className="invest_ipo_modal">
         <div className="section_header">
           <img src={ipo.logo} alt={`${ipo.name} Logo`} className="logo" />
@@ -132,18 +127,6 @@ export default function InvestIpoModal({ isOpen, onClose, ipo, userId }) {
           </button>
         </div>
       </div>
-    </div>}
-    {
-      isEditing && (
-        <EditIposUser 
-        ipos={ipo}
-        iposId={iposId}
-        selectedForEdit={selectedForEdit}
-        onClose={onClose}
-        userId={userId}
-        />
-      )
-    }
-    </>
+    </div>
   );
 }

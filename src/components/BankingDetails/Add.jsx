@@ -143,6 +143,7 @@ const Add = ({ userId, onClose, refreshDetails }) => {
         bankingDetails={selectedBankingDetail}
         bankingDetailsId={bankingDetailId}
         userId={userId}
+        refreshDetails={refreshDetails}
         />
       )
     }

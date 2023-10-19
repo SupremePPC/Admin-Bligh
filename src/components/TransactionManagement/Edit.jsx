@@ -19,7 +19,6 @@ const EditTransaction = ({
   refreshDetails,
   transactionId,
 }) => {
-  console.log(selectedTransaction, transactionId)
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     amount: selectedTransaction.amount,
@@ -131,13 +130,16 @@ const EditTransaction = ({
         timer: 2000,
       });
     }
-  
+    console.log( uid,
+      transactionId,
+      updatedTransaction)
     try {
       const result = await editTransaction(
         uid,
         transactionId,
         updatedTransaction
       );
+
   
       if (result.success) {
         const accountTypeRef = collection(
