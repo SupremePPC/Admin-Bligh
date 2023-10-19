@@ -6,8 +6,6 @@ import CurrencyInput from "react-currency-input-field";
 import LoadingScreen from "../LoadingScreen";
 
 const EditBond = ({
-  bond,
-  setBond,
   selectedBond,
   selectedBondId,
   userId,
@@ -15,7 +13,6 @@ const EditBond = ({
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({ ...selectedBond });
-  const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
@@ -86,18 +83,29 @@ const EditBond = ({
     }
 
     try {
-      if (formData.image && typeof formData.image !== "string") {
-        const imageUrl = await handleUploadImage(formData.image);
-        formData.image = imageUrl;
+      let updatedFormData = { ...formData }; // Create a copy of formData
+      const result = await updateBondUser(
+        userId.userId,
+        selectedBondId,
+        updatedFormData
+      ); // Send updated data to your backend (optional)
+
+      if (result.success) {
+        if (formData.image instanceof File) {
+          // New image selected, upload it and update the image URL
+          const imageUrl = await handleUploadImage(formData.image);
+          console.log(imageUrl);
+          updatedFormData.image = imageUrl; // Update the image field with the Firebase Storage URL
+          console.log(updatedFormData.image, "clicked");
+        } else if (!formData.image) {
+          // If formData.image is empty, use the original image data
+          updatedFormData.image = originalImageData; // Replace 'originalImageData' with the actual original image data
+          console.log(updatedFormData.image, "clicked");
+        }
       }
 
-      const updatedBonds = bond.map((b) =>
-        b.id === selectedBondId ? { ...formData, id: selectedBondId } : b
-      );
-
-      setBond(updatedBonds);
-  
-      await updateBondUser(userId.userId, formData); // Send updated data to your backend (optional)
+      // setBond(updatedFormData);
+      console.log(updatedFormData);
 
       Swal.fire({
         icon: "success",
@@ -129,7 +137,7 @@ const EditBond = ({
         <label htmlFor="image">Issuer Logo:</label>
         {formData.image && (
           <img
-            src={formData.image}
+            src={formData.imagePreview}
             alt="Image Preview"
             width={100}
             className="image_preview"
@@ -149,91 +157,91 @@ const EditBond = ({
           value={formData.issuerName}
         />
         <label htmlFor="type">Type:</label>
-          <input
-            type="text"
-            name="type"
-            onChange={handleChange}
-            value={formData.type}
-          />
+        <input
+          type="text"
+          name="type"
+          onChange={handleChange}
+          value={formData.type}
+        />
 
-          <label htmlFor="companyWebsite">Company Website:</label>
-          <input
-            type="url"
-            name="companyWebsite"
-            onChange={handleChange}
-            value={formData.companyWebsite}
-          />
-          <label htmlFor="isin">ISIN:</label>
-          <input
-            type="text"
-            name="isin"
-            onChange={handleChange}
-            value={formData.isin}
-          />
-          <label htmlFor="quantity">Quantity:</label>
-          <input
-            type="number"
-            min={0}
-            name="quantity"
-            onChange={handleChange}
-            value={formData.quantity}
-          />
-          <label htmlFor="sector">Sector:</label>
-          <input
-            type="text"
-            name="sector"
-            onChange={handleChange}
-            value={formData.sector}
-          />
-          <label htmlFor="maturityDate">Maturity Date:</label>
-          <input
-            type="date"
-            name="maturityDate"
-            onChange={handleChange}
-            value={formData.maturityDate}
-          />
-          <label htmlFor="minimumAmount">Minimum Amount:</label>
-          <CurrencyInput
-            decimalSeparator="."
-            prefix="$"
-            name="minimumAmount"
-            placeholder="0.00"
-            value={formData.minimumAmount}
-            decimalsLimit={2}
-            onValueChange={(value, name) => {
-              setFormData({ ...formData, [name]: value });
-            }}
-          />
-          <label htmlFor="currentValue">Current Value:</label>
-          <input
-            type="number"
-            min={0}
-            name="currentValue"
-            onChange={handleChange}
-            value={formData.currentValue}
-          />
-          <label htmlFor="couponRate">Coupon Rate:</label>
-          <input
-            type="number"
-            name="couponRate"
-            onChange={handleChange}
-            value={formData.couponRate}
-          />
-          <label htmlFor="couponFrequency">Coupon Frequency:</label>
-          <input
-            type="number"
-            name="couponFrequency"
-            onChange={handleChange}
-            min={0}
-            value={formData.couponFrequency}
-          />
-          <label htmlFor="purchaseDate">Purchase Date:</label>
-          <input
-            type="date"
-            name="purchaseDate"
-            onChange={handleChange}
-            value={formData.purchaseDate}
-          />
+        <label htmlFor="companyWebsite">Company Website:</label>
+        <input
+          type="url"
+          name="companyWebsite"
+          onChange={handleChange}
+          value={formData.companyWebsite}
+        />
+        <label htmlFor="isin">ISIN:</label>
+        <input
+          type="text"
+          name="isin"
+          onChange={handleChange}
+          value={formData.isin}
+        />
+        <label htmlFor="quantity">Quantity:</label>
+        <input
+          type="number"
+          min={0}
+          name="quantity"
+          onChange={handleChange}
+          value={formData.quantity}
+        />
+        <label htmlFor="sector">Sector:</label>
+        <input
+          type="text"
+          name="sector"
+          onChange={handleChange}
+          value={formData.sector}
+        />
+        <label htmlFor="maturityDate">Maturity Date:</label>
+        <input
+          type="date"
+          name="maturityDate"
+          onChange={handleChange}
+          value={formData.maturityDate}
+        />
+        <label htmlFor="minimumAmount">Minimum Amount:</label>
+        <CurrencyInput
+          decimalSeparator="."
+          prefix="$"
+          name="minimumAmount"
+          placeholder="0.00"
+          value={formData.minimumAmount}
+          decimalsLimit={2}
+          onValueChange={(value, name) => {
+            setFormData({ ...formData, [name]: value });
+          }}
+        />
+        <label htmlFor="currentValue">Current Value:</label>
+        <input
+          type="number"
+          min={0}
+          name="currentValue"
+          onChange={handleChange}
+          value={formData.currentValue}
+        />
+        <label htmlFor="couponRate">Coupon Rate:</label>
+        <input
+          type="number"
+          name="couponRate"
+          onChange={handleChange}
+          value={formData.couponRate}
+        />
+        <label htmlFor="couponFrequency">Coupon Frequency:</label>
+        <input
+          type="number"
+          name="couponFrequency"
+          onChange={handleChange}
+          min={0}
+          value={formData.couponFrequency}
+        />
+        <label htmlFor="purchaseDate">Purchase Date:</label>
+        <input
+          type="date"
+          name="purchaseDate"
+          onChange={handleChange}
+          value={formData.purchaseDate}
+        />
         <div style={{ marginTop: "30px" }}>
           <input type="submit" value="Save" />
           <input

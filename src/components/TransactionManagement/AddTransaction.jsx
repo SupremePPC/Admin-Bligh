@@ -18,7 +18,7 @@ const AddTransaction = ({
   refreshDetails,
 }) => {
   const [formData, setFormData] = useState({
-    amount: 0.00,
+    amount: 0.0,
     accountType: "",
     type: "",
     status: "",
@@ -44,8 +44,8 @@ const AddTransaction = ({
         showConfirmButton: true,
       });
     }
- // Format the amount with commas and two decimal places
- const formattedAmount = parseFloat(amount.replace(/,/g, "")).toFixed(2);
+    // Format the amount with commas and two decimal places
+    const formattedAmount = parseFloat(amount.replace(/,/g, "")).toFixed(2);
 
     if (type === "Withdrawal") {
       // Check if the specified accountType exists and has a balance greater than or equal to the withdrawal amount
@@ -114,7 +114,6 @@ const AddTransaction = ({
       }
     }
 
-   
     const newTransaction = {
       amount: formattedAmount,
       accountType,
@@ -145,7 +144,7 @@ const AddTransaction = ({
           { ...newTransaction, id: result.id },
         ]);
         setFormData({
-          amount: 0.00,
+          amount: 0.0,
           accountType: "",
           type: "",
           status: "",
@@ -266,7 +265,7 @@ const AddTransaction = ({
           )}
         </div>
       )}
-      {isEditing && selectedTransaction &&(
+      {isEditing && selectedTransaction && (
         <EditTransaction
           onClose={() => {
             setIsEditing(false);

@@ -500,7 +500,7 @@ const UserOverview = () => {
                             <td>
                               <div className="button_grid">
                                 <img
-                                  src={item[i].image}
+                                  src={item[i].imagePreview}
                                   alt="Bond image"
                                 />
                                 <p>{item[i].issuerName}</p>
