@@ -29,7 +29,6 @@ const AddTransaction = ({
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [transactionId, setTransactionId] = useState(null);
 
-
   const handleAdd = async (e) => {
     e.preventDefault();
     setIsLoading(true);

@@ -19,6 +19,7 @@ const EditTransaction = ({
   refreshDetails,
   transactionId,
 }) => {
+  console.log(selectedTransaction, transactionId)
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     amount: selectedTransaction.amount,

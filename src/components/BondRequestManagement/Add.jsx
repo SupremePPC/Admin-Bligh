@@ -25,11 +25,30 @@ const AddBond = ({ setBond, bond, userId, onClose }) => {
   const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    const { name, value, type, files } = e.target;
+  
+    if (type === 'file') {
+      // Make sure files[0] exists
+      if (files.length > 0) {
+        const selectedFile = files[0];
+        handleUploadImage(selectedFile)
+          .then((downloadURL) => {
+            setFormData({
+              ...formData,
+              [name]: selectedFile,
+              imagePreview: downloadURL, // Update imagePreview with the download URL
+            });
+          })
+          .catch((error) => {
+            console.error('Error uploading image:', error);
+          });
+      }
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value,
+      });
+    }
   };
 
   const handleUploadImage = async (imageFile) => {

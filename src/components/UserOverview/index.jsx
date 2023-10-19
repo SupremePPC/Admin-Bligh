@@ -16,6 +16,7 @@ import "./style.css";
 import EditDocument from "../DocumentManagement/Edit";
 import { deleteBankingDetails } from "../../firebaseConfig/firestore";
 import Edit from "../BankingDetails/Edit";
+import EditBond from "../BondRequestManagement/Edit";
 
 const UserOverview = () => {
   const user = useParams();
@@ -30,7 +31,7 @@ const UserOverview = () => {
   const [selectedUserForAdd, setSelectedUserForAdd] = useState(null);
   const [selectedDocument, setSelectedDocument] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedTransaction, setSelectedTransaction] = useState(null);
+  const [selectedForEdit, setSelectedForEdit] = useState(null);
 
   const [modalState, setModalState] = useState({
     isAddTransactionOpen: false,
@@ -53,7 +54,7 @@ const UserOverview = () => {
       [modalType]: true,
     }));
 
-    setSelectedTransaction(selectedId);
+    setSelectedForEdit(selectedId);
   };
 
   const handleCloseModal = (modalType) => {
@@ -351,7 +352,8 @@ const UserOverview = () => {
             {/* Account types and balances*/}
             <div className="user_details">
               <h3>
-                Account Types and Balance with Total Balance of ${formatNumber(totalBalance)}
+                Account Types and Balance with Total Balance of $
+                {formatNumber(totalBalance)}
               </h3>
               {accountTypes.length === 0 ? (
                 <p className="bold_text">
@@ -362,7 +364,9 @@ const UserOverview = () => {
                   {accountTypes.map((item, index) => (
                     <li key={index} className="text_wrap">
                       <p className="bold_text">{item.label} :</p>
-                      <span className="reg_text">$ {formatNumber(item.amount) || 0}</span>
+                      <span className="reg_text">
+                        $ {formatNumber(item.amount) || 0}
+                      </span>
                     </li>
                   ))}
                 </ul>
@@ -466,68 +470,57 @@ const UserOverview = () => {
             {/* Bonds List */}
             <div className="user_details">
               <h3>Bonds Holdings</h3>
-              {bondsHoldings.length === 0 ? (
+              {bondsHoldings.length > 0 ? (
+                <table className="overview_table">
+                  <thead>
+                    <tr>
+                      <th>Issuer Name</th>
+                      <th>Current Value</th>
+                      <th>Maturity Date</th>
+                      <th>Purchase Date</th>
+                      <th>Quantity</th>
+                    </tr>
+                  </thead>
+                      <tbody>
+                        {(() => {
+                          const item = bondsHoldings;
+                          const maxLength = Math.max(
+                            bondsHoldings.length,
+                          );
+                          const rows = [];
+    
+                          for (let i = 0; i < maxLength; i++) {
+                            rows.push(
+                          <tr
+                            key={i}
+                            onClick={() =>
+                              handleOpenModal("isEditBondOpen", item[i])
+                            }
+                          >
+                            <td>
+                              <div className="button_grid">
+                                <img
+                                  src={item[i].image}
+                                  alt="Bond image"
+                                  style={{ width: "100px" }}
+                                />
+                                <p>{item[i].issuerName}</p>
+                              </div>
+                            </td>
+                            <td>$ {item[i].currentValue}</td>
+                            <td>{item[i].maturityDate}</td>
+                            <td>{item[i].purchaseDate}</td>
+                            <td>{item[i].quantity}</td>
+                          </tr>
+                          )}
+                          return rows;
+                        })()}
+                      </tbody>
+                </table>
+              ) : (
                 <p className="bold_text">
                   This user holds no bonds at the moment.
                 </p>
-              ) : (
-                bondsHoldings.map((item) => {
-                  const maturityObject = item.maturityDate?.toDate
-                    ? item.maturityDate.toDate()
-                    : new Date(item.maturityDate);
-                  const maturityDay = String(maturityObject.getDate()).padStart(
-                    2,
-                    "0"
-                  );
-                  const maturityMonth = String(
-                    maturityObject.getMonth() + 1
-                  ).padStart(2, "0");
-                  const maturityYear = maturityObject.getFullYear();
-                  const formattedMaturity = `${maturityDay}/${maturityMonth}/${maturityYear}`;
-
-                  const purchaseObject = item.purchaseDate?.toDate
-                    ? item.purchaseDate.toDate()
-                    : new Date(item.purchaseDate);
-                  const day = String(purchaseObject.getDate()).padStart(2, "0");
-                  const month = String(purchaseObject.getMonth() + 1).padStart(
-                    2,
-                    "0"
-                  );
-                  const year = purchaseObject.getFullYear();
-                  const formattedPurchase = `${day}/${month}/${year}`;
-
-                  return (
-                    <div className="user_wrap" key={item.id}>
-                      <div className="text_wrap">
-                        <img
-                          src={item.image}
-                          alt="Bond image"
-                          style={{ width: "100px" }}
-                        />
-                      </div>
-                      <div className="text_wrap">
-                        <p className="bold_text">Issuer Name:</p>
-                        <span className="reg_text">{item.issuerName}</span>
-                      </div>
-                      <div className="text_wrap">
-                        <p className="bold_text">Current Value:</p>
-                        <span className="reg_text">$ {item.currentValue}</span>
-                      </div>
-                      <div className="text_wrap">
-                        <p className="bold_text">Maturity Date:</p>
-                        <span className="reg_text">{formattedMaturity}</span>
-                      </div>
-                      <div className="text_wrap">
-                        <p className="bold_text">Purchase Date:</p>
-                        <span className="reg_text">{formattedPurchase}</span>
-                      </div>
-                      <div className="text_wrap">
-                        <p className="bold_text">Quantity:</p>
-                        <span className="reg_text">{item.quantity}</span>
-                      </div>
-                    </div>
-                  );
-                })
               )}
               <div className="dropdown_btn">
                 <button onClick={() => handleOpenModal("isAddBondOpen")}>
@@ -565,7 +558,12 @@ const UserOverview = () => {
                       <tbody key={index}>
                         <tr>
                           <td>
-                            <div className="button_grid" onClick={() => handleOpenModal("isEditTermOpen", term.id)}>
+                            <div
+                              className="button_grid"
+                              onClick={() =>
+                                handleOpenModal("isEditTermOpen", term.id)
+                              }
+                            >
                               <img src={term.logo} alt="logo" />
                               <p>{term.bankName}</p>
                             </div>
@@ -755,7 +753,7 @@ const UserOverview = () => {
             handleCloseModal("isEditTransactionOpen");
             setSelectedUserForAdd(null);
           }}
-          selectedTransaction={selectedTransaction}
+          selectedTransaction={selectedForEdit}
           setTransactions={setTransactions}
           userId={user}
           totalBalance={totalBalance}
@@ -763,7 +761,7 @@ const UserOverview = () => {
             fetchSubCollection("transactions", setTransactions);
             fetchSubCollection("accountTypes", setAccountTypes);
           }}
-          transactionId={selectedTransaction.id}
+          transactionId={selectedForEdit.id}
         />
       )}
 
@@ -783,11 +781,12 @@ const UserOverview = () => {
         <EditBond
           onClose={() => {
             handleCloseModal("isEditBondOpen");
-            setSelectedUserForAdd(null);
+            selectedForEdit(null);
           }}
           bond={bondsHoldings}
           setBond={setBondsHoldings}
-          selectedBonds={bondsHoldings[0]}
+          selectedBondId={selectedForEdit.id}
+          selectedBond={selectedForEdit}
           userId={user}
         />
       )}

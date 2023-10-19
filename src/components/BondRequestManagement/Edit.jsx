@@ -1,7 +1,18 @@
 import React from 'react';
 
-export default function Edit() {
+export default function EditBond({
+  onClose,
+  bond,
+  setBond,
+  selectedBond,
+  selectedBondId,
+  userId
+}) {
+  console.log(bond, userId)
+  console.log(selectedBond, selectedBondId)
   return (
-    <div>Edit</div>
+    <div>
+      Edit: 
+    </div>
   )
 }
