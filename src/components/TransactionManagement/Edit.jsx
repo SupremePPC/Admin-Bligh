@@ -170,9 +170,9 @@ const EditTransaction = ({
             });
           } else {
             if (type === "Deposit") {
-              existingAmount += updatedTransaction.amount; // Add to the existing amount for deposits
+              existingAmount = updatedTransaction.amount; // Add to the existing amount for deposits
             } else if (type === "Withdrawal") {
-              existingAmount -= updatedTransaction.amount; // Subtract from the existing amount for withdrawals
+              existingAmount = updatedTransaction.amount; // Subtract from the existing amount for withdrawals
             }
   
             // Check if the label has changed and update it

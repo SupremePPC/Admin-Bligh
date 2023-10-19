@@ -49,6 +49,7 @@ export default function InvestIpoModal({ isOpen, onClose, ipo, userId }) {
       setInvestmentAmount(0);
       setSelectedForEdit(investmentData)
       setSelectedId(result.id);
+      setIsEditing(true);
       onClose();
     } catch (error) {
       setError(
@@ -136,9 +137,8 @@ export default function InvestIpoModal({ isOpen, onClose, ipo, userId }) {
     {
       isEditing && (
         <EditIposUser 
-        ipos={ipo}
-        iposId={iposId}
-        selectedForEdit={selectedForEdit}
+        iposId={setSelectedId}
+        ipo={selectedForEdit}
         onClose={onClose}
         userId={userId}
         />

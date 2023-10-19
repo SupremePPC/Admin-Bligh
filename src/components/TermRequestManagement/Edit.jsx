@@ -138,7 +138,10 @@ const EditTerm = ({ userId, onClose, term, termId }) => {
     <div className="small-container">
       {isLoading && <LoadingScreen />}
       <form onSubmit={handleSubmit}>
+        <div className="section_header">
+
         <h3>Edit Term for {userId.userId}</h3>
+        </div>
         <label htmlFor="logo">Upload Logo:</label>
         {formData.imagePreview && (
           <img
@@ -229,3 +232,4 @@ const EditTerm = ({ userId, onClose, term, termId }) => {
 };
 
 export default EditTerm;
+

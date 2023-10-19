@@ -18,6 +18,7 @@ import { deleteBankingDetails, formatNumber } from "../../firebaseConfig/firesto
 import Edit from "../BankingDetails/Edit";
 import EditBond from "../BondRequestManagement/Edit";
 import EditTerm from "../TermRequestManagement/Edit";
+import EditIposUser from "../IPOrequests/Edit";
 
 const UserOverview = () => {
   const user = useParams();
@@ -216,6 +217,7 @@ const UserOverview = () => {
         !modalState.isAddNewTermOpen &&
         !modalState.isEditTermOpen &&
         !modalState.isAddNewIpos &&
+        !modalState.isEditIposOpen &&
         !modalState.isAddNewDocumentOpen &&
         !modalState.isEditDocumentOpen && (
           <div className="userOverview_container">
@@ -682,22 +684,33 @@ const UserOverview = () => {
                         <th>Current Price</th>
                       </tr>
                     </thead>
-                    {ipos.map((ipos, index) => (
-                      <tbody key={index}>
-                        <tr>
+                      <tbody>
+                        {(() => {
+                        const item = ipos;
+                        const maxLength = Math.max(ipos.length);
+                        const rows = [];
+
+                        for (let i = 0; i < maxLength; i++) {
+                          console.log(item[i]);
+                          rows.push(
+                            <tr
+                              key={i} onClick={() => handleOpenModal("isEditIposOpen", item[i])}>
                           <td>
                             <div className="button_grid">
-                              <img src={ipos.logo} alt="logo" />
-                              <p>{ipos.name}</p>
+                              <img src={item[i].logo} alt="logo" />
+                              <p>{item[i].name}</p>
                             </div>
                           </td>
-                          <td>{ipos.date}</td>
-                          <td>$ {formatNumber(ipos.amountInvested)}</td>
-                          <td>{ipos.numberOfShares}</td>
-                          <td>$ {ipos.sharePrice}</td>
+                          <td>{item[i].date}</td>
+                          <td>$ {formatNumber(item[i].amountInvested)}</td>
+                          <td>{item[i].numberOfShares}</td>
+                          <td>$ {item[i].sharePrice}</td>
                         </tr>
+                          );
+                        }
+                        return rows;
+                      })()}
                       </tbody>
-                    ))}
                   </>
                 ) : (
                   <tbody>
@@ -855,16 +868,15 @@ const UserOverview = () => {
         />
       )}
 
-      {modalState.isEditIpos && (
-        <Edit
+      {modalState.isEditIposOpen && (
+        <EditIposUser
           onClose={() => {
-            handleCloseModal("isEditIpos");
+            handleCloseModal("isEditIposOpen");
             setSelectedForEdit(null);
           }}
-          ipos={ipos}
           setIpos={setIpos}
           userId={user}
-          selectedForEdit={selectedForEdit}
+          ipo={selectedForEdit}
           iposId={selectedForEdit.id}
         />
       )}

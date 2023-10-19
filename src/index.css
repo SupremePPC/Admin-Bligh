@@ -576,6 +576,14 @@ dd {
 
 .small-container {
   max-width: 800px;
+  padding: 2rem 1rem;
+  margin-left: auto;
+  margin-right: auto;
+  background: #f3f7f9;
+  border: 1px solid #00b7ffa1;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  border-radius: 10px;
 }
 
 .medium-container {
