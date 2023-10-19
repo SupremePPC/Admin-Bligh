@@ -1,14 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import CurrencyInput from 'react-currency-input-field'; // Import any required libraries
+import React, { useState, useEffect } from "react";
+import CurrencyInput from "react-currency-input-field";
+import { updateTermInUserCollection } from "../../firebaseConfig/firestore";
+import Swal from "sweetalert2";
 
-const EditTerm = ({ setFixedTerm, fixedTerm, userId, onClose, term, termId }) => {
+const EditTerm = ({ userId, onClose, term, termId }) => {
+  console.log("term:", term, termId, userId);
   const [isLoading, setIsLoading] = useState(false);
-  const [errors, setErrors] = useState({});
   const [formData, setFormData] = useState({
     bankName: term.bankName,
     interestRate: term.interestRate,
     logo: term.logo,
-    minAmount: term.minAmount,
+    minAmount: term.principalAmount,
     status: term.status,
     term: term.term,
     type: term.type,
@@ -17,14 +19,14 @@ const EditTerm = ({ setFixedTerm, fixedTerm, userId, onClose, term, termId }) =>
   const getCurrentDate = () => {
     const now = new Date();
     const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0'); // Month is zero-based
-    const day = String(now.getDate()).padStart(2, '0');
+    const month = String(now.getMonth() + 1).padStart(2, "0"); // Month is zero-based
+    const day = String(now.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
   };
 
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
-    if (type === 'file') {
+    if (type === "file") {
       if (files.length > 0) {
         const selectedFile = files[0];
         handleUploadImage(selectedFile)
@@ -36,7 +38,7 @@ const EditTerm = ({ setFixedTerm, fixedTerm, userId, onClose, term, termId }) =>
             });
           })
           .catch((error) => {
-            console.error('Error uploading image:', error);
+            console.error("Error uploading image:", error);
           });
       }
     } else {
@@ -50,7 +52,7 @@ const EditTerm = ({ setFixedTerm, fixedTerm, userId, onClose, term, termId }) =>
   const handleUploadImage = async (imageFile) => {
     if (imageFile instanceof File) {
       // Handle image upload logic here
-    } else if (typeof imageFile === 'string') {
+    } else if (typeof imageFile === "string") {
       // Image is already a URL, no need to re-upload
       return imageFile;
     } else {
@@ -64,16 +66,24 @@ const EditTerm = ({ setFixedTerm, fixedTerm, userId, onClose, term, termId }) =>
 
     try {
       // Validate form data
-      if (!formData.logo || !formData.bankName || !formData.minAmount || !formData.interestRate || !formData.term || !formData.status || !formData.type) {
-        throw new Error('All fields are required.');
+      if (
+        !formData.logo ||
+        !formData.bankName ||
+        !formData.minAmount ||
+        !formData.interestRate ||
+        !formData.term ||
+        !formData.status ||
+        !formData.type
+      ) {
+        throw new Error("All fields are required.");
       }
 
       const updatedData = {
         bankName: formData.bankName,
         date: getCurrentDate(),
-        interestRate: parseFloat(formData.interestRate.replace(/,/g, '')),
+        interestRate: parseFloat(formData.interestRate.replace(/,/g, "")),
         logo: formData.logo,
-        principalAmount: parseFloat(formData.minAmount.replace(/,/g, '')),
+        principalAmount: parseFloat(formData.principalAmount.replace(/,/g, "")),
         status: formData.status,
         term: formData.term,
         type: formData.type,
@@ -86,15 +96,39 @@ const EditTerm = ({ setFixedTerm, fixedTerm, userId, onClose, term, termId }) =>
       }
 
       // Handle the update logic using termId
-      // ...
-
-      // Assuming the update is successful, display a success message and update the state
-      // ...
-
+      const result = await updateTermInUserCollection(
+        userId.userId,
+        updatedData,
+        termId
+      );
+      if (result.success) {
+        if (formData.logo instanceof File) {
+          // New image selected, upload it and update the image URL
+          const imageUrl = await handleUploadImage(formData.logo);
+          console.log(imageUrl);
+          updatedData.image = imageUrl; // Update the image field with the Firebase Storage URL
+          console.log(updatedData.logo, "clicked");
+        } else if (!formData.logo) {
+          // If formData.image is empty, use the original image data
+          updatedData.image = originalImageData; // Replace 'originalImageData' with the actual original image data
+          console.log(updatedData.logo, "clicked");
+        }
+        Swal.fire({
+          icon: "success",
+          title: "Added!",
+          text: `Term added successfully.`,
+          showConfirmButton: false,
+          timer: 2000,
+        });
+      }
     } catch (error) {
       console.error(error);
-      // Handle error and display an error message
-      // ...
+      Swal.fire({
+        icon: "error",
+        title: "Error!",
+        text: `Error adding term: ${error.message}`,
+        showConfirmButton: true,
+      });
     } finally {
       setIsLoading(false);
     }
@@ -102,13 +136,18 @@ const EditTerm = ({ setFixedTerm, fixedTerm, userId, onClose, term, termId }) =>
 
   return (
     <div className="small-container">
-      {isLoading && (
-        <LoadingScreen />
-      )}
+      {isLoading && <LoadingScreen />}
       <form onSubmit={handleSubmit}>
         <h3>Edit Term for {userId.userId}</h3>
         <label htmlFor="logo">Upload Logo:</label>
-        {/* Include logic for image preview here */}
+        {formData.imagePreview && (
+          <img
+            src={formData.imagePreview}
+            alt="Image Preview"
+            width={100}
+            className="img_preview"
+          />
+        )}
         <input
           type="file"
           name="logo"
@@ -116,19 +155,74 @@ const EditTerm = ({ setFixedTerm, fixedTerm, userId, onClose, term, termId }) =>
           accept="image/*"
           required
         />
-        {/* Include other form fields here */}
-        <div style={{ marginTop: '30px' }}>
-          <input type="submit" value="Update" />
+        <label htmlFor="bankName">Bank Name:</label>
+        <input
+          type="text"
+          name="bankName"
+          onChange={handleChange}
+          value={formData.bankName}
+          required
+        />
+        <label htmlFor="term">Terms (e.g 24 Months or 1 Year):</label>
+        <input
+          type="text"
+          name="term"
+          onChange={handleChange}
+          value={formData.term}
+          required
+        />
+        <label htmlFor="minAmount">Minimum Amount:</label>
+        <CurrencyInput
+          decimalSeparator="."
+          prefix="$"
+          name="minAmount"
+          placeholder="0.00"
+          value={formData.principalAmount} // Use the formData value here
+          decimalsLimit={2}
+          onValueChange={(value, name) => {
+            setFormData({ ...formData, [name]: value });
+          }}
+        />
+
+        <label htmlFor="interestRate">Interest Rate:</label>
+        <input
+          type="number"
+          name="interestRate"
+          onChange={handleChange}
+          value={formData.interestRate}
+          required
+        />
+        <label htmlFor="accountType">Term Type</label>
+        <select
+          id="type"
+          value={formData.type}
+          onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+        >
+          <option value="">--Select--</option>
+          <option value="Deposit">Deposit</option>
+          <option value="Withdrawal">Withdrawal</option>
+        </select>
+        <label htmlFor="accountType">Status</label>
+        <select
+          id="status"
+          value={formData.status}
+          onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+        >
+          <option value="">--Select--</option>
+          <option value="Pending">Pending</option>
+          <option value="Approved">Approved</option>
+          <option value="Declined">Declined</option>
+        </select>
+        <div style={{ marginTop: "30px" }}>
+          <input type="submit" value="Add" />
           <input
-            style={{ marginLeft: '12px' }}
+            style={{ marginLeft: "12px" }}
             className="muted-button"
             type="button"
             value="Cancel"
             onClick={onClose}
           />
         </div>
-        {errors.isin && <div>{errors.isin}</div>}
-        {errors.issuerName && <div>{errors.issuerName}</div>}
       </form>
     </div>
   );

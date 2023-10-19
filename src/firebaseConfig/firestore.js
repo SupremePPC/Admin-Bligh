@@ -834,6 +834,38 @@ export async function addTermToUserCollection(userId, termData) {
   }
 };
 
+// Function to update term in user's terms subcollection
+export async function updateTermInUserCollection(userId, termData, termId) {
+  try {
+    const userTermsHoldingsPath = collection(
+      db,
+      `users/${userId}/fixedTermDeposits/${termId}`
+    );
+    const docRef = doc(userTermsHoldingsPath, termId);
+    await updateDoc(docRef, termData);
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating term:", error);
+    return { success: false, error: error.message };
+  }
+}
+
+// Function to delete term from user's terms subcollection
+export async function deleteTermFromUserCollection(userId, termId) {
+  try {
+    const userTermsHoldingsPath = collection(
+      db,
+      `users/${userId}/fixedTermDeposits/${termId}`
+    );
+    const docRef = doc(userTermsHoldingsPath, termId);
+    await deleteDoc(docRef);
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting term:", error);
+    return { success: false, error: error.message };
+  }
+}
+
 //IPOS
 const IPOS_COLLECTION = "ipos";
 

@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { serverTimestamp } from "firebase/firestore";
 import { addIposToUserCollection } from "../../../firebaseConfig/firestore";
 import CurrencyInput from "react-currency-input-field";
 import Swal from "sweetalert2";
@@ -10,6 +9,14 @@ export default function InvestIpoModal({ isOpen, onClose, ipo, userId }) {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  const getCurrentDate = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0"); // Month is zero-based
+    const day = String(now.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
 
   const handleInvestInIpo = async () => {
     if (!investmentAmount || investmentAmount < ipo.minInvestment) {
@@ -29,7 +36,7 @@ export default function InvestIpoModal({ isOpen, onClose, ipo, userId }) {
       expectedDate: ipo.expectedDate,
       sharePrice: ipo.sharePrice,
       expListingPrice: ipo.expListingPrice,
-      date: serverTimestamp(),
+      date: getCurrentDate(),
       minInvestment: ipo.minInvestment,
       numberOfShares: numberOfShares,
     };

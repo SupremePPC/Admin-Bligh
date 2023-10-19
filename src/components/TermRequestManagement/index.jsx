@@ -20,27 +20,27 @@ const TermsRequestTable = () => {
   const [searchQuery, setSearchQuery] = useState(""); // To store the search query
   const [filteredTermRequests, setFilteredTermRequests] = useState([]); // To store the filtered requests
 
-  useEffect(() => {
-    const fetchTermRequests = async () => {
-      try {
-        setIsLoading(true);
-        const allRequests = await getTermRequests();
-        const requestsWithUserDetails = await Promise.all(
-          allRequests.map(async (request) => {
-            const userDoc = await getDoc(doc(db, "users", request.userId));
-            const userDetails = userDoc.data();
-            return { ...request, userName: userDetails.fullName };
-          })
-        );
-        setTermRequests(requestsWithUserDetails);
-        setFilteredTermRequests(requestsWithUserDetails); // Set filteredTermRequests here
-      } catch (error) {
-        console.error("Error fetching request:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const fetchTermRequests = async () => {
+    try {
+      setIsLoading(true);
+      const allRequests = await getTermRequests();
+      const requestsWithUserDetails = await Promise.all(
+        allRequests.map(async (request) => {
+          const userDoc = await getDoc(doc(db, "users", request.userId));
+          const userDetails = userDoc.data();
+          return { ...request, userName: userDetails.fullName };
+        })
+      );
+      setTermRequests(requestsWithUserDetails);
+      setFilteredTermRequests(requestsWithUserDetails); // Set filteredTermRequests here
+    } catch (error) {
+      console.error("Error fetching request:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchTermRequests();
   }, []);
 
@@ -92,6 +92,7 @@ const TermsRequestTable = () => {
       if (message) await addNotification(userId, message, newStatus);
 
       // Refresh the table data
+      fetchTermRequests();
       
       Swal.fire({
         icon: "success",
@@ -100,9 +101,6 @@ const TermsRequestTable = () => {
         showConfirmButton: false,
         timer: 2000,
       });
-      
-      const allRequests = await getTermRequests();
-      setTermRequests(allRequests);
     } catch (err) {
       console.error("Error updating request:", err);
       Swal.fire({
@@ -118,9 +116,9 @@ const TermsRequestTable = () => {
 
   return (
     <div className="container">
-      {isLoading ? (
+      {isLoading && (
         <LoadingScreen />
-      ) : (
+      )}
         <>
           <Header
             handleSearch={handleSearch}
@@ -133,7 +131,7 @@ const TermsRequestTable = () => {
             handleUpdateRequest={handleUpdateRequest}
           />
         </>
-      )}
+    
     </div>
   );
 };

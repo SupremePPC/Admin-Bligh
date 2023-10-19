@@ -17,6 +17,7 @@ import EditDocument from "../DocumentManagement/Edit";
 import { deleteBankingDetails } from "../../firebaseConfig/firestore";
 import Edit from "../BankingDetails/Edit";
 import EditBond from "../BondRequestManagement/Edit";
+import EditTerm from "../TermRequestManagement/Edit";
 
 const UserOverview = () => {
   const user = useParams();
@@ -32,7 +33,7 @@ const UserOverview = () => {
   const [selectedDocument, setSelectedDocument] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedForEdit, setSelectedForEdit] = useState(null);
-
+  const [error, setError] = useState(null);
   const [modalState, setModalState] = useState({
     isAddTransactionOpen: false,
     isAddBondOpen: false,
@@ -165,7 +166,8 @@ const UserOverview = () => {
     // Parse the term string to extract the number and the unit
     const termParts = term.split(" ");
     if (termParts.length !== 2) {
-      console.error("Invalid term format:", term);
+      // console.error("Invalid term format:", term);
+      // setError("Invalid term format");
       return "Invalid Input";
     }
 
@@ -228,6 +230,7 @@ const UserOverview = () => {
         !modalState.isEditBondOpen &&
         !modalState.isEditBankingDetails &&
         !modalState.isAddNewTermOpen &&
+        !modalState.isEditTermOpen &&
         !modalState.isAddNewIpos &&
         !modalState.isAddNewDocumentOpen &&
         !modalState.isEditDocumentOpen && (
@@ -288,9 +291,15 @@ const UserOverview = () => {
               <h3>Banking Details</h3>
               {bankingDetails.length === 0 ? (
                 <>
-                  <p className="bold_text">
+                  <table className="overview_table">
+                  <tbody>
+                    <tr>
+                      <td className="no_holding">
                     This user hasn't added any banking details yet.
-                  </p>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
                   <div className="dropdown_btn">
                     <button
                       style={{ marginLeft: "12px" }}
@@ -349,6 +358,55 @@ const UserOverview = () => {
               )}
             </div>
 
+            {/* Document */}
+            <div className="user_details">
+              <h3>Document</h3>
+              {docs.length === 0 ? (
+                <table className="overview_table">
+                  <tbody>
+                    <tr>
+                      <td className="no_holding">
+                      No document has been added yet.
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              ) : (
+                docs.map((doc, item) => (
+                  <div className="user_wrap" key={item}>
+                    {/* <div className="text_wrap"> */}
+                    <div className="text_wrap">
+                      <p className="bold_text">File Description :</p>
+                      <span className="reg_text">{doc.fileDescription}</span>
+                    </div>
+                    {/* </div> */}
+                    <div className="text_wrap">
+                      <p className="bold_text">File Url :</p>
+                      <a className="bold_text" href={doc.downloadURL}>
+                        <u>Download URL</u>
+                      </a>
+                    </div>
+                    {/* <div className="text_wrap">
+                      <div className="dropdown_btn">
+                        <button
+                          onClick={() => {
+                            handleEditDocument(doc);
+                          }}
+                        >
+                          Edit Document
+                        </button>
+                      </div>
+                    </div> */}
+                  </div>
+                ))
+              )}
+              <div className="dropdown_btn">
+                <button onClick={() => handleOpenModal("isAddNewDocumentOpen")}>
+                  Add Document
+                </button>
+              </div>
+            </div>
+
             {/* Account types and balances*/}
             <div className="user_details">
               <h3>
@@ -356,9 +414,15 @@ const UserOverview = () => {
                 {formatNumber(totalBalance)}
               </h3>
               {accountTypes.length === 0 ? (
-                <p className="bold_text">
+                <table className="overview_table">
+                <tbody>
+                  <tr>
+                    <td className="no_holding">
                   This user has no account or balance at the moment.
-                </p>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
               ) : (
                 <ul className="user_wrap">
                   {accountTypes.map((item, index) => (
@@ -376,90 +440,96 @@ const UserOverview = () => {
             {/* Transactions List */}
             <div className="user_details">
               <h3>Transaction List</h3>
-              {transactions.length === 0 ? (
-                <p className="bold_text">
-                  No Transaction has been carried out yet.
-                </p>
-              ) : (
-                <table className="overview_table">
-                  <thead>
-                    <tr>
-                      <th className="bold_text">Deposit amount</th>
-                      <th className="bold_text">Withdrawal amount</th>
-                    </tr>
-                  </thead>
+              <table className="overview_table">
+                {transactions.length === 0 ? (
                   <tbody>
-                    {(() => {
-                      const deposits = transactions.filter(
-                        (t) => t.type === "Deposit"
-                      );
-                      const withdrawals = transactions.filter(
-                        (t) => t.type === "Withdrawal"
-                      );
-                      const maxLength = Math.max(
-                        deposits.length,
-                        withdrawals.length
-                      );
-                      const rows = [];
-
-                      for (let i = 0; i < maxLength; i++) {
-                        rows.push(
-                          <tr key={i}>
-                            <td>
-                              {deposits[i] && (
-                                <div
-                                  onClick={() =>
-                                    handleOpenModal(
-                                      "isEditTransactionOpen",
-                                      deposits[i]
-                                    )
-                                  }
-                                >
-                                  <span className="bold_text">
-                                    {deposits[i].status}
-                                  </span>{" "}
-                                  <span className="reg_text">
-                                    ${formatNumber(deposits[i].amount)}
-                                  </span>
-                                  <span> in </span>
-                                  <span className="bold_text">
-                                    {deposits[i].accountType}
-                                  </span>
-                                </div>
-                              )}
-                            </td>
-                            <td>
-                              {withdrawals[i] && (
-                                <div
-                                  onClick={() =>
-                                    handleOpenModal(
-                                      "isEditTransactionOpen",
-                                      withdrawals[i]
-                                    )
-                                  }
-                                >
-                                  <span className="bold_text">
-                                    {withdrawals[i].status}
-                                  </span>{" "}
-                                  <span className="reg_text">
-                                    ${formatNumber(withdrawals[i].amount)}
-                                  </span>
-                                  <span> in </span>
-                                  <span className="bold_text">
-                                    {withdrawals[i].accountType}
-                                  </span>
-                                </div>
-                              )}
-                            </td>
-                          </tr>
-                        );
-                      }
-
-                      return rows;
-                    })()}
+                    <tr>
+                      <td className="no_holding">
+                        No Transaction has been carried out yet.
+                      </td>
+                    </tr>
                   </tbody>
-                </table>
-              )}
+                ) : (
+                  <>
+                    <thead>
+                      <tr>
+                        <th className="bold_text">Deposit amount</th>
+                        <th className="bold_text">Withdrawal amount</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(() => {
+                        const deposits = transactions.filter(
+                          (t) => t.type === "Deposit"
+                        );
+                        const withdrawals = transactions.filter(
+                          (t) => t.type === "Withdrawal"
+                        );
+                        const maxLength = Math.max(
+                          deposits.length,
+                          withdrawals.length
+                        );
+                        const rows = [];
+
+                        for (let i = 0; i < maxLength; i++) {
+                          rows.push(
+                            <tr key={i}>
+                              <td>
+                                {deposits[i] && (
+                                  <div
+                                    onClick={() =>
+                                      handleOpenModal(
+                                        "isEditTransactionOpen",
+                                        deposits[i]
+                                      )
+                                    }
+                                  >
+                                    <span className="bold_text">
+                                      {deposits[i].status}
+                                    </span>{" "}
+                                    <span className="reg_text">
+                                      ${formatNumber(deposits[i].amount)}
+                                    </span>
+                                    <span> in </span>
+                                    <span className="bold_text">
+                                      {deposits[i].accountType}
+                                    </span>
+                                  </div>
+                                )}
+                              </td>
+                              <td>
+                                {withdrawals[i] && (
+                                  <div
+                                    onClick={() =>
+                                      handleOpenModal(
+                                        "isEditTransactionOpen",
+                                        withdrawals[i]
+                                      )
+                                    }
+                                  >
+                                    <span className="bold_text">
+                                      {withdrawals[i].status}
+                                    </span>{" "}
+                                    <span className="reg_text">
+                                      ${formatNumber(withdrawals[i].amount)}
+                                    </span>
+                                    <span> in </span>
+                                    <span className="bold_text">
+                                      {withdrawals[i].accountType}
+                                    </span>
+                                  </div>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        }
+
+                        return rows;
+                      })()}
+                    </tbody>
+                  </>
+                )}
+              </table>
               <div className="dropdown_btn">
                 <button onClick={() => handleOpenModal("isAddTransactionOpen")}>
                   Add Transaction
@@ -470,57 +540,62 @@ const UserOverview = () => {
             {/* Bonds List */}
             <div className="user_details">
               <h3>Bonds Holdings</h3>
-              {bondsHoldings.length > 0 ? (
-                <table className="overview_table">
-                  <thead>
-                    <tr>
-                      <th>Issuer Name</th>
-                      <th>Current Value</th>
-                      <th>Maturity Date</th>
-                      <th>Purchase Date</th>
-                      <th>Quantity</th>
-                    </tr>
-                  </thead>
-                      <tbody>
-                        {(() => {
-                          const item = bondsHoldings;
-                          const maxLength = Math.max(
-                            bondsHoldings.length,
+              <table className="overview_table">
+                {bondsHoldings.length > 0 ? (
+                  <>
+                    <thead>
+                      <tr>
+                        <th>Issuer Name</th>
+                        <th>Current Value</th>
+                        <th>Maturity Date</th>
+                        <th>Purchase Date</th>
+                        <th>Quantity</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(() => {
+                        const item = bondsHoldings;
+                        const maxLength = Math.max(bondsHoldings.length);
+                        const rows = [];
+
+                        for (let i = 0; i < maxLength; i++) {
+                          rows.push(
+                            <tr
+                              key={i}
+                              onClick={() =>
+                                handleOpenModal("isEditBondOpen", item[i])
+                              }
+                            >
+                              <td>
+                                <div className="button_grid">
+                                  <img
+                                    src={item[i].imagePreview}
+                                    alt="Bond image"
+                                  />
+                                  <p>{item[i].issuerName}</p>
+                                </div>
+                              </td>
+                              <td>$ {item[i].currentValue}</td>
+                              <td>{item[i].maturityDate}</td>
+                              <td>{item[i].purchaseDate}</td>
+                              <td>{item[i].quantity}</td>
+                            </tr>
                           );
-                          const rows = [];
-    
-                          for (let i = 0; i < maxLength; i++) {
-                            rows.push(
-                          <tr
-                            key={i}
-                            onClick={() =>
-                              handleOpenModal("isEditBondOpen", item[i])
-                            }
-                          >
-                            <td>
-                              <div className="button_grid">
-                                <img
-                                  src={item[i].imagePreview}
-                                  alt="Bond image"
-                                />
-                                <p>{item[i].issuerName}</p>
-                              </div>
-                            </td>
-                            <td>$ {item[i].currentValue}</td>
-                            <td>{item[i].maturityDate}</td>
-                            <td>{item[i].purchaseDate}</td>
-                            <td>{item[i].quantity}</td>
-                          </tr>
-                          )}
-                          return rows;
-                        })()}
-                      </tbody>
-                </table>
-              ) : (
-                <p className="bold_text">
-                  This user holds no bonds at the moment.
-                </p>
-              )}
+                        }
+                        return rows;
+                      })()}
+                    </tbody>
+                  </>
+                ) : (
+                  <tbody>
+                    <tr>
+                      <td className="no_holding">
+                        This user holds no bonds at the moment.
+                      </td>
+                    </tr>
+                  </tbody>
+                )}
+              </table>
               <div className="dropdown_btn">
                 <button onClick={() => handleOpenModal("isAddBondOpen")}>
                   Add Bond
@@ -553,34 +628,43 @@ const UserOverview = () => {
                         </th>
                       </tr>
                     </thead>
-                    {fixedTerm.map((term, index) => (
-                      <tbody key={index}>
-                        <tr>
-                          <td>
-                            <div
-                              className="button_grid"
+                    <tbody>
+                      {(() => {
+                        const term = fixedTerm;
+                        const maxLength = Math.max(fixedTerm.length);
+                        const rows = [];
+
+                        for (let i = 0; i < maxLength; i++) {
+                          rows.push(
+                            <tr
+                              key={i}
                               onClick={() =>
-                                handleOpenModal("isEditTermOpen", term.id)
+                                handleOpenModal("isEditTermOpen", term[i])
                               }
                             >
-                              <img src={term.logo} alt="logo" />
-                              <p>{term.bankName}</p>
-                            </div>
-                          </td>
-                          <td>$ {formatNumber(term.principalAmount)}</td>
-                          <td>{term.term}</td>
-                          <td>{term.interestRate} %</td>
-                          <td>
-                            ${" "}
-                            {calculateMaturityAmount(
-                              term.principalAmount,
-                              term.interestRate,
-                              term.term
-                            ) || 0}
-                          </td>
-                        </tr>
-                      </tbody>
-                    ))}
+                              <td>
+                                <div className="button_grid">
+                                  <img src={term[i].logo} alt="logo" />
+                                  <p>{term[i].bankName}</p>
+                                </div>
+                              </td>
+                              <td>$ {term[i].principalAmount}</td>
+                              <td>{term[i].term}</td>
+                              <td>{term[i].interestRate} %</td>
+                              <td>
+                                ${" "}
+                                {calculateMaturityAmount(
+                                  term[i].principalAmount,
+                                  term[i].interestRate,
+                                  term[i].term
+                                ) || 0}
+                              </td>
+                            </tr>
+                          );
+                        }
+                        return rows;
+                      })()}
+                    </tbody>
                   </>
                 ) : (
                   <tbody>
@@ -634,7 +718,7 @@ const UserOverview = () => {
                 ) : (
                   <tbody>
                     <tr>
-                      <td className="no_holding">No current Holdings.</td>
+                      <td className="no_holding">No current IPOs.</td>
                     </tr>
                   </tbody>
                 )}
@@ -646,48 +730,6 @@ const UserOverview = () => {
               </div>
             </div>
 
-            {/* Document */}
-            <div className="user_details">
-              <h3>Document</h3>
-              {docs.length === 0 ? (
-                <>
-                  <p className="bold_text">No document has been added yet.</p>
-                </>
-              ) : (
-                docs.map((doc, item) => (
-                  <div className="user_wrap" key={item}>
-                    {/* <div className="text_wrap"> */}
-                    <div className="text_wrap">
-                      <p className="bold_text">File Description :</p>
-                      <span className="reg_text">{doc.fileDescription}</span>
-                    </div>
-                    {/* </div> */}
-                    <div className="text_wrap">
-                      <p className="bold_text">File Url :</p>
-                      <a className="bold_text" href={doc.downloadURL}>
-                        <u>Download URL</u>
-                      </a>
-                    </div>
-                    {/* <div className="text_wrap">
-                      <div className="dropdown_btn">
-                        <button
-                          onClick={() => {
-                            handleEditDocument(doc);
-                          }}
-                        >
-                          Edit Document
-                        </button>
-                      </div>
-                    </div> */}
-                  </div>
-                ))
-              )}
-              <div className="dropdown_btn">
-                <button onClick={() => handleOpenModal("isAddNewDocumentOpen")}>
-                  Add Document
-                </button>
-              </div>
-            </div>
           </div>
         )}
 
@@ -799,6 +841,20 @@ const UserOverview = () => {
           fixedTerm={fixedTerm}
           setFixedTerm={setFixedTerm}
           userId={user}
+        />
+      )}
+
+      {modalState.isEditTermOpen && (
+        <EditTerm
+          onClose={() => {
+            handleCloseModal("isEditTermOpen");
+            setSelectedForEdit(null);
+          }}
+          fixedTerm={fixedTerm}
+          setFixedTerm={setFixedTerm}
+          userId={user}
+          term={selectedForEdit}
+          termId={selectedForEdit.id}
         />
       )}
 

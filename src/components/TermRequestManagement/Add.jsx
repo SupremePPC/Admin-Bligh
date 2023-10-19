@@ -11,7 +11,7 @@ const AddNewTerm = ({ setFixedTerm, fixedTerm, userId, onClose }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [selectedTerm, setSelectedTerm] = useState(null);
-  const [selecetedTermId, setSelectedTermId] = useState(null); 
+  const [selectedTermId, setSelectedTermId] = useState(null); 
   const [errors, setErrors] = useState({});
   const [formData, setFormData] = useState({
     bankName: "",
@@ -128,8 +128,8 @@ const AddNewTerm = ({ setFixedTerm, fixedTerm, userId, onClose }) => {
         });
         setFixedTerm([...fixedTerm, { ...newData, id: result.id }]);
         setIsEditing(false);
-        selecetedTermId(result.id);
-        selectedTerm(newData);
+        setSelectedTermId(result.id);
+        setSelectedTerm(newData);
       } else {
         throw new Error(result.error);
       }
@@ -176,7 +176,7 @@ const AddNewTerm = ({ setFixedTerm, fixedTerm, userId, onClose }) => {
             value={formData.bankName}
             required
           />
-          <label htmlFor="term">Terms:</label>
+          <label htmlFor="term">Terms (e.g 24 Months or 1 Year):</label>
           <input
             type="text"
             name="term"
@@ -190,7 +190,7 @@ const AddNewTerm = ({ setFixedTerm, fixedTerm, userId, onClose }) => {
             prefix="$"
             name="minAmount"
             placeholder="0.00"
-            defaultValue={formData.minAmount} // Use the formData value here
+            value={formData.minAmount} // Use the formData value here
             decimalsLimit={2}
             onValueChange={(value, name) => {
               setFormData({ ...formData, [name]: value });
@@ -238,8 +238,6 @@ const AddNewTerm = ({ setFixedTerm, fixedTerm, userId, onClose }) => {
               onClick={onClose}
             />
           </div>
-          {errors.isin && <div>{errors.isin}</div>}
-          {errors.issuerName && <div>{errors.issuerName}</div>}
         </form>
     </div>
     )}
@@ -253,7 +251,7 @@ const AddNewTerm = ({ setFixedTerm, fixedTerm, userId, onClose }) => {
             setIsEditing(false);
           }}
           term={selectedTerm}
-          termId={selecetedTermId}
+          termId={selectedTermId}
         />
     )}
     </>
