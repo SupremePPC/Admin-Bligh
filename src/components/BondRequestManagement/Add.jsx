@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import Swal from "sweetalert2";
-import LoadingScreen from "../LoadingScreen";
 import CurrencyInput from "react-currency-input-field";
 import { addBondUser } from "../../firebaseConfig/firestore";
 import { getDownloadURL, getStorage, uploadBytes } from "firebase/storage";
+import LoadingScreen from "../LoadingScreen";
 
 const AddBond = ({ setBond, bond, userId, onClose }) => {
   const [isLoading, setIsLoading] = useState(false);

@@ -155,8 +155,6 @@ const EditTransaction = ({
           const existingData = docSnap.data();
           let existingAmount = existingData.amount;
 
-          
-
           if (
             status !== "Approved"
           ) {

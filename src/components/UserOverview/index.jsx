@@ -502,7 +502,6 @@ const UserOverview = () => {
                                 <img
                                   src={item[i].image}
                                   alt="Bond image"
-                                  style={{ width: "100px" }}
                                 />
                                 <p>{item[i].issuerName}</p>
                               </div>
@@ -781,7 +780,7 @@ const UserOverview = () => {
         <EditBond
           onClose={() => {
             handleCloseModal("isEditBondOpen");
-            selectedForEdit(null);
+            setSelectedForEdit(null);
           }}
           bond={bondsHoldings}
           setBond={setBondsHoldings}

@@ -581,6 +581,27 @@ export async function addBondUser(userId, bondData) {
   }
 }
 
+//update new bonds for a particular user
+export async function updateBondUser(userId, bondId, bondData) {
+  try {
+    const bondsRef = collection(db, USERS_COLLECTION, userId, "bondsHoldings", bondId);
+    const updatedBondRef = await addDoc(bondsRef, bondData);
+    return { success: true, id: updatedBondRef.id };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+}
+
+export async function deleteBondUser(bondId) {
+  try {
+    const bondRef = collection(db, USERS_COLLECTION, userId, "bondsHoldings", bondId);
+    await deleteDoc(bondRef);
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+}
+
 //uodate existing bond
 export async function updateBond(bondId, updatedData) {
   try {
