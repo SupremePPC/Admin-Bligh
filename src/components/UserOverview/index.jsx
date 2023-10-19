@@ -14,7 +14,7 @@ import AddDocument from "../DocumentManagement/Add";
 import Swal from "sweetalert2";
 import "./style.css";
 import EditDocument from "../DocumentManagement/Edit";
-import { deleteBankingDetails } from "../../firebaseConfig/firestore";
+import { deleteBankingDetails, formatNumber } from "../../firebaseConfig/firestore";
 import Edit from "../BankingDetails/Edit";
 import EditBond from "../BondRequestManagement/Edit";
 import EditTerm from "../TermRequestManagement/Edit";
@@ -200,22 +200,6 @@ const UserOverview = () => {
     return maturityAmount.toFixed(2);
   };
 
-  const firestoreTimestampToDate = (timestamp) => {
-    return timestamp
-      ? new Date(timestamp.seconds * 1000).toLocaleDateString()
-      : "";
-  };
-
-  function formatNumber(
-    number,
-    options = {
-      style: "decimal",
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }
-  ) {
-    return number.toLocaleString("en-US", options);
-  }
 
   return (
     <div className="container">

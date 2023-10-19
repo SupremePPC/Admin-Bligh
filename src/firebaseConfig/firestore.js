@@ -1061,3 +1061,14 @@ export function getCurrentDate () {
   const day = String(now.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 };
+
+export function formatNumber(
+  number,
+  options = {
+    style: "decimal",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }
+) {
+  return number.toLocaleString("en-US", options);
+}
