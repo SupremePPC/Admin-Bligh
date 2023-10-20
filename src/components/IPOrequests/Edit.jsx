@@ -1,19 +1,22 @@
 import React, { useState } from "react";
-import { addIposToUserCollection, getCurrentDate } from "../../firebaseConfig/firestore";
+import {
+  addIposToUserCollection,
+  deleteIposFromUserCollection,
+  getCurrentDate,
+} from "../../firebaseConfig/firestore";
 import CurrencyInput from "react-currency-input-field";
 import Swal from "sweetalert2";
+import LoadingScreen from "../LoadingScreen";
 // import "./style.css";
 
 export default function EditIposUser({
   iposId,
   ipo,
   onClose,
+  refreshDetails,
   userId,
 }) {
-  console.log(iposId, ipo, userId);
   const [investmentAmount, setInvestmentAmount] = useState(0);
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleUpdate = async () => {
@@ -50,83 +53,120 @@ export default function EditIposUser({
       });
       setInvestmentAmount(0);
       onClose();
+      refreshDetails();
     } catch (error) {
-      setError(
-        `There was an issue sending your investment request. Try again later.`
-      );
+      Swal.fire({
+        icon: "error",
+        title: "Error!",
+        text: "There was an issue sending your investment request. Try again later.",
+        showConfirmButton: false,
+        timer: 2000,
+      });
       console.error(error.message);
-      setTimeout(() => setError(""), 4000);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    setIsLoading(true);
+    try {
+      await deleteIposFromUserCollection(userId.userId, iposId);
+      Swal.fire({
+        icon: "success",
+        title: "Success!",
+        text: "You have successfully deleted this investment.",
+        showConfirmButton: false,
+        timer: 2000,
+      });
+      refreshDetails();
+      onClose();
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error!",
+        text: "There was an issue deleting this investment. Try again later.",
+        showConfirmButton: false,
+        timer: 2000,
+      });
+      console.error(error.message);
     } finally {
       setIsLoading(false);
     }
   };
 
   const totalCost = ipo.amountInvested * ipo.sharePrice;
-  const numberOfShares = Math.ceil((investmentAmount / ipo.sharePrice) * 100) / 100;
+  const numberOfShares =
+    Math.ceil((investmentAmount / ipo.sharePrice) * 100) / 100;
 
   return (
-    
-    <div className="small-container">
-      {isLoading && <LoadingScreen />}
-      <div >
-        <div className="section_header">
-        <h3>Edit Term for {userId.userId}</h3>
-          <img src={ipo.logo} alt={`${ipo.name} Logo`} className="logo" />
-          <h2 className="title">{ipo.name}</h2>
-        </div>
-        <div className="section_body">
-        <div className="">
-          <label>IPO Expected Date:</label>
-          <p className="reg_text">{ipo.expectedDate}</p>
-        </div>
-        <div className="">
-          <label>IPO Share Price: </label>
-          <p className="reg_text">$ {ipo.sharePrice}</p>
-        </div>
-        <div className="">
-          <label>Expected Listing Price:</label>
-          <p className="reg_text">$ {ipo.expListingPrice}</p>
-        </div>
-        <div className="">
-          <label>Minimum Investment Amount:</label>
-          <p className="reg_text">$ {ipo.minInvestment}</p>
-        </div>
-        <div className="">
-          <label>Number of Shares:</label>
-          <p className="reg_text">{ipo.numberOfShares}</p>
-        </div>
-        <div className="">
-          <label>Total Cost:</label>
-          <p className="reg_text">$ {totalCost}</p>
-        </div>
-        <div className="input_group">
-          <label htmlFor="title">Investment Amount:</label>
-          <CurrencyInput
-            decimalSeparator="."
-            prefix="$"
-            name="investmentAmount"
-            placeholder="$0"
-            value={ipo.amountInvested}
-            decimalsLimit={2}
-            onValueChange={(value) => {
-              const formattedValue = parseFloat(value).toFixed(2);
-              setInvestmentAmount(parseFloat(formattedValue)); // Store as a number
-            }}
-            
-          />
+    <div className="invest_ipo_overlay" onClick={(e) => e.stopPropagation()}>
+      <div className="invest_ipo_modal">
+          <div className="section_header">
+            <h6>Edit Term for {userId.userId}</h6>
+            <img src={ipo.logo} alt={`${ipo.name} Logo`} className="logo" />
+            <h2 className="title">{ipo.name}</h2>
+          </div>
+          <div className="section_body">
+            <div className="more_dets">
+              <p className="bold_text">IPO Expected Date:</p>
+              <p className="reg_text">{ipo.expectedDate}</p>
+            </div>
+            <div className="more_dets">
+              <p className="bold_text">IPO Share Price: </p>
+              <p className="reg_text">$ {ipo.sharePrice}</p>
+            </div>
+            <div className="more_dets">
+              <p className="bold_text">Expected Listing Price:</p>
+              <p className="reg_text">$ {ipo.expListingPrice}</p>
+            </div>
+            <div className="more_dets">
+              <p className="bold_text">Minimum Investment Amount:</p>
+              <p className="reg_text">$ {ipo.minInvestment}</p>
+            </div>
+            <div className="more_dets">
+              <p className="bold_text">Number of Shares:</p>
+              <p className="reg_text">{numberOfShares || 0}</p>
+            </div>
+            <div className="more_dets">
+              <p className="bold_text">Total Cost:</p>
+              <p className="reg_text">$ {totalCost || 0}</p>
+            </div>
+            <div className="input_group">
+              <label htmlFor="title">Investment Amount:</label>
+              <CurrencyInput
+                decimalSeparator="."
+                prefix="$"
+                name="investmentAmount"
+                placeholder="$0"
+                defaultValue={investmentAmount}
+                decimalsLimit={2}
+                onValueChange={(value) => {
+                  const formattedValue = parseFloat(value).toFixed(2);
+                  setInvestmentAmount(parseFloat(formattedValue)); // Store as a number
+                }}
+              />
+            </div>
+          </div>
+          <div style={{display: "flex"}}>
+            <input type="submit" value="Save" onClick={handleUpdate} />
+            <input
+              style={{ marginLeft: "12px" }}
+              className="reject_btn"
+              type="button"
+              value="Delete"
+              onClick={handleDelete}
+            />
+            {isLoading && <div className="spinner" style={{ marginLeft: "12px" }}></div>}
+            <input
+              style={{ marginLeft: "auto", marginRight: "0" }}
+              className="muted-button"
+              type="button"
+              value="Cancel"
+              onClick={onClose}
+            />
+          </div>
         </div>
       </div>
-        <div style={{ marginTop: "30px" }}>
-          <input type="submit" value="Save" onClick={handleUpdate}/>
-          <input
-            style={{ marginLeft: "12px" }}
-            className="muted-button"
-            type="button"
-            value="Cancel"
-            onClick={onClose}
-          />
-        </div>
-      </div>
-    </div>
   );
 }

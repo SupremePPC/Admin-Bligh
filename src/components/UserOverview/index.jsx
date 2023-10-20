@@ -691,7 +691,6 @@ const UserOverview = () => {
                         const rows = [];
 
                         for (let i = 0; i < maxLength; i++) {
-                          console.log(item[i]);
                           rows.push(
                             <tr
                               key={i} onClick={() => handleOpenModal("isEditIposOpen", item[i])}>
@@ -878,6 +877,9 @@ const UserOverview = () => {
           userId={user}
           ipo={selectedForEdit}
           iposId={selectedForEdit.id}
+          refreshDetails={() => {
+            fetchSubCollection("ipos", setIpos);
+          }}
         />
       )}
 

@@ -714,6 +714,7 @@ export async function addNotification(userId, message, type = "info") {
 //TERMS REQUEST
 const TERMS_REQUEST_SUB_COLLECTION = "termDepositRequest";
 
+// 1.Function to fetch all the term requests
 export async function getTermRequests() {
   try {
     const adminDashRef = collection(db, ADMINDASH_COLLECTION);
@@ -754,7 +755,7 @@ export async function getTermRequests() {
   }
 }
 
-// Function to handle withdraw terms
+// 2.Function to handle withdraw terms
 export async function handleWithdrawalApproval(uid, termData) {
   const userTermsPath = `users/${uid}/fixedTermDeposits`;
   const termDocRef = doc(db, `${userTermsPath}/${termData.id}`); // Assuming termData.id is unique for each term
@@ -768,7 +769,7 @@ export async function handleWithdrawalApproval(uid, termData) {
   }
 }
 
-// Function to handle deposit terms
+// 3.Function to handle deposit terms
 export async function handleDepositApproval(uid, termData) {
   try {
     // Check if termData and its id are defined
@@ -795,7 +796,7 @@ export async function handleDepositApproval(uid, termData) {
   }
 }
 
-// Function to update fixed term request status in the Firestore
+// 4.Function to update fixed term request status in the Firestore
 export async function updateFixedTermRequestStatus(
   userId,
   requestId,
@@ -808,7 +809,7 @@ export async function updateFixedTermRequestStatus(
   await updateDoc(requestDocPath, { status: newStatus });
 }
 
-// Function to delete request from termsRequest sub-collection
+// 5.Function to delete request from termsRequest sub-collection
 export async function deleteFixedTermRequestStatus(userId, requestId) {
   const requestDocPath = doc(
     db,
@@ -817,7 +818,7 @@ export async function deleteFixedTermRequestStatus(userId, requestId) {
   await deleteDoc(requestDocPath);
 }
 
-// Function to add term to user's terms sub-collection
+// 6.Function to add term to user's terms sub-collection
 export async function addTermToUserCollection(userId, termData) {
   try {
   const userTermsHoldingsPath = collection(
@@ -834,7 +835,7 @@ export async function addTermToUserCollection(userId, termData) {
   }
 };
 
-// Function to update term in user's terms subcollection
+// 7.Function to update term in user's terms subcollection
 export async function updateTermInUserCollection(userId, termData, termId) {
   try {
     const userTermsHoldingsPath = collection(
@@ -850,7 +851,7 @@ export async function updateTermInUserCollection(userId, termData, termId) {
   }
 }
 
-// Function to delete term from user's terms subcollection
+// 8.Function to delete term from user's terms subcollection
 export async function deleteTermFromUserCollection(userId, termId) {
   try {
     const userTermsHoldingsPath = collection(
@@ -869,7 +870,7 @@ export async function deleteTermFromUserCollection(userId, termId) {
 //IPOS
 const IPOS_COLLECTION = "ipos";
 
-//getIPOS
+// 1.Get all IPOs
 export const getAllIpos = async () => {
   const iposQuery = query(
     collection(db, IPOS_COLLECTION)
@@ -887,7 +888,7 @@ export const getAllIpos = async () => {
   }));
 };
 
-//Update
+// 2.Update
 export const updateIpo = async (ipoId, updatedData) => {
   try {
     const ipoRef = doc(db, IPOS_COLLECTION, ipoId);
@@ -898,7 +899,7 @@ export const updateIpo = async (ipoId, updatedData) => {
   }
 };
 
-//Add New
+// 3.Add New
 export const addNewIpos = async (ipoData) => {
   try {
     const iposCollectionRef = collection(db, IPOS_COLLECTION);
@@ -910,7 +911,7 @@ export const addNewIpos = async (ipoData) => {
   }
 };
 
-//Delete
+// 4.Delete
 export const deleteIpos = async (ipoId) => {
   const ipoRef = doc(db, IPOS_COLLECTION, ipoId);
   try {
@@ -941,11 +942,14 @@ export const addIposToUserCollection = async (userId, ipoData) => {
     }
 };
 
-
-
 // 3. Delete the IPO request status from the user's request collection
 export const deleteIposRequestStatus = async (uid, requestId) => {
   const requestRef = doc(db, ADMINDASH_COLLECTION, uid, IPOS_REQUESTS_COLLECTION, requestId);
+  await deleteDoc(requestRef);
+};
+
+export const deleteIposFromUserCollection = async (uid, requestId) => {
+  const requestRef = doc(db, USERS_COLLECTION, uid, IPOS_COLLECTION, requestId);
   await deleteDoc(requestRef);
 };
 
@@ -1053,7 +1057,7 @@ export const getSpecificIpoRequest = async (requestId, uid) => {
   return requestSnapshot.data();
 };
 
-
+//Get Current Date
 export function getCurrentDate () {
   const now = new Date();
   const year = now.getFullYear();
@@ -1062,6 +1066,7 @@ export function getCurrentDate () {
   return `${year}-${month}-${day}`;
 };
 
+//Format Number
 export function formatNumber(
   number,
   options = {
