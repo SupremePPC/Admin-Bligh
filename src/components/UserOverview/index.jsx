@@ -15,9 +15,9 @@ import Swal from "sweetalert2";
 import "./style.css";
 import EditDocument from "../DocumentManagement/Edit";
 import { deleteBankingDetails, formatNumber } from "../../firebaseConfig/firestore";
-import EditBond from "../BondRequestManagement/Edit";
 import EditTerm from "../TermRequestManagement/Edit";
 import EditIposUser from "../IPOrequests/Modals/EditModal";
+import EditBondModal from "../BondRequestManagement/Modal/EditBondModal";
 
 const UserOverview = () => {
   const user = useParams();
@@ -552,7 +552,7 @@ const UserOverview = () => {
                               <td>
                                 <div className="button_grid">
                                   <img
-                                    src={item[i].imagePreview}
+                                    src={item[i].image}
                                     alt="Bond image"
                                   />
                                   <p>{item[i].issuerName}</p>
@@ -807,7 +807,7 @@ const UserOverview = () => {
       )}
 
       {modalState.isEditBondOpen && (
-        <EditBond
+        <EditBondModal
           onClose={() => {
             handleCloseModal("isEditBondOpen");
             setSelectedForEdit(null);
@@ -863,8 +863,8 @@ const UserOverview = () => {
             handleCloseModal("isEditIposOpen");
             setSelectedForEdit(null);
           }}
-          setIpos={setIpos}
           userId={user}
+          setIpos={setIpos}
           ipo={selectedForEdit}
           iposId={selectedForEdit.id}
           refreshDetails={() => {

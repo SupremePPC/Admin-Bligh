@@ -1,14 +1,40 @@
 import React, { useState } from "react";
-import { getAuthUser } from "../../../firebase/firestore";
 import CurrencyInput from "react-currency-input-field";
-import { updateBondUser, getCurrentDate } from "../../../firebaseConfig/firestore";
+import { updateBondUser, getCurrentDate, deleteBondUser } from "../../../firebaseConfig/firestore";
 import "./style.css";
 
-export default function AddBondModal({  bondId, onClose, bond, refreshDetails, userId }) {
+export default function EditBondModal({  bondId, onClose, bond, refreshDetails, userId }) {
   const [bondsAmount, setBondsAmount] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  const handleDelete = async () => {
+    setIsLoading(true);
+    try {
+      await deleteBondUser(userId.userId, bondId);
+      Swal.fire({
+        icon: "success",
+        title: "Success!",
+        text: "You have successfully deleted this bond investment.",
+        showConfirmButton: false,
+        timer: 2000,
+      });
+      refreshDetails();
+      onClose();
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error!",
+        text: "There was an issue deleting this investment. Try again later.",
+        showConfirmButton: false,
+        timer: 2000,
+      });
+      console.error(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleBuyBonds = async () => {
     const minimumInvestmentAmount = bond.minimumAmount;
@@ -47,7 +73,7 @@ export default function AddBondModal({  bondId, onClose, bond, refreshDetails, u
     setIsLoading(true);
     try {
       await updateBondUser(
-        userId,
+        userId.userId,
         bondId,
         bondData
       );
@@ -122,16 +148,33 @@ export default function AddBondModal({  bondId, onClose, bond, refreshDetails, u
         </div>
         {message && <p className="success_msg">{message}</p>}
         {error && <p className="error_msg">{error}</p>}
-        {isLoading && <div className="spinner" style={{margin: "0 auto"}}></div> }
         <div className="buttons_wrap">
+        {isLoading ? (
+          <button className="submit_btn" typeof="submit" disabled>
+            <div className="spinner"></div>
+          </button>
+        ) : (
           <button
             onClick={() => {
-              handleBuyBonds();
+                handleBuyBonds();
             }}
             className="submit_btn"
-          >
-            Request
+            >
+            Save
           </button>
+        )}
+        {isLoading ? (
+          <button className="submit_btn" typeof="submit" disabled>
+            <div className="spinner"></div>
+          </button>
+        ) : (
+          <button
+            onClick={handleDelete()}
+            className="submit_btn"
+            >
+            Delete
+          </button>
+        )}
           <button onClick={onClose} className="cancel_btn">
             Cancel
           </button>

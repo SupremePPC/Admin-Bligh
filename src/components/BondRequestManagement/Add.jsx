@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import { addBondUser, getAllBonds } from "../../firebaseConfig/firestore";
 import LoadingScreen from "../LoadingScreen";
-import EditBond from "./Edit";
+import AddBondModal from "./Modal/AddBondModal";
+import EditBondModal from "./Modal/EditBondModal";
 
 const AddBond = ({ userId, onClose }) => {
   const [bonds, setBonds] = useState([]);
@@ -31,7 +32,7 @@ const AddBond = ({ userId, onClose }) => {
   }, []);
 
   const handleInvestSuccess = (investmentData, iposId) => {
-    setIposModalOpen(false);
+    setBondModalOpen(false);
     setIsEditing(true);
     setSelectedId(iposId);
     setSelectedForEdit(investmentData);
@@ -255,19 +256,18 @@ const AddBond = ({ userId, onClose }) => {
                 </div>
               </div>
               {bondModalOpen && (
-                <InvestBondModal
+                <AddBondModal
                   onClose={() => {
                     setBondModalOpen(false);
                     setSelectedBond(null);
                   }}
                   bond={selectedBond}
                   userId={userId}
-                  openEdit={openEdit}
                   onInvestSuccess={handleInvestSuccess}
                 />
               )}
               {isEditing && (
-                <EditBond
+                <EditBondModal
                   bondId={selectedId}
                   bond={selectedForEdit}
                   onClose={onClose}

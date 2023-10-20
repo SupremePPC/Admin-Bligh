@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { getAuthUser } from "../../../firebase/firestore";
 import CurrencyInput from "react-currency-input-field";
 import { addBondUser, getCurrentDate } from "../../../firebaseConfig/firestore";
 import "./style.css";
@@ -10,8 +9,9 @@ export default function AddBondModal({ onInvestSuccess, onClose, bond, userId })
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-
+  
   const handleBuyBonds = async () => {
+    const minimumInvestmentAmount = bond.minimumAmount;
     if (bondsAmount < minimumInvestmentAmount) {
       Swal.fire({
         icon: "error",
@@ -44,11 +44,11 @@ export default function AddBondModal({ onInvestSuccess, onClose, bond, userId })
       minimumAmount: bond.minimumAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
       quantity: numberOfBondsBought.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
     };
+    console.log(bondData);
     setIsLoading(true);
-    const uid = getAuthUser();
     try {
      const result= await addBondUser(
-        uid,
+        userId.userId,
         bondData
       );
       const bondId = result.id;
@@ -122,16 +122,16 @@ export default function AddBondModal({ onInvestSuccess, onClose, bond, userId })
         </div>
         {message && <p className="success_msg">{message}</p>}
         {error && <p className="error_msg">{error}</p>}
-        {isLoading && <div className="spinner" style={{margin: "0 auto"}}></div> }
         <div className="buttons_wrap">
           <button
             onClick={() => {
               handleBuyBonds();
             }}
             className="submit_btn"
-          >
+            >
             Request
           </button>
+            {isLoading && <div className="spinner" style={{margin: "0 auto"}}></div> }
           <button onClick={onClose} className="cancel_btn">
             Cancel
           </button>
