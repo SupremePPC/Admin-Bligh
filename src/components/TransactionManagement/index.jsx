@@ -298,7 +298,7 @@ const TransactionDashboard = () => {
 
   return (
     <div className="container">
-      {!isAdding && !isEditPageOpen && (
+      {!isEditPageOpen && (
         <>
           <Header
             setIsAdding={setIsAdding}
@@ -312,10 +312,10 @@ const TransactionDashboard = () => {
             handleFilter={handleStatusFilter}
             statusFilter={statusFilter}
           />
-          {isLoading ? (
+          {isLoading && (
             <LoadingScreen />
-          ) : (
-            <>
+          )}
+           
               <Table
                 transactions={transactions}
                 handleApproval={showApprovalModal}
@@ -346,16 +346,6 @@ const TransactionDashboard = () => {
                 />
               )}
             </>
-          )}
-        </>
-      )}
-      {isAdding && (
-        <AddTransaction
-          onClose={() => setIsAdding(false)}
-          setIsAdding={setIsAdding}
-          setTransactions={setTransactions}
-
-        />
       )}
       {isEditPageOpen && (
         <EditTransaction
@@ -364,6 +354,7 @@ const TransactionDashboard = () => {
             setIsEditPageOpen(false);
             setTransactionForEdit(null);
           }}
+          handleDelete={handleDelete}
         />
       )}
     </div>

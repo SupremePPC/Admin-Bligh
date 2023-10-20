@@ -5,6 +5,7 @@ import { addNewTerm } from "../../firebaseConfig/firestore";
 import LoadingScreen from "../LoadingScreen";
 import CurrencyInput from 'react-currency-input-field';
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
+import EditTerm from "../TermRequestManagement/Edit";
 
 const AddNewTerm = ({ setIsAdding, refreshTerm }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -15,8 +16,6 @@ const AddNewTerm = ({ setIsAdding, refreshTerm }) => {
     interestRate: 0,
     term: "",
   });
-
-  const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
@@ -65,9 +64,17 @@ const AddNewTerm = ({ setIsAdding, refreshTerm }) => {
     }
   };
 
+  const handleCurrencyChange = (value, name) => {
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    console.log(formData);
     
     try {
       if (formData.logo) {
@@ -104,75 +111,83 @@ const AddNewTerm = ({ setIsAdding, refreshTerm }) => {
   };
 
   return (
-    <div className="small-container">
-      {isLoading ? (
-        <LoadingScreen />
-      ) : (
-        <form onSubmit={handleSubmit}>
-          <h1>Add New Term</h1>
-          <label htmlFor="logo">Upload Logo:</label>
-          {formData.imagePreview && (
-            <img src={formData.imagePreview} alt="Image Preview" width={100} className="img_preview" />
-          )}
-          <input
-            type="file"
-            name="logo"
-            onChange={handleChange}
-            accept="image/*"
-            required
-          />
-          <label htmlFor="bankName">Bank Name:</label>
-          <input
-            type="text"
-            name="bankName"
-            onChange={handleChange}
-            value={formData.bankName}
-            required
-          />
-          <label htmlFor="term">Terms:</label>
-          <input
-            type="text"
-            name="term"
-            onChange={handleChange}
-            value={formData.term}
-            required
-          />
-          <label htmlFor="minAmount">Minimum Amount:</label>
-          <CurrencyInput
-            decimalSeparator="."
-            prefix="$"
-            name="minAmount"
-            placeholder="0.00"
-            defaultValue={0.00}
-            decimalsLimit={2}
-            onValueChange={formData.minAmount}
-          />
-          <label htmlFor="interestRate">Interest Rate:</label>
-          <input
-            type="number"
-            name="interestRate"
-            onChange={handleChange}
-            value={formData.interestRate}
-            required
-          />
-          <div style={{ marginTop: "30px" }}>
-            <input type="submit" value="Add" />
+    <>
+     {!isEditing && (
+     <div className="small-container">
+        {isLoading && (
+          <LoadingScreen />
+        )}
+          <form onSubmit={handleSubmit}>
+            <h1>Add New Term</h1>
+            <label htmlFor="logo">Upload Logo:</label>
+            {formData.imagePreview && (
+              <img src={formData.imagePreview} alt="Image Preview" width={100} className="img_preview" />
+            )}
             <input
-              style={{ marginLeft: "12px" }}
-              className="muted-button"
-              type="button"
-              value="Cancel"
-              onClick={() => {
-                setIsAdding(false);
-                refreshTerm();
+              type="file"
+              name="logo"
+              onChange={handleChange}
+              accept="image/*"
+              required
+            />
+            <label htmlFor="bankName">Bank Name:</label>
+            <input
+              type="text"
+              name="bankName"
+              onChange={handleChange}
+              value={formData.bankName}
+              required
+            />
+            <label htmlFor="term">Terms(e.g 24 Months or 1 Year):</label>
+            <input
+              type="text"
+              name="term"
+              onChange={handleChange}
+              value={formData.term}
+              required
+            />
+            <label htmlFor="minAmount">Minimum Amount:</label>
+            <CurrencyInput
+              decimalSeparator="."
+              prefix="$"
+              name="minAmount"
+              placeholder="0.00"
+              defaultValue={0.00}
+              decimalsLimit={2}
+              onValueChange={(value) => {
+                const formattedValue = parseFloat(value).toFixed(2);
+                handleCurrencyChange(formattedValue, "minAmount");
               }}
             />
-          </div>
-          {errors.isin && <div>{errors.isin}</div>}
-          {errors.issuerName && <div>{errors.issuerName}</div>}
-        </form>
+            <label htmlFor="interestRate">Interest Rate:</label>
+            <input
+              type="number"
+              name="interestRate"
+              onChange={handleChange}
+              value={formData.interestRate}
+              required
+            />
+            <div style={{ marginTop: "30px" }}>
+              <input type="submit" value="Add" />
+              <input
+                style={{ marginLeft: "12px" }}
+                className="muted-button"
+                type="button"
+                value="Cancel"
+                onClick={() => {
+                  setIsAdding(false);
+                  refreshTerm();
+                }}
+              />
+            </div>
+          </form>
+      </div>
       )}
-    </div>
+      {
+        isEditing && (
+          <EditTerm />
+      )}
+    </>
   );
 };
 

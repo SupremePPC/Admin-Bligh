@@ -15,26 +15,41 @@ const BankingDetails = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const fetchBankingDetails = async () => {
+  const fetchBankingDetailsForAllUsers = async () => {
     setIsLoading(true);
     try {
-      const uid = "your_user_id"; // Replace with the user's ID
-      const allBankingDetails = await getBankingDetails(uid);
-
-      if (allBankingDetails) {
-        setBankingDetails(allBankingDetails);
+      const usersQuery = query(collection(db, USERS_COLLECTION));
+      const querySnapshot = await getDocs(usersQuery);
+  
+      const bankingDetailsByUser = [];
+  
+      if (!querySnapshot.empty) {
+        querySnapshot.forEach((userDoc) => {
+          const uid = userDoc.id;
+          // const bankingDetails = await getBankingDetails(uid);
+  
+          if (bankingDetails) {
+            bankingDetailsByUser.push({
+              userId: uid,
+              details: bankingDetails,
+            });
+          }
+        });
+  
+        // bankingDetailsByUser now contains banking details for all users
+        console.log("Banking details for all users:", bankingDetailsByUser);
       } else {
-        console.error("No banking details found");
+        console.error("No users found");
       }
     } catch (error) {
-      console.error("Error fetching banking details:", error);
+      console.error("Error fetching banking details for all users:", error);
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchBankingDetails();
+    fetchBankingDetailsForAllUsers();
   }, []);
 
   useEffect(() => {

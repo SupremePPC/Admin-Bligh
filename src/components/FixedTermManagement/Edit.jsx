@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "firebase/firestore";
 import Swal from "sweetalert2";
 import { updateTerm } from "../../firebaseConfig/firestore";
@@ -142,7 +142,7 @@ const Edit = ({ termToEdit, setIsEditPageOpen, refreshTerms }) => {
         <LoadingScreen />
       ) : (
         <form onSubmit={handleSubmit}>
-          <h1>Add New Term</h1>
+          <h1>Edit Term</h1>
           <label htmlFor="logo">Upload Logo:</label>
           {formData.logo && (
             <img
@@ -166,7 +166,7 @@ const Edit = ({ termToEdit, setIsEditPageOpen, refreshTerms }) => {
             value={formData.bankName}
             required
           />
-          <label htmlFor="term">Terms:</label>
+          <label htmlFor="term">Terms (e.g 24 Months or 1 Year):</label>
           <input
             type="text"
             name="term"
@@ -175,23 +175,15 @@ const Edit = ({ termToEdit, setIsEditPageOpen, refreshTerms }) => {
             required
           />
           <label htmlFor="minimumAmount">Minimum Amount:</label>
-          <input
-            type="number"
-            min={0}
-            name="minAmount"
-            onChange={handleChange}
-            value={formData.minAmount}
-            required
-          />
           <CurrencyInput
             decimalSeparator="."
             prefix="$"
             name="expListingPrice"
             placeholder="0.00"
-            value={formData.expListingPrice} 
+            value={formData.minAmount} 
             onValueChange={(value) => {
               const formattedValue = parseFloat(value).toFixed(2);
-              handleCurrencyChange(formattedValue, "expListingPrice");
+              handleCurrencyChange(formattedValue, "minAmount");
             }}
           />
           <label htmlFor="interestRate">Interest Rate:</label>

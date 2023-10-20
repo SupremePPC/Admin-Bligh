@@ -115,8 +115,8 @@ const Edit = ({ bondToEdit, setIsEditPageOpen, refreshBonds }) => {
       } else if (!formData.image) {
         // If formData.image is empty, use the original image data
         updatedFormData.image = originalImageData; // Replace 'originalImageData' with the actual original image data
-        console.log(updatedFormData.image, 'clicked')
       }
+      
   
       await updateBond(updatedFormData.id, updatedFormData);
       Swal.fire({

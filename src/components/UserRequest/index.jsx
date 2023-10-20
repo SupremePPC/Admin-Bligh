@@ -202,9 +202,9 @@ export default function UserRequest() {
   return (
     <div className="container">
       <Header />
-      {isLoading ? (
+      {isLoading && (
         <LoadingScreen />
-      ) : (
+      )}
         <Table
           userRequests={userRequests}
           handleApproval={(userId, requestData) => {
@@ -216,11 +216,7 @@ export default function UserRequest() {
             setIsRejected(true);
           }}
         />
-      )}
-      {/* {error && <div className="error-message">{error}</div>}
-      {successMessage && (
-        <div className="success-message">{successMessage}</div>
-      )} */}
+      
       {isApproved && pendingRequestData && (
         <Modal
           isOpen={isApproved}

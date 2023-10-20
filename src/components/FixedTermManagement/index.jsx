@@ -83,9 +83,9 @@ export default function TermsPage() {
       {!isAdding && !isEditPageOpen && (
         <>
           <Header setIsAdding={setIsAdding} />
-          {isLoading ? (
+          {isLoading && (
             <LoadingScreen />
-          ) : (
+          )}
             <>
               <List
                 handleDelete={handleDelete}
@@ -108,7 +108,6 @@ export default function TermsPage() {
                 />
               )}
             </>
-          )}
         </>
       )}
       {isAdding && <AddNewTerm setIsAdding={setIsAdding} refreshTerm={fetchTerms} />}

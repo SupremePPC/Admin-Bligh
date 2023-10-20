@@ -93,7 +93,7 @@ const BondsRequestTable = () => {
         const allRequests = await getBondRequests();
   
         if (allRequests.length === 0) {
-          setNoRequestsFound(true);
+          // setNoRequestsFound(true);
         } else {
           const requestsWithUserDetails = await Promise.all(
             allRequests.map(async (request) => {

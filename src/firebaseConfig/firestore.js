@@ -130,6 +130,65 @@ export async function editTransaction(userId, transactionId, updatedFields) {
   return { success: true };
 }
 
+export async function deleteTransaction(userId, transactionId) {
+  const transactionRef = doc(
+    db, 
+    USERS_COLLECTION,
+    userId,
+    TRANSACTIONS_SUB_COLLECTION,
+    transactionId
+  );
+
+  await deleteDoc(transactionRef);
+
+  return { success: true };
+}
+
+
+//Account Types
+export async function addToAccount(userId, label, amount) {
+  const accountTypeRef = collection(db, "users", userId, "accountTypes");
+  const docRef = doc(accountTypeRef, label);
+  console.log(amount)
+  try {
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+
+          await updateDoc(docRef, { amount: amount });
+      } else {
+          await setDoc(docRef, {
+              label: label,
+              amount: amount,
+          });
+      }
+
+      return { success: true };
+  } catch (error) {
+      console.error("Error adding to account:", error);
+      return { success: false, error: error.message };
+  }
+}
+
+export async function getAccountTypes(userId) {
+  const accountTypeRef = collection(db, "users", userId, "accountTypes");
+
+  try {
+      const querySnapshot = await getDocs(accountTypeRef);
+      const accountTypes = [];
+
+      querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          accountTypes.push({ id: doc.id, label: data.label, amount: data.amount });
+      });
+
+      return accountTypes;
+  } catch (error) {
+      console.error("Error getting account types:", error);
+      return [];
+  }
+}
+
 // Banking Details
 const BANKING_DETAILS_SUB_COLLECTION = "bankingDetails";
 
@@ -200,7 +259,7 @@ export async function updateBankingDetails(
 
 export async function getBankingDetails(uid) {
   const bankingDetailsQuery = query(
-    collection(db, USERS_COLLECTION, uid, BANKING_DETAILS_SUB_COLLECTION)
+    doc(db, USERS_COLLECTION, uid), BANKING_DETAILS_SUB_COLLECTION
   );
   const querySnapshot = await getDocs(bankingDetailsQuery);
 
@@ -522,6 +581,27 @@ export async function addBondUser(userId, bondData) {
   }
 }
 
+//update new bonds for a particular user
+export async function updateBondUser(userId, bondId, bondData) {
+  try {
+    const bondsRef = collection(db, USERS_COLLECTION, userId, "bondsHoldings", bondId);
+    const updatedBondRef = await addDoc(bondsRef, bondData);
+    return { success: true, id: updatedBondRef.id };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+}
+
+export async function deleteBondUser(bondId) {
+  try {
+    const bondRef = collection(db, USERS_COLLECTION, userId, "bondsHoldings", bondId);
+    await deleteDoc(bondRef);
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+}
+
 //uodate existing bond
 export async function updateBond(bondId, updatedData) {
   try {
@@ -754,6 +834,38 @@ export async function addTermToUserCollection(userId, termData) {
   }
 };
 
+// Function to update term in user's terms subcollection
+export async function updateTermInUserCollection(userId, termData, termId) {
+  try {
+    const userTermsHoldingsPath = collection(
+      db,
+      `users/${userId}/fixedTermDeposits/${termId}`
+    );
+    const docRef = doc(userTermsHoldingsPath, termId);
+    await updateDoc(docRef, termData);
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating term:", error);
+    return { success: false, error: error.message };
+  }
+}
+
+// Function to delete term from user's terms subcollection
+export async function deleteTermFromUserCollection(userId, termId) {
+  try {
+    const userTermsHoldingsPath = collection(
+      db,
+      `users/${userId}/fixedTermDeposits/${termId}`
+    );
+    const docRef = doc(userTermsHoldingsPath, termId);
+    await deleteDoc(docRef);
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting term:", error);
+    return { success: false, error: error.message };
+  }
+}
+
 //IPOS
 const IPOS_COLLECTION = "ipos";
 
@@ -940,3 +1052,23 @@ export const getSpecificIpoRequest = async (requestId, uid) => {
   const requestSnapshot = await getDoc(requestRef);
   return requestSnapshot.data();
 };
+
+
+export function getCurrentDate () {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0"); // Month is zero-based
+  const day = String(now.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+export function formatNumber(
+  number,
+  options = {
+    style: "decimal",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }
+) {
+  return number.toLocaleString("en-US", options);
+}
