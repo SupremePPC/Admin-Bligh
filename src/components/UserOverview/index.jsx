@@ -530,9 +530,10 @@ const UserOverview = () => {
                       <tr>
                         <th>Issuer Name</th>
                         <th>Current Value</th>
+                        <th>Amount</th>
                         <th>Maturity Date</th>
                         <th>Purchase Date</th>
-                        <th>Quantity</th>
+                        {/* <th>Quantity</th> */}
                       </tr>
                     </thead>
                     <tbody>
@@ -558,10 +559,11 @@ const UserOverview = () => {
                                   <p>{item[i].issuerName}</p>
                                 </div>
                               </td>
-                              <td>$ {item[i].currentValue}</td>
+                              <td>{item[i].currentValue}</td>
+                              <td>$ {formatNumber(item[i].bondsAmount)}</td>
                               <td>{item[i].maturityDate}</td>
                               <td>{item[i].purchaseDate}</td>
-                              <td>{item[i].quantity}</td>
+                              {/* <td>{item[i].quantity}</td> */}
                             </tr>
                           );
                         }
@@ -725,6 +727,7 @@ const UserOverview = () => {
 
           </div>
         )}
+        
       {modalState.isEditUserDetailsOpen && (
         <EditUser
           onClose={() => {
@@ -803,6 +806,10 @@ const UserOverview = () => {
           bond={bondsHoldings}
           setBond={setBondsHoldings}
           userId={user}
+          refreshDetails={() => {
+            fetchSubCollection("bondsHoldings", setBondsHoldings);
+          }
+          }
         />
       )}
 
@@ -812,11 +819,13 @@ const UserOverview = () => {
             handleCloseModal("isEditBondOpen");
             setSelectedForEdit(null);
           }}
-          bond={bondsHoldings}
           setBond={setBondsHoldings}
-          selectedBondId={selectedForEdit.id}
-          selectedBond={selectedForEdit}
+          bondId={selectedForEdit.id}
+          bond={selectedForEdit}
           userId={user}
+          refreshDetails={ () => {
+            fetchSubCollection("bondsHoldings", setBondsHoldings);
+          }}
         />
       )}
 

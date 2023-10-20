@@ -37,12 +37,13 @@ export default function AddBondModal({ onInvestSuccess, onClose, bond, userId })
       isin: bond.isin,
       maturityDate: bond.maturityDate,
       purchaseDate: getCurrentDate(),
+      bondsAmount: bondsAmount,
       currentValue: numberOfBondsBought.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
       issuerName: bond.issuerName,
       sector: bond.sector,
       couponFrequency: bond.couponFrequency,
       minimumAmount: bond.minimumAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
-      quantity: numberOfBondsBought.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+      // quantity: numberOfBondsBought.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
     };
     console.log(bondData);
     setIsLoading(true);

@@ -5,7 +5,7 @@ import LoadingScreen from "../LoadingScreen";
 import InvestIpoModal from "./Modals/InvestModal";
 import EditIposUser from "./Modals/EditModal";
 
-const AddUserIpos = ({ userId, onClose, openEdit }) => {
+const AddUserIpos = ({ userId, onClose }) => {
   const [ipos, setIpos] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [iposModalOpen, setIposModalOpen] = useState(false);
@@ -129,7 +129,6 @@ const AddUserIpos = ({ userId, onClose, openEdit }) => {
                   }}
                   ipo={selectedIpo}
                   userId={userId}
-                  openEdit={openEdit}
                   onInvestSuccess={handleInvestSuccess}
                 />
               )}

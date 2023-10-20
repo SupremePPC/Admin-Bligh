@@ -5,7 +5,7 @@ import LoadingScreen from "../LoadingScreen";
 import AddBondModal from "./Modal/AddBondModal";
 import EditBondModal from "./Modal/EditBondModal";
 
-const AddBond = ({ userId, onClose }) => {
+const AddBond = ({ userId, onClose, refreshDetails }) => {
   const [bonds, setBonds] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -36,103 +36,6 @@ const AddBond = ({ userId, onClose }) => {
     setIsEditing(true);
     setSelectedId(iposId);
     setSelectedForEdit(investmentData);
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-
-    const {
-      companyWebsite,
-      couponFrequency,
-      couponRate,
-      currentValue,
-      image,
-      isin,
-      issuerName,
-      maturityDate,
-      minimumAmount,
-      purchaseDate,
-      quantity,
-      sector,
-      type,
-    } = formData;
-    console.log(formData);
-
-    if (
-      !companyWebsite ||
-      !couponFrequency ||
-      !couponRate ||
-      !currentValue ||
-      !image ||
-      !isin ||
-      !issuerName ||
-      !maturityDate ||
-      !issuerName ||
-      !maturityDate ||
-      !minimumAmount ||
-      !purchaseDate ||
-      !quantity ||
-      !sector ||
-      !type
-    ) {
-      setIsLoading(false);
-      return Swal.fire({
-        icon: "error",
-        title: "Error!",
-        text: "All fields are required.",
-        showConfirmButton: true,
-      });
-    }
-
-    try {
-      if (formData.image) {
-        const imageUrl = await handleUploadImage(formData.image);
-        formData.image = imageUrl;
-      }
-      const result = await addBondUser(userId.userId, formData);
-      if (result.success) {
-        Swal.fire({
-          icon: "success",
-          title: "Added!",
-          text: `Bond added succesfully.`,
-          showConfirmButton: false,
-          timer: 2000,
-        });
-        setBond([...bond, { ...formData, id: result.id }]);
-        setFormData({
-          companyWebsite: "",
-          couponFrequency: 0,
-          couponRate: 0,
-          currentValue: 0,
-          image: null,
-          isin: "",
-          issuerName: "",
-          maturityDate: "",
-          minimumAmount: 0.0,
-          purchaseDate: "",
-          quantity: 0,
-          sector: "",
-          type: "",
-        });
-
-        setIsEditing(true);
-        setSelectedBond(formData);
-        setBondId(result.id);
-      } else {
-        throw new Error(result.error);
-      }
-    } catch (error) {
-      console.error(error);
-      Swal.fire({
-        icon: "error",
-        title: "Error!",
-        text: `Error adding bond: ${error}`,
-        showConfirmButton: true,
-      });
-    } finally {
-      setIsLoading(false);
-    }
   };
 
   const toggleDropdown = (index) => {

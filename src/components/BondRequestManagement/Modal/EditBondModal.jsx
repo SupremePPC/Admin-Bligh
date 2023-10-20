@@ -2,39 +2,12 @@ import React, { useState } from "react";
 import CurrencyInput from "react-currency-input-field";
 import { updateBondUser, getCurrentDate, deleteBondUser } from "../../../firebaseConfig/firestore";
 import "./style.css";
+import Swal from "sweetalert2";
 
 export default function EditBondModal({  bondId, onClose, bond, refreshDetails, userId }) {
-  const [bondsAmount, setBondsAmount] = useState("");
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
+  const [bondsAmount, setBondsAmount] = useState(bond.bondsAmount);
   const [isLoading, setIsLoading] = useState(false);
-
-  const handleDelete = async () => {
-    setIsLoading(true);
-    try {
-      await deleteBondUser(userId.userId, bondId);
-      Swal.fire({
-        icon: "success",
-        title: "Success!",
-        text: "You have successfully deleted this bond investment.",
-        showConfirmButton: false,
-        timer: 2000,
-      });
-      refreshDetails();
-      onClose();
-    } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Error!",
-        text: "There was an issue deleting this investment. Try again later.",
-        showConfirmButton: false,
-        timer: 2000,
-      });
-      console.error(error.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  console.log(bond);
 
   const handleBuyBonds = async () => {
     const minimumInvestmentAmount = bond.minimumAmount;
@@ -68,7 +41,7 @@ export default function EditBondModal({  bondId, onClose, bond, refreshDetails, 
       sector: bond.sector,
       couponFrequency: bond.couponFrequency,
       minimumAmount: bond.minimumAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
-      quantity: numberOfBondsBought.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+      // quantity: numberOfBondsBought.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
     };
     setIsLoading(true);
     try {
@@ -88,7 +61,7 @@ export default function EditBondModal({  bondId, onClose, bond, refreshDetails, 
         onClose();
         refreshDetails();
     } catch (error) {
-        console.log(error.message);
+        console.log(error);
         Swal.fire({
             icon: "error",
             title: "Error!",
@@ -100,6 +73,34 @@ export default function EditBondModal({  bondId, onClose, bond, refreshDetails, 
         setIsLoading(false);
     }
   };
+
+  const handleDelete = async () => {
+    setIsLoading(true);
+    try {
+      await deleteBondUser(userId.userId, bondId);
+      Swal.fire({
+        icon: "success",
+        title: "Success!",
+        text: "You have successfully deleted this bond investment.",
+        showConfirmButton: false,
+        timer: 2000,
+      });
+      refreshDetails();
+      onClose();
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error!",
+        text: "There was an issue deleting this investment. Try again later.",
+        showConfirmButton: false,
+        timer: 2000,
+      });
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
 
   return (
     <div className="modal_overlay" onClick={(e) => e.stopPropagation()}>
@@ -137,7 +138,7 @@ export default function EditBondModal({  bondId, onClose, bond, refreshDetails, 
               prefix="$"
               name="bondsAmount"
               placeholder="$0"
-              defaultValue={bondsAmount}
+              value={bondsAmount}
               decimalsLimit={2}
               onValueChange={(value) => {
                 const formattedValue = parseFloat(value).toFixed(2);
@@ -146,8 +147,6 @@ export default function EditBondModal({  bondId, onClose, bond, refreshDetails, 
             />
           </div>
         </div>
-        {message && <p className="success_msg">{message}</p>}
-        {error && <p className="error_msg">{error}</p>}
         <div className="buttons_wrap">
         {isLoading ? (
           <button className="submit_btn" typeof="submit" disabled>
@@ -155,9 +154,7 @@ export default function EditBondModal({  bondId, onClose, bond, refreshDetails, 
           </button>
         ) : (
           <button
-            onClick={() => {
-                handleBuyBonds();
-            }}
+            onClick={handleBuyBonds}
             className="submit_btn"
             >
             Save
@@ -169,8 +166,8 @@ export default function EditBondModal({  bondId, onClose, bond, refreshDetails, 
           </button>
         ) : (
           <button
-            onClick={handleDelete()}
-            className="submit_btn"
+            onClick={handleDelete}
+            className="cancel_btn"
             >
             Delete
           </button>
