@@ -13,6 +13,7 @@ export default function List({ bonds, handleDelete, handleEditClick }) {
 
   return (
     <div className="bondsPage">
+     
       <div className="sectionBody">
         {!bonds || bonds.length === 0 ? (
           <h5 className="no_data">NO BONDS FOUND.</h5>

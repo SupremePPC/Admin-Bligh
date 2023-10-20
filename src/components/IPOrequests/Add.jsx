@@ -3,7 +3,7 @@ import "firebase/firestore";
 import { getAllIpos } from "../../firebaseConfig/firestore";
 import LoadingScreen from "../LoadingScreen";
 import InvestIpoModal from "./Modals/InvestModal";
-import EditIposUser from "./Edit";
+import EditIposUser from "./Modals/EditModal";
 
 const AddUserIpos = ({ userId, onClose, openEdit }) => {
   const [ipos, setIpos] = useState([]);
@@ -40,7 +40,7 @@ const AddUserIpos = ({ userId, onClose, openEdit }) => {
   return (
     <div className="iposPage_Wrapper">
       <div className="headerSection">
-        <h2 className="title">IPOs</h2>
+        <h2 className="title">Choose IPOs</h2>
         <div className="svgWrapper">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -61,9 +61,10 @@ const AddUserIpos = ({ userId, onClose, openEdit }) => {
       </div>
       <div className="contentBody">
         {ipos.length === 0 && <h5>No IPOs Available.</h5>}
-        {isLoading ? (
+        {isLoading && (
           <LoadingScreen />
-        ) : (
+        )}
+        {!isLoading && (
           ipos.map((ipo, index) => (
             <div key={index} className="ipoCard">
               <div className="ipoDetails">

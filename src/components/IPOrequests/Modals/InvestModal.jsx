@@ -5,7 +5,7 @@ import {
 } from "../../../firebaseConfig/firestore";
 import CurrencyInput from "react-currency-input-field";
 import Swal from "sweetalert2";
-import EditIposUser from "../Edit";
+import EditIposUser from "./EditModal";
 import "./style.css";
 
 export default function InvestIpoModal({ onInvestSuccess, onClose, ipo, userId }) {

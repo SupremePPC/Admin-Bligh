@@ -3,7 +3,7 @@ import {
   updateIposToUserCollection,
   deleteIposFromUserCollection,
   getCurrentDate,
-} from "../../firebaseConfig/firestore";
+} from "../../../firebaseConfig/firestore";
 import CurrencyInput from "react-currency-input-field";
 import Swal from "sweetalert2";
 

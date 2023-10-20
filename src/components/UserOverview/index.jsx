@@ -18,7 +18,7 @@ import { deleteBankingDetails, formatNumber } from "../../firebaseConfig/firesto
 import Edit from "../BankingDetails/Edit";
 import EditBond from "../BondRequestManagement/Edit";
 import EditTerm from "../TermRequestManagement/Edit";
-import EditIposUser from "../IPOrequests/Edit";
+import EditIposUser from "../IPOrequests/Modals/EditModal";
 
 const UserOverview = () => {
   const user = useParams();
