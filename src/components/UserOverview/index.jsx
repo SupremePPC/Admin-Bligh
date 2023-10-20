@@ -15,7 +15,6 @@ import Swal from "sweetalert2";
 import "./style.css";
 import EditDocument from "../DocumentManagement/Edit";
 import { deleteBankingDetails, formatNumber } from "../../firebaseConfig/firestore";
-import Edit from "../BankingDetails/Edit";
 import EditBond from "../BondRequestManagement/Edit";
 import EditTerm from "../TermRequestManagement/Edit";
 import EditIposUser from "../IPOrequests/Modals/EditModal";
@@ -30,11 +29,9 @@ const UserOverview = () => {
   const [ipos, setIpos] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [fixedTerm, setFixedTerm] = useState([]);
-  const [selectedUserForAdd, setSelectedUserForAdd] = useState(null);
   const [selectedDocument, setSelectedDocument] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedForEdit, setSelectedForEdit] = useState(null);
-  const [error, setError] = useState(null);
   const [modalState, setModalState] = useState({
     isAddTransactionOpen: false,
     isAddBondOpen: false,
@@ -743,7 +740,6 @@ const UserOverview = () => {
         <AddBankingDetails
           onClose={() => {
             handleCloseModal("isAddBankingDetails");
-            setSelectedUserForAdd(null);
           }}
           userId={user}
           refreshDetails={() => {
@@ -756,7 +752,6 @@ const UserOverview = () => {
         <EditBankingDetails
           onClose={() => {
             handleCloseModal("isEditBankingDetails");
-            setSelectedUserForAdd(null);
           }}
           userId={user}
           bankingDetailsId={bankingDetails.id}
@@ -787,7 +782,6 @@ const UserOverview = () => {
         <EditTransaction
           onClose={() => {
             handleCloseModal("isEditTransactionOpen");
-            setSelectedUserForAdd(null);
           }}
           selectedTransaction={selectedForEdit}
           setTransactions={setTransactions}
@@ -805,7 +799,6 @@ const UserOverview = () => {
         <AddBond
           onClose={() => {
             handleCloseModal("isAddBondOpen");
-            setSelectedUserForAdd(null);
           }}
           bond={bondsHoldings}
           setBond={setBondsHoldings}
@@ -831,7 +824,6 @@ const UserOverview = () => {
         <AddNewTerm
           onClose={() => {
             handleCloseModal("isAddNewTermOpen");
-            setSelectedUserForAdd(null);
           }}
           fixedTerm={fixedTerm}
           setFixedTerm={setFixedTerm}
@@ -857,7 +849,6 @@ const UserOverview = () => {
         <AddUserIpos
           onClose={() => {
             handleCloseModal("isAddNewIpos");
-            setSelectedUserForAdd(null);
             fetchSubCollection("ipos", setIpos);
           }}
           ipos={ipos}
@@ -886,7 +877,6 @@ const UserOverview = () => {
         <AddDocument
           onClose={() => {
             handleCloseModal("isAddNewDocumentOpen");
-            setSelectedUserForAdd(null);
           }}
           docs={docs}
           setDocs={setDocs}

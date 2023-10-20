@@ -5,7 +5,6 @@ import {
 } from "../../../firebaseConfig/firestore";
 import CurrencyInput from "react-currency-input-field";
 import Swal from "sweetalert2";
-import EditIposUser from "./EditModal";
 import "./style.css";
 
 export default function InvestIpoModal({ onInvestSuccess, onClose, ipo, userId }) {
@@ -39,7 +38,6 @@ export default function InvestIpoModal({ onInvestSuccess, onClose, ipo, userId }
     setIsLoading(true);
     try {
       const result = await addIposToUserCollection(userId.userId, investmentData);
-     
       Swal.fire({
         icon: "success",
         title: "Success!",

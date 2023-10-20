@@ -570,6 +570,28 @@ export async function addNewBond(bondData) {
   }
 }
 
+//uodate existing bond
+export async function updateBond(bondId, updatedData) {
+  try {
+    const bondRef = doc(db, "bonds", bondId);
+    await updateDoc(bondRef, updatedData);
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+}
+
+//delete
+export async function deleteBond(bondId) {
+  try {
+    const bondRef = doc(db, "bonds", bondId);
+    await deleteDoc(bondRef);
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+}
+
 //add new bonds for a particular user
 export async function addBondUser(userId, bondData) {
   try {
@@ -595,28 +617,6 @@ export async function updateBondUser(userId, bondId, bondData) {
 export async function deleteBondUser(bondId) {
   try {
     const bondRef = collection(db, USERS_COLLECTION, userId, "bondsHoldings", bondId);
-    await deleteDoc(bondRef);
-    return { success: true };
-  } catch (error) {
-    return { success: false, error: error.message };
-  }
-}
-
-//uodate existing bond
-export async function updateBond(bondId, updatedData) {
-  try {
-    const bondRef = doc(db, "bonds", bondId);
-    await updateDoc(bondRef, updatedData);
-    return { success: true };
-  } catch (error) {
-    return { success: false, error: error.message };
-  }
-}
-
-//delete
-export async function deleteBond(bondId) {
-  try {
-    const bondRef = doc(db, "bonds", bondId);
     await deleteDoc(bondRef);
     return { success: true };
   } catch (error) {
@@ -962,16 +962,18 @@ export const updateIposToUserCollection = async (userId, ipoId, ipoData) => {
   }
 };
 
+// 3. Delete IPO from user's ipos sub-collection
+export const deleteIposFromUserCollection = async (uid, requestId) => {
+  const requestRef = doc(db, USERS_COLLECTION, uid, IPOS_COLLECTION, requestId);
+  await deleteDoc(requestRef);
+};
+
 // 3. Delete the IPO request status from the user's request collection
 export const deleteIposRequestStatus = async (uid, requestId) => {
   const requestRef = doc(db, ADMINDASH_COLLECTION, uid, IPOS_REQUESTS_COLLECTION, requestId);
   await deleteDoc(requestRef);
 };
 
-export const deleteIposFromUserCollection = async (uid, requestId) => {
-  const requestRef = doc(db, USERS_COLLECTION, uid, IPOS_COLLECTION, requestId);
-  await deleteDoc(requestRef);
-};
 
 // 4. Fetch all the IPO requests
 export async function getIposRequests() {
