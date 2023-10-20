@@ -1,13 +1,11 @@
 import React, { useState } from "react";
 import {
-  addIposToUserCollection,
+  updateIposToUserCollection,
   deleteIposFromUserCollection,
   getCurrentDate,
 } from "../../firebaseConfig/firestore";
 import CurrencyInput from "react-currency-input-field";
 import Swal from "sweetalert2";
-import LoadingScreen from "../LoadingScreen";
-// import "./style.css";
 
 export default function EditIposUser({
   iposId,
@@ -16,7 +14,7 @@ export default function EditIposUser({
   refreshDetails,
   userId,
 }) {
-  const [investmentAmount, setInvestmentAmount] = useState(0);
+  const [investmentAmount, setInvestmentAmount] = useState(ipo.amountInvested);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleUpdate = async () => {
@@ -43,7 +41,7 @@ export default function EditIposUser({
     };
     setIsLoading(true);
     try {
-      await addIposToUserCollection(userId.userId, investmentData);
+      await updateIposToUserCollection(userId.userId, iposId, investmentData);
       Swal.fire({
         icon: "success",
         title: "Success!",
@@ -126,7 +124,7 @@ export default function EditIposUser({
             </div>
             <div className="more_dets">
               <p className="bold_text">Number of Shares:</p>
-              <p className="reg_text">{numberOfShares || 0}</p>
+              <p className="reg_text">{ipo.numberOfShares || numberOfShares || 0}</p>
             </div>
             <div className="more_dets">
               <p className="bold_text">Total Cost:</p>
@@ -139,7 +137,7 @@ export default function EditIposUser({
                 prefix="$"
                 name="investmentAmount"
                 placeholder="$0"
-                defaultValue={investmentAmount}
+                value={investmentAmount}
                 decimalsLimit={2}
                 onValueChange={(value) => {
                   const formattedValue = parseFloat(value).toFixed(2);
@@ -163,7 +161,7 @@ export default function EditIposUser({
               className="muted-button"
               type="button"
               value="Cancel"
-              onClick={onClose}
+              onClick={() => {onClose(); setInvestmentAmount(0)}}
             />
           </div>
         </div>

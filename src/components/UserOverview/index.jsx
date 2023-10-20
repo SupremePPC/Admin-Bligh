@@ -728,7 +728,6 @@ const UserOverview = () => {
 
           </div>
         )}
-
       {modalState.isEditUserDetailsOpen && (
         <EditUser
           onClose={() => {
@@ -906,6 +905,7 @@ const UserOverview = () => {
           userId={user}
         />
       )}
+
     </div>
   );
 };

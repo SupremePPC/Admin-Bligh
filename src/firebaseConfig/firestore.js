@@ -840,11 +840,12 @@ export async function updateTermInUserCollection(userId, termData, termId) {
   try {
     const userTermsHoldingsPath = collection(
       db,
-      `users/${userId}/fixedTermDeposits/${termId}`
+      `users/${userId}/fixedTermDeposits/`
     );
     const docRef = doc(userTermsHoldingsPath, termId);
     await updateDoc(docRef, termData);
-    return { success: true };
+    const docId = docRef.id;
+    return { success: true,  id: docId};
   } catch (error) {
     console.error("Error updating term:", error);
     return { success: false, error: error.message };
@@ -940,6 +941,25 @@ export const addIposToUserCollection = async (userId, ipoData) => {
       console.error('Error adding term:', error);
       return { success: false, error: error.message };
     }
+};
+
+// 2. Add IPO details to a sub-collection in the user's document
+export const updateIposToUserCollection = async (userId, ipoId, ipoData) => {
+  try {
+    const userIposHoldingsPath = collection(
+      db,
+      `users/${userId}/ipos` // Reference to the subcollection
+    );
+    
+    const docRef = doc(userIposHoldingsPath, ipoId); // Reference to the specific document within the subcollection
+    await updateDoc(docRef, ipoData);
+    const docId = docRef.id;
+  
+    return { success: true, id: docId };
+  } catch (error) {
+    console.error('Error updating ipos:', error);
+    return { success: false, error: error.message };
+  }
 };
 
 // 3. Delete the IPO request status from the user's request collection

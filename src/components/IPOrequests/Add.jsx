@@ -3,12 +3,16 @@ import "firebase/firestore";
 import { getAllIpos } from "../../firebaseConfig/firestore";
 import LoadingScreen from "../LoadingScreen";
 import InvestIpoModal from "./Modals/InvestModal";
+import EditIposUser from "./Edit";
 
 const AddUserIpos = ({ userId, onClose, openEdit }) => {
   const [ipos, setIpos] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [iposModalOpen, setIposModalOpen] = useState(false);
   const [selectedIpo, setSelectedIpo] = useState(null);
+  const [selectedForEdit, setSelectedForEdit] = useState(false);
+  const [selectedId, setSelectedId] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   const fetchIpos = async () => {
     try {
@@ -22,10 +26,16 @@ const AddUserIpos = ({ userId, onClose, openEdit }) => {
     }
   };
 
-  useEffect (() => {
+  useEffect(() => {
     fetchIpos();
-  }
-  , []);
+  }, []);
+
+  const handleInvestSuccess = (investmentData, iposId) => {
+    setIposModalOpen(false);
+    setIsEditing(true);
+    setSelectedId(iposId);
+    setSelectedForEdit(investmentData);
+  };
 
   return (
     <div className="iposPage_Wrapper">
@@ -108,18 +118,29 @@ const AddUserIpos = ({ userId, onClose, openEdit }) => {
                   >
                     Invest Now
                   </button>
-                  <InvestIpoModal
-                    isOpen={iposModalOpen}
-                    onClose={() => {
-                      setIposModalOpen(false);
-                      setSelectedIpo(null);
-                    }}
-                    ipo={selectedIpo}
-                    userId={userId}
-                    openEdit={openEdit}
-                  />
                 </div>
               </div>
+              {iposModalOpen && (
+                <InvestIpoModal
+                  onClose={() => {
+                    setIposModalOpen(false);
+                    setSelectedIpo(null);
+                  }}
+                  ipo={selectedIpo}
+                  userId={userId}
+                  openEdit={openEdit}
+                  onInvestSuccess={handleInvestSuccess}
+                />
+              )}
+              {isEditing && (
+                <EditIposUser
+                  iposId={selectedId}
+                  ipo={selectedForEdit}
+                  onClose={onClose}
+                  userId={userId}
+                  refreshDetails={fetchIpos}
+                />
+              )}
             </div>
           ))
         )}

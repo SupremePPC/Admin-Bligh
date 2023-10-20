@@ -8,14 +8,11 @@ import Swal from "sweetalert2";
 import EditIposUser from "../Edit";
 import "./style.css";
 
-export default function InvestIpoModal({ isOpen, onClose, ipo, userId }) {
+export default function InvestIpoModal({ onInvestSuccess, onClose, ipo, userId }) {
   const [investmentAmount, setInvestmentAmount] = useState(0);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedForEdit, setSelectedForEdit] = useState(false);
-  const [selectedId, setSelectedId] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
 
   const handleInvestInIpo = async () => {
     if (!investmentAmount || investmentAmount < ipo.minInvestment) {
@@ -41,10 +38,8 @@ export default function InvestIpoModal({ isOpen, onClose, ipo, userId }) {
     };
     setIsLoading(true);
     try {
-      const result = await addIposToUserCollection(
-        userId.userId,
-        investmentData
-      );
+      const result = await addIposToUserCollection(userId.userId, investmentData);
+     
       Swal.fire({
         icon: "success",
         title: "Success!",
@@ -53,10 +48,8 @@ export default function InvestIpoModal({ isOpen, onClose, ipo, userId }) {
         timer: 2000,
       });
       setInvestmentAmount(0);
-      setSelectedForEdit(investmentData);
-      setSelectedId(result.id);
-      setIsEditing(true);
-      // onClose();
+      const iposId = result.id;
+      onInvestSuccess(investmentData, iposId);
     } catch (error) {
       setError(
         `There was an issue sending your investment request. Try again later.`
@@ -68,15 +61,13 @@ export default function InvestIpoModal({ isOpen, onClose, ipo, userId }) {
     }
   };
 
-  if (!isOpen) return null;
-
   const totalCost = investmentAmount * ipo.sharePrice;
   const numberOfShares =
     Math.ceil((investmentAmount / ipo.sharePrice) * 100) / 100;
 
   return (
     <>
-      {!isEditing && (
+      {/* {!isEditing && ( */}
         <div
           className="invest_ipo_overlay"
           onClick={(e) => e.stopPropagation()}
@@ -142,15 +133,8 @@ export default function InvestIpoModal({ isOpen, onClose, ipo, userId }) {
             </div>
           </div>
         </div>
-      )}
-      {isEditing && (
-        <EditIposUser
-          iposId={setSelectedId}
-          ipo={selectedForEdit}
-          onClose={onClose}
-          userId={userId}
-        />
-      )}
+      {/* )} */}
+      
     </>
   );
 }

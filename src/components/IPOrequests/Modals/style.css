@@ -161,12 +161,14 @@
     border-radius: 10px;
     margin-top: .5rem;
     background-color: var(--red);
+    border: var(--red) 1px solid;
     cursor: pointer;
     transition: all 0.3s ease-in-out;
 }
 
 .invest_ipo_modal .buttons_wrap .cancel_btn:hover {
   background-color: #f81d1dd3;
+  border: #f81d1dd3 1px solid;
 }
   
 @media screen and (max-width: 415px) {
