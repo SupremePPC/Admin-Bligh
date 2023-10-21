@@ -1,10 +1,20 @@
 import React, { useState } from "react";
 import CurrencyInput from "react-currency-input-field";
-import { updateBondUser, getCurrentDate, deleteBondUser } from "../../../firebaseConfig/firestore";
+import {
+  updateBondUser,
+  getCurrentDate,
+  deleteBondUser,
+} from "../../../firebaseConfig/firestore";
 import "./style.css";
 import Swal from "sweetalert2";
 
-export default function EditBondModal({  bondId, onClose, bond, refreshDetails, userId }) {
+export default function EditBondModal({
+  bondId,
+  onClose,
+  bond,
+  refreshDetails,
+  userId,
+}) {
   const [bondsAmount, setBondsAmount] = useState(bond.amountRequested);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -20,11 +30,11 @@ export default function EditBondModal({  bondId, onClose, bond, refreshDetails, 
       });
       return;
     }
-  
+
     // Calculate how many bonds the user is buying
     const amountAsNumber = parseFloat(bondsAmount);
     const numberOfBondsBought = amountAsNumber / minimumInvestmentAmount;
-  
+
     // Create bond data
     const bondData = {
       amountRequested: amountAsNumber,
@@ -43,11 +53,7 @@ export default function EditBondModal({  bondId, onClose, bond, refreshDetails, 
     };
     setIsLoading(true);
     try {
-      await updateBondUser(
-        userId.userId,
-        bondId,
-        bondData
-        );
+      await updateBondUser(userId.userId, bondId, bondData);
       Swal.fire({
         icon: "success",
         title: "Success!",
@@ -55,20 +61,20 @@ export default function EditBondModal({  bondId, onClose, bond, refreshDetails, 
         showConfirmButton: false,
         timer: 2000,
       });
-        setBondsAmount(0);
-        onClose();
-        refreshDetails();
+      setBondsAmount(0);
+      refreshDetails();
+      onClose();
     } catch (error) {
-        console.log(error);
-        Swal.fire({
-            icon: "error",
-            title: "Error!",
-            text: "There was an issue sending your investment request. Try again later.",
-            showConfirmButton: false,
-            timer: 2000,
-          });
+      console.log(error);
+      Swal.fire({
+        icon: "error",
+        title: "Error!",
+        text: "There was an issue sending your investment request. Try again later.",
+        showConfirmButton: false,
+        timer: 2000,
+      });
     } finally {
-        setIsLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -99,7 +105,6 @@ export default function EditBondModal({  bondId, onClose, bond, refreshDetails, 
     }
   };
 
-
   return (
     <div className="invest_ipo_overlay" onClick={(e) => e.stopPropagation()}>
       <div className="invest_ipo_modal">
@@ -120,9 +125,7 @@ export default function EditBondModal({  bondId, onClose, bond, refreshDetails, 
             <div className="">
               <div className="maturity_row">
                 <p className="bold_text">Maturity Date:</p>
-                <span className="reg_text">
-                  {bond.maturityDate}
-                </span>
+                <span className="reg_text">{bond.maturityDate}</span>
               </div>
               <div className="maturity_row">
                 <p className="bold_text">Minimum Amount:</p>
@@ -132,7 +135,7 @@ export default function EditBondModal({  bondId, onClose, bond, refreshDetails, 
           </div>
           <div className="input_group">
             <label htmlFor="title">Input Amount:</label>
-             <CurrencyInput
+            <CurrencyInput
               decimalSeparator="."
               prefix="$"
               name="bondsAmount"
@@ -169,7 +172,6 @@ export default function EditBondModal({  bondId, onClose, bond, refreshDetails, 
             }}
           />
         </div>
-        
       </div>
     </div>
   );
