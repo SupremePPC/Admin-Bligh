@@ -136,7 +136,6 @@ const UserOverview = () => {
       fetchSubCollection("fixedTermDeposits", setFixedTerm);
       fetchSubCollection("ipos", setIpos);
       fetchSubCollection("docs", setDocs);
-      // console.log(bankingDetails, bankingDetails[0].id);
     } else {
       Swal.fire({
         icon: "error",
@@ -846,11 +845,13 @@ const UserOverview = () => {
             handleCloseModal("isEditTermOpen");
             setSelectedForEdit(null);
           }}
-          fixedTerm={fixedTerm}
           setFixedTerm={setFixedTerm}
           userId={user}
-          term={selectedForEdit}
+          fixedTerm={selectedForEdit}
           termId={selectedForEdit.id}
+          refreshDetails={() => {
+            fetchSubCollection("fixedTermDeposits", setFixedTerm);}
+          }
         />
       )}
 

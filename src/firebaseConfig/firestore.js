@@ -884,7 +884,7 @@ export async function deleteTermFromUserCollection(userId, termId) {
   try {
     const userTermsHoldingsPath = collection(
       db,
-      `users/${userId}/fixedTermDeposits/${termId}`
+      `users/${userId}/fixedTermDeposits/`
     );
     const docRef = doc(userTermsHoldingsPath, termId);
     await deleteDoc(docRef);

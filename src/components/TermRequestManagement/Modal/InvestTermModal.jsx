@@ -42,6 +42,7 @@ export default function InvestTermModal({
       const newDeposit = {
         date: getCurrentDate(),
         principalAmount: parseFloat(depositAmount),
+        minAmount: fixedTerm.minAmount,
         status: "Pending",
         bankName: fixedTerm.bankName,
         term: fixedTerm.term,
@@ -49,21 +50,19 @@ export default function InvestTermModal({
         type: "deposit",
         logo: fixedTerm.logo,
       };
-      console.log(newDeposit);
 
       const result = await addTermToUserCollection(userId.userId, newDeposit);
       const depositId = result.id;
       onInvestSuccess(newDeposit, depositId);
+
       Swal.fire({
         icon: "success",
         title: "Request Sent!",
-        text: `You have successfully requested a deposit of $${depositAmount} on behalf of this user.`,
+        text: `You have successfully made a deposit of $${depositAmount} on behalf of this user.`,
         showConfirmButton: false,
         timer: 4000,
       });
       setDepositAmount(0);
-      setIsLoading(false);
-      onClose();
     } catch (error) {
       console.error("Error adding deposit transaction: ", error);
     }
