@@ -560,10 +560,9 @@ const UserOverview = () => {
                                 </div>
                               </td>
                               <td>{item[i].currentValue}</td>
-                              <td>$ {formatNumber(item[i].bondsAmount)}</td>
+                              <td>$ {formatNumber(item[i].amountRequested)}</td>
                               <td>{item[i].maturityDate}</td>
                               <td>{item[i].purchaseDate}</td>
-                              {/* <td>{item[i].quantity}</td> */}
                             </tr>
                           );
                         }
@@ -818,6 +817,7 @@ const UserOverview = () => {
           onClose={() => {
             handleCloseModal("isEditBondOpen");
             setSelectedForEdit(null);
+            fetchSubCollection("bondsHoldings", setBondsHoldings);
           }}
           setBond={setBondsHoldings}
           bondId={selectedForEdit.id}

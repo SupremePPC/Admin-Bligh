@@ -16,7 +16,7 @@ export default function AddBondModal({ onInvestSuccess, onClose, bond, userId })
       Swal.fire({
         icon: "error",
         title: "Oops...",
-        text: `Cannot buy less than $${minimumInvestmentAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+        text: `Cannot buy less than $${minimumInvestmentAmount}`,
         showConfirmButton: false,
         timer: 2000,
       });
@@ -29,21 +29,20 @@ export default function AddBondModal({ onInvestSuccess, onClose, bond, userId })
   
     // Create bond data
     const bondData = {
-      amountRequested: amountAsNumber.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+      amountRequested: amountAsNumber,
       image: bond.image,
       type: bond.type,
-      couponRate: bond.couponRate.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+      couponRate: bond.couponRate,
       companyWebsite: bond.companyWebsite,
       isin: bond.isin,
       maturityDate: bond.maturityDate,
       purchaseDate: getCurrentDate(),
-      bondsAmount: bondsAmount,
-      currentValue: numberOfBondsBought.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+      currentValue: numberOfBondsBought,
       issuerName: bond.issuerName,
       sector: bond.sector,
       couponFrequency: bond.couponFrequency,
-      minimumAmount: bond.minimumAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
-      // quantity: numberOfBondsBought.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+      minimumAmount: bond.minimumAmount,
+      // quantity: numberOfBondsBought,
     };
     console.log(bondData);
     setIsLoading(true);
@@ -130,7 +129,7 @@ export default function AddBondModal({ onInvestSuccess, onClose, bond, userId })
             }}
             className="submit_btn"
             >
-            Request
+            Invest
           </button>
             {isLoading && <div className="spinner" style={{margin: "0 auto"}}></div> }
           <button onClick={onClose} className="cancel_btn">

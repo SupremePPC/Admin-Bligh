@@ -101,9 +101,9 @@ export default function EditIposUser({
     <div className="invest_ipo_overlay" onClick={(e) => e.stopPropagation()}>
       <div className="invest_ipo_modal">
         <div className="section_header">
-          <h6>Edit Term for {userId.userId}</h6>
+          <h6>Edit {ipo.name} IPOs for User</h6>
           <img src={ipo.logo} alt={`${ipo.name} Logo`} className="logo" />
-          <h2 className="title">{ipo.name}</h2>
+          {/* <h2 className="title">{ipo.name}</h2> */}
         </div>
         <div className="section_body">
           <div className="more_dets">

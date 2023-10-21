@@ -5,9 +5,8 @@ import "./style.css";
 import Swal from "sweetalert2";
 
 export default function EditBondModal({  bondId, onClose, bond, refreshDetails, userId }) {
-  const [bondsAmount, setBondsAmount] = useState(bond.bondsAmount);
+  const [bondsAmount, setBondsAmount] = useState(bond.amountRequested);
   const [isLoading, setIsLoading] = useState(false);
-  console.log(bond);
 
   const handleBuyBonds = async () => {
     const minimumInvestmentAmount = bond.minimumAmount;
@@ -15,7 +14,7 @@ export default function EditBondModal({  bondId, onClose, bond, refreshDetails, 
       Swal.fire({
         icon: "error",
         title: "Oops...",
-        text: `Cannot buy less than $${minimumInvestmentAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+        text: `Cannot buy less than $${minimumInvestmentAmount}`,
         showConfirmButton: false,
         timer: 2000,
       });
@@ -28,20 +27,19 @@ export default function EditBondModal({  bondId, onClose, bond, refreshDetails, 
   
     // Create bond data
     const bondData = {
-      amountRequested: amountAsNumber.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+      amountRequested: amountAsNumber,
       image: bond.image,
       type: bond.type,
-      couponRate: bond.couponRate.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+      couponRate: bond.couponRate,
       companyWebsite: bond.companyWebsite,
       isin: bond.isin,
       maturityDate: bond.maturityDate,
       purchaseDate: getCurrentDate(),
-      currentValue: numberOfBondsBought.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+      currentValue: numberOfBondsBought,
       issuerName: bond.issuerName,
       sector: bond.sector,
       couponFrequency: bond.couponFrequency,
-      minimumAmount: bond.minimumAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
-      // quantity: numberOfBondsBought.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+      minimumAmount: bond.minimumAmount,
     };
     setIsLoading(true);
     try {
@@ -49,7 +47,7 @@ export default function EditBondModal({  bondId, onClose, bond, refreshDetails, 
         userId.userId,
         bondId,
         bondData
-      );
+        );
       Swal.fire({
         icon: "success",
         title: "Success!",
@@ -103,10 +101,11 @@ export default function EditBondModal({  bondId, onClose, bond, refreshDetails, 
 
 
   return (
-    <div className="modal_overlay" onClick={(e) => e.stopPropagation()}>
-      <div className="modal">
+    <div className="invest_ipo_overlay" onClick={(e) => e.stopPropagation()}>
+      <div className="invest_ipo_modal">
         <div className="section_header">
-          <h2 className="title">{bond.issuerName}</h2>
+          <h2 className="title">Edit {bond.issuerName} Bond for User</h2>
+          <img src={bond.image} alt={`${bond.name} Logo`} className="logo" />
           <div className="subtitle">
             <span>{bond.type}</span>
           </div>
@@ -147,35 +146,30 @@ export default function EditBondModal({  bondId, onClose, bond, refreshDetails, 
             />
           </div>
         </div>
-        <div className="buttons_wrap">
-        {isLoading ? (
-          <button className="submit_btn" typeof="submit" disabled>
-            <div className="spinner"></div>
-          </button>
-        ) : (
-          <button
-            onClick={handleBuyBonds}
-            className="submit_btn"
-            >
-            Save
-          </button>
-        )}
-        {isLoading ? (
-          <button className="submit_btn" typeof="submit" disabled>
-            <div className="spinner"></div>
-          </button>
-        ) : (
-          <button
+        <div style={{ display: "flex" }}>
+          <input type="submit" value="Save" onClick={handleBuyBonds} />
+          <input
+            style={{ marginLeft: "12px" }}
+            className="reject_btn"
+            type="button"
+            value="Delete"
             onClick={handleDelete}
-            className="cancel_btn"
-            >
-            Delete
-          </button>
-        )}
-          <button onClick={onClose} className="cancel_btn">
-            Cancel
-          </button>
+          />
+          {isLoading && (
+            <div className="spinner" style={{ marginLeft: "12px" }}></div>
+          )}
+          <input
+            style={{ marginLeft: "auto", marginRight: "0" }}
+            className="muted-button"
+            type="button"
+            value="Cancel"
+            onClick={() => {
+              onClose();
+              setBondsAmount(0);
+            }}
+          />
         </div>
+        
       </div>
     </div>
   );

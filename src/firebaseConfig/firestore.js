@@ -25,7 +25,13 @@ import {
   where,
 } from "firebase/firestore";
 import { db } from "./firebase";
-import { ref, deleteObject, getStorage, getDownloadURL, uploadBytesResumable } from "firebase/storage";
+import {
+  ref,
+  deleteObject,
+  getStorage,
+  getDownloadURL,
+  uploadBytesResumable,
+} from "firebase/storage";
 
 const ADMINUSER_COLLECTION = "admin_users";
 const ADMINDASH_COLLECTION = "admin_users";
@@ -132,7 +138,7 @@ export async function editTransaction(userId, transactionId, updatedFields) {
 
 export async function deleteTransaction(userId, transactionId) {
   const transactionRef = doc(
-    db, 
+    db,
     USERS_COLLECTION,
     userId,
     TRANSACTIONS_SUB_COLLECTION,
@@ -144,29 +150,27 @@ export async function deleteTransaction(userId, transactionId) {
   return { success: true };
 }
 
-
 //Account Types
 export async function addToAccount(userId, label, amount) {
   const accountTypeRef = collection(db, "users", userId, "accountTypes");
   const docRef = doc(accountTypeRef, label);
-  console.log(amount)
+  console.log(amount);
   try {
-      const docSnap = await getDoc(docRef);
+    const docSnap = await getDoc(docRef);
 
-      if (docSnap.exists()) {
+    if (docSnap.exists()) {
+      await updateDoc(docRef, { amount: amount });
+    } else {
+      await setDoc(docRef, {
+        label: label,
+        amount: amount,
+      });
+    }
 
-          await updateDoc(docRef, { amount: amount });
-      } else {
-          await setDoc(docRef, {
-              label: label,
-              amount: amount,
-          });
-      }
-
-      return { success: true };
+    return { success: true };
   } catch (error) {
-      console.error("Error adding to account:", error);
-      return { success: false, error: error.message };
+    console.error("Error adding to account:", error);
+    return { success: false, error: error.message };
   }
 }
 
@@ -174,18 +178,18 @@ export async function getAccountTypes(userId) {
   const accountTypeRef = collection(db, "users", userId, "accountTypes");
 
   try {
-      const querySnapshot = await getDocs(accountTypeRef);
-      const accountTypes = [];
+    const querySnapshot = await getDocs(accountTypeRef);
+    const accountTypes = [];
 
-      querySnapshot.forEach((doc) => {
-          const data = doc.data();
-          accountTypes.push({ id: doc.id, label: data.label, amount: data.amount });
-      });
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      accountTypes.push({ id: doc.id, label: data.label, amount: data.amount });
+    });
 
-      return accountTypes;
+    return accountTypes;
   } catch (error) {
-      console.error("Error getting account types:", error);
-      return [];
+    console.error("Error getting account types:", error);
+    return [];
   }
 }
 
@@ -210,11 +214,11 @@ export async function addBankingDetails(
   // Create a query to check for existing documents with the same details
   const dets = query(
     bankingDetailsRef,
-    where('accountName', '==', accountName),
-    where('bankName', '==', bankName),
-    where('branch', '==', branch),
-    where('bsbNumber', '==', bsbNumber),
-    where('accountNumber', '==', accountNumber)
+    where("accountName", "==", accountName),
+    where("bankName", "==", bankName),
+    where("branch", "==", branch),
+    where("bsbNumber", "==", bsbNumber),
+    where("accountNumber", "==", accountNumber)
   );
 
   // Execute the query to check for existing documents
@@ -223,7 +227,9 @@ export async function addBankingDetails(
   // Check if any documents were found
   if (!querySnapshot.empty) {
     // Documents with the same details already exist
-    throw new Error('Details already exist. Proceed to the edit page to edit them.');
+    throw new Error(
+      "Details already exist. Proceed to the edit page to edit them."
+    );
   } else {
     // No matching documents found, proceed to add a new document
     return addDoc(bankingDetailsRef, {
@@ -236,14 +242,14 @@ export async function addBankingDetails(
   }
 }
 
-
-export async function updateBankingDetails(
-  uid,
-  formData,
-  bankingDetailsId,
-) {
-
-  const updateBankingDetailsRef = doc(db, USERS_COLLECTION, uid, BANKING_DETAILS_SUB_COLLECTION, bankingDetailsId);
+export async function updateBankingDetails(uid, formData, bankingDetailsId) {
+  const updateBankingDetailsRef = doc(
+    db,
+    USERS_COLLECTION,
+    uid,
+    BANKING_DETAILS_SUB_COLLECTION,
+    bankingDetailsId
+  );
   try {
     await updateDoc(updateBankingDetailsRef, {
       accountName: formData.accountName,
@@ -253,13 +259,14 @@ export async function updateBankingDetails(
       accountNumber: formData.accountNumber,
     });
   } catch (error) {
-    throw error; 
+    throw error;
   }
 }
 
 export async function getBankingDetails(uid) {
   const bankingDetailsQuery = query(
-    doc(db, USERS_COLLECTION, uid), BANKING_DETAILS_SUB_COLLECTION
+    doc(db, USERS_COLLECTION, uid),
+    BANKING_DETAILS_SUB_COLLECTION
   );
   const querySnapshot = await getDocs(bankingDetailsQuery);
 
@@ -488,7 +495,7 @@ export const uploadDocument = async (userId, fileDescription, file) => {
   const storage = getStorage();
   const uid = userId.userId;
   const storageRef = ref(storage, `${uid}/${file.name}`);
-console.log(fileDescription, file, uid)
+  console.log(fileDescription, file, uid);
   try {
     // Upload the document to Firebase Storage
     const uploadTask = uploadBytesResumable(storageRef, file);
@@ -516,10 +523,15 @@ console.log(fileDescription, file, uid)
   }
 };
 
-export const updateDocumentInFirestore = async (userId, documentId, fileDescription, file) => {
+export const updateDocumentInFirestore = async (
+  userId,
+  documentId,
+  fileDescription,
+  file
+) => {
   try {
     // Create a reference to the Firestore document
-    const docRef = doc(db, 'users', userId, 'docs', documentId);
+    const docRef = doc(db, "users", userId, "docs", documentId);
 
     // Create a reference to the Firebase Storage for the user
     const storage = getStorage();
@@ -610,23 +622,26 @@ export async function updateBondUser(userId, bondId, bondData) {
       db,
       `users/${userId}/bondsHoldings` // Reference to the subcollection
     );
-    
+
     const docRef = doc(userIposHoldingsPath, bondId); // Reference to the specific document within the subcollection
     await updateDoc(docRef, bondData);
     const docId = docRef.id;
-  
     return { success: true, id: docId };
   } catch (error) {
-    console.error('Error updating ipos:', error);
+    console.error("Error updating ipos:", error);
     return { success: false, error: error.message };
   }
 }
 
 export const deleteBondUser = async (uid, requestId) => {
-  const requestRef = doc(db, USERS_COLLECTION, uid, "bondsHoldings", requestId);
-  await deleteDoc(requestRef);
+  try {
+    const requestRef = doc(db, USERS_COLLECTION, uid, "bondsHoldings", requestId);
+    await deleteDoc(requestRef);
+  } catch (error) {
+    console.error("Error deleting IPO: ", error);
+    throw error;
+  }
 };
-
 
 //TERMS
 const TERMS_COLLECTION = "fixedTermDeposit";
@@ -705,7 +720,16 @@ export async function addNotification(userId, message, type = "info") {
     notificationData.notificationId = notificationRef.id;
 
     // Update the document with the notification ID
-    await updateDoc(doc(db, USERS_COLLECTION, userId, NOTIFICATIONS_SUB_COLLECTION, notificationRef.id), notificationData);
+    await updateDoc(
+      doc(
+        db,
+        USERS_COLLECTION,
+        userId,
+        NOTIFICATIONS_SUB_COLLECTION,
+        notificationRef.id
+      ),
+      notificationData
+    );
 
     return { success: true, id: notificationRef.id };
   } catch (error) {
@@ -713,7 +737,6 @@ export async function addNotification(userId, message, type = "info") {
     return { success: false, error: error.message };
   }
 }
-
 
 //TERMS REQUEST
 const TERMS_REQUEST_SUB_COLLECTION = "termDepositRequest";
@@ -825,19 +848,19 @@ export async function deleteFixedTermRequestStatus(userId, requestId) {
 // 6.Function to add term to user's terms sub-collection
 export async function addTermToUserCollection(userId, termData) {
   try {
-  const userTermsHoldingsPath = collection(
-    db,
-    `users/${userId}/fixedTermDeposits`
-  );
-  const docRef= await addDoc(userTermsHoldingsPath, termData);
-  const docId = docRef.id;
+    const userTermsHoldingsPath = collection(
+      db,
+      `users/${userId}/fixedTermDeposits`
+    );
+    const docRef = await addDoc(userTermsHoldingsPath, termData);
+    const docId = docRef.id;
 
     return { success: true, id: docId };
   } catch (error) {
-    console.error('Error adding term:', error);
+    console.error("Error adding term:", error);
     return { success: false, error: error.message };
   }
-};
+}
 
 // 7.Function to update term in user's terms subcollection
 export async function updateTermInUserCollection(userId, termData, termId) {
@@ -849,7 +872,7 @@ export async function updateTermInUserCollection(userId, termData, termId) {
     const docRef = doc(userTermsHoldingsPath, termId);
     await updateDoc(docRef, termData);
     const docId = docRef.id;
-    return { success: true,  id: docId};
+    return { success: true, id: docId };
   } catch (error) {
     console.error("Error updating term:", error);
     return { success: false, error: error.message };
@@ -933,18 +956,15 @@ const IPOS_REQUESTS_COLLECTION = "ipoInvestmentRequests";
 // 1. Add IPO details to a sub-collection in the user's document
 export const addIposToUserCollection = async (userId, ipoData) => {
   try {
-    const userIposHoldingsPath = collection(
-      db,
-      `users/${userId}/ipos`
-    );
-    const docRef= await addDoc(userIposHoldingsPath, ipoData);
+    const userIposHoldingsPath = collection(db, `users/${userId}/ipos`);
+    const docRef = await addDoc(userIposHoldingsPath, ipoData);
     const docId = docRef.id;
-  
-      return { success: true, id: docId };
-    } catch (error) {
-      console.error('Error adding term:', error);
-      return { success: false, error: error.message };
-    }
+
+    return { success: true, id: docId };
+  } catch (error) {
+    console.error("Error adding term:", error);
+    return { success: false, error: error.message };
+  }
 };
 
 // 2. Add IPO details to a sub-collection in the user's document
@@ -954,14 +974,14 @@ export const updateIposToUserCollection = async (userId, ipoId, ipoData) => {
       db,
       `users/${userId}/ipos` // Reference to the subcollection
     );
-    
+
     const docRef = doc(userIposHoldingsPath, ipoId); // Reference to the specific document within the subcollection
     await updateDoc(docRef, ipoData);
     const docId = docRef.id;
-  
+
     return { success: true, id: docId };
   } catch (error) {
-    console.error('Error updating ipos:', error);
+    console.error("Error updating ipos:", error);
     return { success: false, error: error.message };
   }
 };
@@ -974,10 +994,15 @@ export const deleteIposFromUserCollection = async (uid, requestId) => {
 
 // 3. Delete the IPO request status from the user's request collection
 export const deleteIposRequestStatus = async (uid, requestId) => {
-  const requestRef = doc(db, ADMINDASH_COLLECTION, uid, IPOS_REQUESTS_COLLECTION, requestId);
+  const requestRef = doc(
+    db,
+    ADMINDASH_COLLECTION,
+    uid,
+    IPOS_REQUESTS_COLLECTION,
+    requestId
+  );
   await deleteDoc(requestRef);
 };
-
 
 // 4. Fetch all the IPO requests
 export async function getIposRequests() {
@@ -1029,7 +1054,7 @@ export const handleIpoApproval = async (uid, requestId, requestData) => {
     }
 
     // Move to `ipos` sub-collection
-    const userIposPath = USERS_COLLECTION/uid/IPOS_COLLECTION;
+    const userIposPath = USERS_COLLECTION / uid / IPOS_COLLECTION;
     const iposDocRef = doc(db, `${userIposPath}/${requestId.id}`);
     await setDoc(iposDocRef, { ...requestId, status: "Approved" }); // set the status to Approved
 
@@ -1044,14 +1069,13 @@ export const handleIpoApproval = async (uid, requestId, requestData) => {
       message: "Your IPO request has been approved.",
       type: "Approved",
     });
-
   } catch (error) {
     console.error("Error in Approval:", error);
   }
 };
 
 // 6. Handle the IPO decline logic
-export const handleIpoDecline = async (uid, requestId,) => {
+export const handleIpoDecline = async (uid, requestId) => {
   try {
     if (!requestId) {
       console.error("Invalid requestId:", requestId);
@@ -1084,13 +1108,13 @@ export const getSpecificIpoRequest = async (requestId, uid) => {
 };
 
 //Get Current Date
-export function getCurrentDate () {
+export function getCurrentDate() {
   const now = new Date();
   const year = now.getFullYear();
   const month = String(now.getMonth() + 1).padStart(2, "0"); // Month is zero-based
   const day = String(now.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
-};
+}
 
 //Format Number
 export function formatNumber(
