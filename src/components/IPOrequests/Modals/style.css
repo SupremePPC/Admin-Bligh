@@ -38,6 +38,10 @@
     object-fit: contain;
 }
 
+.section_header .logo img{
+    object-fit: contain;
+}
+
 .invest_ipo_modal .section_header .title {
     font-size: var(--font-twentyFour);
     font-weight: 600;

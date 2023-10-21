@@ -45,7 +45,7 @@ export default function InvestTermModal({
         status: "Pending",
         bankName: fixedTerm.bankName,
         term: fixedTerm.term,
-        coupon: fixedTerm.interestRate,
+        interestRate: fixedTerm.interestRate,
         type: "deposit",
         logo: fixedTerm.logo,
       };

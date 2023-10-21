@@ -122,7 +122,7 @@ const AddNewTerm = ({ userId, onClose, refreshDetails }) => {
                     setTermModalOpen(false);
                     setSelectedTerm(null);
                   }}
-                  term={selectedTerm}
+                  fixedTerm={selectedTerm}
                   userId={userId}
                   onInvestSuccess={handleInvestSuccess}
                 />
@@ -130,7 +130,7 @@ const AddNewTerm = ({ userId, onClose, refreshDetails }) => {
               {isEditing && (
                 <EditTermUser
                   termId={selectedId}
-                  term={selectedForEdit}
+                  fixedTerm={selectedForEdit}
                   onClose={onClose}
                   userId={userId}
                   refreshDetails={refreshDetails}
@@ -138,6 +138,18 @@ const AddNewTerm = ({ userId, onClose, refreshDetails }) => {
               )}
           </div>
         ))}
+      </div>
+      <div style={{ marginTop: "30px" }}>
+        <input
+          style={{ marginLeft: "12px" }}
+          className="muted-button"
+          type="button"
+          value="Close"
+          onClick={() => {
+            fetchTerm();
+            onClose();
+          }}
+        />
       </div>
     </div>
   );
