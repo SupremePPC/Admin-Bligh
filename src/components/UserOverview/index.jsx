@@ -15,9 +15,9 @@ import Swal from "sweetalert2";
 import "./style.css";
 import EditDocument from "../DocumentManagement/Edit";
 import { deleteBankingDetails, formatNumber } from "../../firebaseConfig/firestore";
-import EditTerm from "../TermRequestManagement/Edit";
 import EditIposUser from "../IPOrequests/Modals/EditModal";
 import EditBondModal from "../BondRequestManagement/Modal/EditBondModal";
+import EditTermUser from "../TermRequestManagement/Modal/EditTermModal";
 
 const UserOverview = () => {
   const user = useParams();
@@ -841,7 +841,7 @@ const UserOverview = () => {
       )}
 
       {modalState.isEditTermOpen && (
-        <EditTerm
+        <EditTermUser
           onClose={() => {
             handleCloseModal("isEditTermOpen");
             setSelectedForEdit(null);

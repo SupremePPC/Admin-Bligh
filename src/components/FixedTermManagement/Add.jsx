@@ -5,7 +5,8 @@ import { addNewTerm } from "../../firebaseConfig/firestore";
 import LoadingScreen from "../LoadingScreen";
 import CurrencyInput from 'react-currency-input-field';
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
-import EditTerm from "../TermRequestManagement/Edit";
+import EditTerm from "./Edit";
+// import EditTerm from "../TermRequestManagement/Edit";
 
 const AddNewTerm = ({ setIsAdding, refreshTerm }) => {
   const [isLoading, setIsLoading] = useState(false);

@@ -6,7 +6,7 @@ import LoadingScreen from "../LoadingScreen";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import CurrencyInput from "react-currency-input-field";
 
-const Edit = ({ termToEdit, setIsEditPageOpen, refreshTerms }) => {
+const EditTerm = ({ termToEdit, setIsEditPageOpen, refreshTerms }) => {
   const [formData, setFormData] = useState(termToEdit);
   const [errors, setErrors] = useState({});
   const [isLoaing, setIsLoading] = useState(false);
@@ -215,4 +215,4 @@ const Edit = ({ termToEdit, setIsEditPageOpen, refreshTerms }) => {
   );
 };
 
-export default Edit;
+export default EditTerm;

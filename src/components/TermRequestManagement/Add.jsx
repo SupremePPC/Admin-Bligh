@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
 import LoadingScreen from "../LoadingScreen";
-import CurrencyInput from "react-currency-input-field";
 import "firebase/firestore";
-import Swal from "sweetalert2";
-import Edit from "./Edit";
 import { getAllTerms } from "../../firebaseConfig/firestore";
+import InvestTermModal from "./Modal/InvestTermModal";
+import EditTermUser from "./Modal/EditTermModal";
 
 const AddNewTerm = ({ userId, onClose, refreshDetails }) => {
   const [fixedTerms, setFixedTerm] = useState([]);
@@ -112,7 +111,7 @@ const AddNewTerm = ({ userId, onClose, refreshDetails }) => {
                     value="Buy Fixed Term"
                     onClick={() => {
                       setTermModalOpen(true);
-                      setSelectedIpo(fixedTerm);
+                      setSelectedTerm(fixedTerm);
                     }}
                   />
               </div>
