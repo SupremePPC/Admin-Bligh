@@ -175,7 +175,7 @@ const AddBond = ({ userId, onClose, refreshDetails }) => {
                   bond={selectedForEdit}
                   onClose={onClose}
                   userId={userId}
-                  refreshDetails={fetchBonds}
+                  refreshDetails={refreshDetails}
                 />
               )}
             </div>
