@@ -5,6 +5,7 @@ import {
   createUserWithEmailAndPassword,
   getAuth,
   sendEmailVerification,
+  sendPasswordResetEmail,
   sendSignInLinkToEmail,
 } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
@@ -82,8 +83,10 @@ const Add = ({ setUsers, setIsAdding }) => {
         password
       );
       const user = userCredential.user;
-      // Send email verification
-      await sendEmailVerification(user);
+      const userEmail = user.email;
+
+      // Send password reset email
+      await sendPasswordResetEmail(auth, userEmail);
 
       // Add user to Firestore using user.uid as the document ID
       const newUser = {
@@ -119,12 +122,13 @@ const Add = ({ setUsers, setIsAdding }) => {
       Swal.fire({
         icon: "error",
         title: "Error!",
-        text: `There was an error adding the user. ${error}`,
+        text: `There was an error adding the user. ${error.message}`,
         showConfirmButton: true,
       });
     }
     setIsLoading(false);
-  };
+};
+
 
   return (
     <div className="small-container">
