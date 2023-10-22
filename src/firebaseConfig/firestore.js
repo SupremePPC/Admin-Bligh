@@ -154,7 +154,6 @@ export async function deleteTransaction(userId, transactionId) {
 export async function addToAccount(userId, label, amount) {
   const accountTypeRef = collection(db, "users", userId, "accountTypes");
   const docRef = doc(accountTypeRef, label);
-  console.log(amount);
   try {
     const docSnap = await getDoc(docRef);
 
@@ -582,7 +581,7 @@ export async function addNewBond(bondData) {
   }
 }
 
-//uodate existing bond
+//update existing bond
 export async function updateBond(bondId, updatedData) {
   try {
     const bondRef = doc(db, "bonds", bondId);
@@ -811,9 +810,6 @@ export async function handleDepositApproval(uid, termData) {
 
     // If termDoc doesn't exist, then this is the first document in the fixedTermDeposits collection
     if (!termDoc.exists()) {
-      console.log(
-        "Document does not exist, creating the fixedTermDeposits subcollection and setting the document..."
-      );
       await setDoc(termDocRef, { ...termData });
       return;
     }
@@ -822,6 +818,8 @@ export async function handleDepositApproval(uid, termData) {
     console.error("Error in handleDepositApproval:", error);
   }
 }
+
+
 
 // 4.Function to update fixed term request status in the Firestore
 export async function updateFixedTermRequestStatus(
@@ -1117,13 +1115,10 @@ export function getCurrentDate() {
 }
 
 //Format Number
-export function formatNumber(
-  number,
-  options = {
+export function formatNumber(number) {
+  return new Intl.NumberFormat("en-US", {
     style: "decimal",
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  }
-) {
-  return number.toLocaleString("en-US", options);
+  }).format(number);
 }

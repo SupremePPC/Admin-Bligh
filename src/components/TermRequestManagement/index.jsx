@@ -63,17 +63,14 @@ const TermsRequestTable = () => {
   const handleUpdateRequest = async (userId, requestId, newStatus) => {
     try {
       setIsLoading(true);
-
       // Fetching the request data
       const requestData = await getTermRequests(userId, requestId);
       const requestObject = requestData[0]; // Accessing the object inside the array
-
       let message;
       if (newStatus === "Approved") {
         if (requestObject.type === "deposit") {
           await handleDepositApproval(userId, requestObject);
           message = `Your fixed term deposit request to deposit $${requestObject.principalAmount} to ${requestObject.bankName} with ${requestObject.term} term and ${requestObject.coupon}% coupon has been approved.`;
-          await addTermToUserCollection(userId, requestObject, newStatus);
         } else if (requestObject.type === "withdraw") {
           await handleWithdrawalApproval(userId, requestObject);
           message = `Your fixed term deposit request to withdraw $${requestObject.principalAmount} has been approved.`;

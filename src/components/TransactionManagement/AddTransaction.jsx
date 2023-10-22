@@ -53,7 +53,6 @@ const AddTransaction = ({
       const targetAccount = accountTypes.find(
         (acc) => acc.label === accountType
       );
-      console.log("targetAccount:", targetAccount);
       if (!targetAccount) {
         setIsLoading(false);
         return Swal.fire({
@@ -94,7 +93,6 @@ const AddTransaction = ({
       const targetAccount = accountTypes.find(
         (acc) => acc.label === accountType
       );
-      console.log("targetAccount:", targetAccount);
       if (!targetAccount) {
         // If the account doesn't exist, create a new one with the specified amount
         await addToAccount(userId.userId, accountType, amount);
