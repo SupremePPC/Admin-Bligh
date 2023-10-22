@@ -9,7 +9,7 @@ import {
   setDoc,
 } from "firebase/firestore";
 import { auth, db } from "../../firebaseConfig/firebase";
-import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
+import { createUserWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail } from "firebase/auth";
 import Header from "./Header";
 import Table from "./Table";
 import "./style.css";
@@ -77,7 +77,7 @@ export default function UserRequest() {
       const user = userCredential.user;
       // Send email verification
       await sendEmailVerification(user);
-  
+
       // Step 2: Use the User ID as the document ID in the 'users' collection
       const newUserId = userCredential.user.uid;
       await setDoc(doc(db, "users", newUserId), {
@@ -86,6 +86,8 @@ export default function UserRequest() {
         address: requestData.address,
         mobilePhone: requestData.mobilePhone,
         country: requestData.country,
+        jointAccount: requestData.jointAccount,
+        secondaryAccountHolder: requestData.secondaryAccountHolder,
       });
   
       // Delete the admin request
@@ -120,8 +122,14 @@ export default function UserRequest() {
       // Delete the admin request document from 'admin_users' collection
       await deleteDoc(doc(db, "admin_users", requestData.uid, "userRequests", userId));
     } catch (error) {
-      if (error.code === "auth/email-already-in-use") {
-        setError("The email is already in use. Please use a different email.");
+      if (error.code === "auth/email-already-in-use" ) {
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: `Error; email already in use. Please try another email.`,
+          showConfirmButton: false,
+          timer: 2000,
+        });
       } else {
         console.error("Error approving user:", error);
         Swal.fire({

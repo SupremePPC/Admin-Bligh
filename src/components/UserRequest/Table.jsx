@@ -35,7 +35,7 @@ const Table = ({
                 <td>{user.fullName.split(" ")[0] || "N/A"}</td>
                 <td>{user.fullName.split(" ")[1] || "N/A"}</td>
                 <td>{user.email || "N/A"}</td>
-                <td>{firestoreTimestampToDate(user.date) || "N/A"}</td>
+                <td>{user.createdAt || "N/A"}</td>
                 <td className="text-right">
                   <button
                     onClick={() => handleApproval(user.id, user)}
