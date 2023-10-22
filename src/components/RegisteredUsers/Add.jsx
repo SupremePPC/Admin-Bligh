@@ -6,7 +6,6 @@ import {
   getAuth,
   sendEmailVerification,
   sendPasswordResetEmail,
-  sendSignInLinkToEmail,
 } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { useDispatch } from "react-redux";
@@ -21,6 +20,9 @@ const Add = ({ setUsers, setIsAdding }) => {
     title: "",
     fullName: "",
     email: "",
+    jointAccount: false,
+    secondaryAccountHolder: "",
+    secondaryTitle: "",
     password: "",
     mobile: "",
     home: "",
@@ -30,11 +32,12 @@ const Add = ({ setUsers, setIsAdding }) => {
     postcode: "",
   });
 
-  const handleInputChange = (event) => {
-    const { name, value } = event.target;
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    const newValue = type === "checkbox" ? checked : value;
     setFormData({
       ...formData,
-      [name]: value,
+      [name]: newValue,
     });
   };
 
@@ -44,6 +47,9 @@ const Add = ({ setUsers, setIsAdding }) => {
     const {
       title,
       fullName,
+      jointAccount,
+      secondaryAccountHolder,
+      secondaryTitle,
       email,
       password,
       mobile,
@@ -112,6 +118,9 @@ const Add = ({ setUsers, setIsAdding }) => {
         uid: user.uid,
         title,
         fullName,
+        jointAccount,
+        secondaryAccountHolder,
+        secondaryTitle,
         email,
         mobilePhone: mobile,
         homePhone: home,
@@ -146,8 +155,7 @@ const Add = ({ setUsers, setIsAdding }) => {
       });
     }
     setIsLoading(false);
-};
-
+  };
 
   return (
     <div className="small-container">
@@ -156,6 +164,16 @@ const Add = ({ setUsers, setIsAdding }) => {
         <LoadingScreen />
       ) : (
         <form onSubmit={handleAdd}>
+          <div className="jointAcct_checkbox">
+            <input
+              id="jointAccount"
+              type="checkbox"
+              name="jointAccount"
+              checked={formData.jointAccount}
+              onChange={handleInputChange}
+            />
+            <label htmlFor="jointAccount">Joint Account</label>
+          </div>
           <label htmlFor="title">Title</label>
           <select
             id="title"
@@ -168,6 +186,10 @@ const Add = ({ setUsers, setIsAdding }) => {
             <option value="Miss">Miss</option>
             <option value="Mrs">Mrs</option>
             <option value="Mr">Mr</option>
+            <option value="Ms">Ms</option>
+            <option value="Dr">Dr</option>
+            <option value="Rev">Rev</option>
+            <option value="Other">Other</option>
           </select>
 
           <label htmlFor="fullName">Full Name</label>
@@ -180,6 +202,37 @@ const Add = ({ setUsers, setIsAdding }) => {
             required
           />
 
+          {formData.jointAccount && (
+            <>
+              <label htmlFor="secondaryAccountHolder">
+                Secondary Account Holder
+              </label>
+              <input
+                id="secondaryAccountHolder"
+                type="text"
+                name="secondaryAccountHolder"
+                value={formData.secondaryAccountHolder}
+                onChange={handleInputChange}
+              />
+
+              <label htmlFor="secondaryTitle">Secondary Title</label>
+              <select
+                id="secondaryTitle"
+                name="secondaryTitle"
+                value={formData.secondaryTitle}
+                onChange={handleInputChange}
+              >
+                <option value="">Select Title</option>
+                <option value="Miss">Miss</option>
+                <option value="Mrs">Mrs</option>
+                <option value="Mr">Mr</option>
+                <option value="Ms">Ms</option>
+                <option value="Dr">Dr</option>
+                <option value="Rev">Rev</option>
+                <option value="Other">Other</option>
+              </select>
+            </>
+          )}
           <label htmlFor="email">Email</label>
           <input
             id="email"
@@ -207,7 +260,6 @@ const Add = ({ setUsers, setIsAdding }) => {
             name="home"
             value={formData.home}
             onChange={handleInputChange}
-            
           />
 
           <label htmlFor="address">Address</label>
@@ -250,7 +302,7 @@ const Add = ({ setUsers, setIsAdding }) => {
             // pattern="^[A-Za-z0-9]{3} [A-Za-z0-9]{4}$"
             maxLength="8"
             required
-              title="Postcode must be in the format like D02X88"
+            title="Postcode must be in the format like D02X88"
           />
 
           <label htmlFor="password">Password</label>
