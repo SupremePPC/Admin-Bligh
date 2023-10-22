@@ -1,319 +1,200 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2";
-import CurrencyInput from "react-currency-input-field";
-import { addBondUser } from "../../firebaseConfig/firestore";
-import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
+import { addBondUser, getAllBonds } from "../../firebaseConfig/firestore";
 import LoadingScreen from "../LoadingScreen";
-import EditBond from "./Edit";
+import AddBondModal from "./Modal/AddBondModal";
+import EditBondModal from "./Modal/EditBondModal";
 
-const AddBond = ({ setBond, bond, userId, onClose }) => {
+const AddBond = ({ userId, onClose, refreshDetails }) => {
+  const [bonds, setBonds] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [selectedBond, setSelectedBond] = useState(null);
-  const [bondId, setBondId] = useState(null);
-  const [formData, setFormData] = useState({
-    companyWebsite: "",
-    couponFrequency: 0,
-    couponRate: 0,
-    currentValue: 0,
-    image: null,
-    isin: "",
-    issuerName: "",
-    maturityDate: "",
-    minimumAmount: 0.0,
-    purchaseDate: "",
-    quantity: 0,
-    sector: "",
-    type: "",
-  });
-  const [errors, setErrors] = useState({});
+  const [visibleDropdownIndex, setVisibleDropdownIndex] = useState(null);
+  const [bondModalOpen, setBondModalOpen] = useState(false);
+  const [selectedForEdit, setSelectedForEdit] = useState(false);
+  const [selectedId, setSelectedId] = useState(false);
 
-  const handleChange = (e) => {
-    const { name, value, type, files } = e.target;
-
-    if (type === "file") {
-      // Make sure files[0] exists
-      if (files.length > 0) {
-        const selectedFile = files[0];
-        handleUploadImage(selectedFile)
-          .then((downloadURL) => {
-            setFormData({
-              ...formData,
-              [name]: selectedFile,
-              imagePreview: downloadURL, // Update imagePreview with the download URL
-            });
-          })
-          .catch((error) => {
-            console.error("Error uploading image:", error);
-          });
-      }
-    } else {
-      setFormData({
-        ...formData,
-        [name]: value,
-      });
-    }
-  };
-
-  const handleUploadImage = async (imageFile) => {
-    if (imageFile instanceof File) {
-      const storage = getStorage();
-      const storageRef = ref(storage, `images/${imageFile.name}`);
-
-      try {
-        await uploadBytes(storageRef, imageFile);
-        const downloadURL = await getDownloadURL(storageRef); // Get the download URL
-        return downloadURL;
-      } catch (error) {
-        console.error("Error uploading image to Firebase Storage:", error);
-        throw error;
-      }
-    } else if (typeof imageFile === "string") {
-      return imageFile;
-    } else {
-      return null; // Handle other cases (e.g., null) as needed
-    }
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-
-    const {
-      companyWebsite,
-      couponFrequency,
-      couponRate,
-      currentValue,
-      image,
-      isin,
-      issuerName,
-      maturityDate,
-      minimumAmount,
-      purchaseDate,
-      quantity,
-      sector,
-      type,
-    } = formData;
-    console.log(formData);
-
-    if (
-      !companyWebsite ||
-      !couponFrequency ||
-      !couponRate ||
-      !currentValue ||
-      !image ||
-      !isin ||
-      !issuerName ||
-      !maturityDate ||
-      !issuerName ||
-      !maturityDate ||
-      !minimumAmount ||
-      !purchaseDate ||
-      !quantity ||
-      !sector ||
-      !type
-    ) {
-      setIsLoading(false);
-      return Swal.fire({
-        icon: "error",
-        title: "Error!",
-        text: "All fields are required.",
-        showConfirmButton: true,
-      });
-    }
-
+  const fetchBonds = async () => {
     try {
-      if (formData.image) {
-        const imageUrl = await handleUploadImage(formData.image);
-        formData.image = imageUrl;
-      }
-      const result = await addBondUser(userId.userId, formData);
-      if (result.success) {
-        Swal.fire({
-          icon: "success",
-          title: "Added!",
-          text: `Bond added succesfully.`,
-          showConfirmButton: false,
-          timer: 2000,
-        });
-        setBond([...bond, { ...formData, id: result.id }]);
-        setFormData({
-          companyWebsite: "",
-          couponFrequency: 0,
-          couponRate: 0,
-          currentValue: 0,
-          image: null,
-          isin: "",
-          issuerName: "",
-          maturityDate: "",
-          minimumAmount: 0.0,
-          purchaseDate: "",
-          quantity: 0,
-          sector: "",
-          type: "",
-        });
-
-        setIsEditing(true);
-        setSelectedBond(formData);
-        setBondId(result.id);
-      } else {
-        throw new Error(result.error);
-      }
+      setIsLoading(true);
+      const fetchedBonds = await getAllBonds();
+      setBonds(fetchedBonds);
     } catch (error) {
-      console.error(error);
-      Swal.fire({
-        icon: "error",
-        title: "Error!",
-        text: `Error adding bond: ${error}`,
-        showConfirmButton: true,
-      });
+      console.error("Error fetching bonds:", error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  return (
-    <>
-      {!isEditing && (
-        <div className="small-container">
-          {isLoading && <LoadingScreen />}
-          <form onSubmit={handleSubmit}>
-            <h3>Add New Bond for {userId.userId}</h3>
-            <label htmlFor="image">Issuer Logo:</label>
-            {formData.imagePreview && (
-              <img
-                src={formData.imagePreview}
-                alt="Image Preview"
-                width={100}
-                className="image_preview"
-              />
-            )}
-            <input
-              type="file"
-              name="image"
-              onChange={handleChange}
-              accept="image/*"
-              required
-            />
-            <label htmlFor="issuerName">Issuer Name:</label>
-            <input
-              type="text"
-              name="issuerName"
-              onChange={handleChange}
-              value={formData.issuerName}
-            />
-            <label htmlFor="type">Type:</label>
-            <input
-              type="text"
-              name="type"
-              onChange={handleChange}
-              value={formData.type}
-            />
+  useEffect(() => {
+    fetchBonds();
+  }, []);
 
-            <label htmlFor="companyWebsite">Company Website:</label>
-            <input
-              type="url"
-              name="companyWebsite"
-              onChange={handleChange}
-              value={formData.companyWebsite}
-            />
-            <label htmlFor="isin">ISIN:</label>
-            <input
-              type="text"
-              name="isin"
-              onChange={handleChange}
-              value={formData.isin}
-            />
-            <label htmlFor="quantity">Quantity:</label>
-            <input
-              type="number"
-              min={0}
-              name="quantity"
-              onChange={handleChange}
-              value={formData.quantity}
-            />
-            <label htmlFor="sector">Sector:</label>
-            <input
-              type="text"
-              name="sector"
-              onChange={handleChange}
-              value={formData.sector}
-            />
-            <label htmlFor="maturityDate">Maturity Date:</label>
-            <input
-              type="date"
-              name="maturityDate"
-              onChange={handleChange}
-              value={formData.maturityDate}
-            />
-            <label htmlFor="minimumAmount">Minimum Amount:</label>
-            <CurrencyInput
-              decimalSeparator="."
-              prefix="$"
-              name="minimumAmount"
-              placeholder="0.00"
-              defaultValue={0.0}
-              decimalsLimit={2}
-              onValueChange={(value, name) => {
-                setFormData({ ...formData, [name]: value });
-              }}
-            />
-            <label htmlFor="currentValue">Current Value:</label>
-            <input
-              type="number"
-              min={0}
-              name="currentValue"
-              onChange={handleChange}
-              value={formData.currentValue}
-            />
-            <label htmlFor="couponRate">Coupon Rate:</label>
-            <input
-              type="number"
-              name="couponRate"
-              onChange={handleChange}
-              value={formData.couponRate}
-            />
-            <label htmlFor="couponFrequency">Coupon Frequency:</label>
-            <input
-              type="number"
-              name="couponFrequency"
-              onChange={handleChange}
-              min={0}
-              value={formData.couponFrequency}
-            />
-            <label htmlFor="purchaseDate">Purchase Date:</label>
-            <input
-              type="date"
-              name="purchaseDate"
-              onChange={handleChange}
-              value={formData.purchaseDate}
-            />
-            <div style={{ marginTop: "30px" }}>
-              <input type="submit" value="Add" />
-              <input
-                style={{ marginLeft: "12px" }}
-                className="muted-button"
-                type="button"
-                value="Cancel"
-                onClick={onClose}
-              />
-            </div>
-          </form>
+  const handleInvestSuccess = (investmentData, iposId) => {
+    setBondModalOpen(false);
+    setIsEditing(true);
+    setSelectedId(iposId);
+    setSelectedForEdit(investmentData);
+  };
+
+  const toggleDropdown = (index) => {
+    if (visibleDropdownIndex === index) {
+      setVisibleDropdownIndex(null); // if clicked again on the open dropdown, close it
+    } else {
+      setVisibleDropdownIndex(index); // open the clicked dropdown and close any other open dropdown
+    }
+  };
+
+  return (
+    <div className="iposPage_Wrapper">
+        <div className="headerSection">
+        <h2 className="title">Choose Bonds</h2>
+        <div className="svgWrapper">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="180"
+            height="9"
+            viewBox="0 0 230 9"
+          >
+            <rect
+              id="Rectangle_28"
+              data-name="Rectangle 28"
+              width="230"
+              height="9"
+              rx="4.5"
+              fill="#688fb7"
+            ></rect>
+          </svg>
         </div>
-      )}
-      {isEditing && selectedBond && (
-        <EditBond
-          onClose={() => {
-            setIsEditing(false);
-            setSelectedBond(null);
+      </div>
+      <div className="contentBody">
+        {!bonds || bonds.length === 0 && (
+          <h5 className="no_data">NO BONDS FOUND.</h5>
+        )}
+          {isLoading && (
+            <LoadingScreen />
+          )}
+          {!isLoading && (
+          bonds.map((bond, index) => (
+            <div
+              key={index}
+              className="portfolioCard"
+              onClick={() => toggleDropdown(index)}
+            >
+              <div className="portfolio">
+                <div className="portfolioCol">
+                  <div className="portfolioImg">
+                    <img src={bond.image} alt="" />
+                  </div>
+                  <div className="colDetails">
+                    <div className="issuerDets">
+                      <p className="name"> {bond.issuerName} </p>
+                      <div className="type">
+                        <span> {bond.type} </span>
+                      </div>
+                    </div>
+                    <div className="moreDets">
+                      <div className="maturityRow">
+                        <p className="boldText">Sector:</p>
+                        <span className="regText"> {bond.sector} </span>
+                      </div>
+                      <div className="">
+                        <div className="maturityRow">
+                          <p className="boldText">Maturity Date:</p>
+                          <span className="regText">{bond.maturityDate}</span>
+                        </div>
+                        <div className="maturityRow">
+                          <p className="boldText">Minimum Amount:</p>
+                          <span className="regText">
+                            $ {bond.minimumAmount}{" "}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="couponDets">
+                      <div className="couponWrap">
+                        <div className="couponPercent">
+                          <span className="number"> {bond.couponRate} </span>
+                          <span className="percent">%</span>
+                        </div>
+                        <span className="regText">Coupon</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div
+                className={`bondsDropdown ${
+                  visibleDropdownIndex === index ? "show" : ""
+                }`}
+              >
+                <div className="dropdownCol">
+                  <div className="dropdownRow">
+                    <p className="boldText">Company Website :</p>
+                    <span className="regText"> {bond.companyWebsite} </span>
+                  </div>
+                  <div className="dropdownRow">
+                    <p className="boldText">ISIN :</p>
+                    <span className="regText"> {bond.isin} </span>
+                  </div>
+                  <div className="dropdownRow">
+                    <p className="boldText">Coupon Frequency :</p>
+                    <span className="regText"> {bond.couponFrequency} </span>
+                  </div>
+                  <div className="dropdownRow">
+                    <p className="boldText">Minimum Investment Amount :</p>
+                    <span className="regText">$ {bond.minimumAmount} </span>
+                  </div>
+                </div>
+                <div style={{ marginTop: "30px" }}>
+                  <input
+                    type="submit"
+                    value="Invest Bond"
+                    onClick={() => {
+                      setBondModalOpen(true);
+                    setSelectedBond(bond);
+                    }}
+                  />
+                </div>
+              </div>
+              {bondModalOpen && (
+                <AddBondModal
+                  onClose={() => {
+                    setBondModalOpen(false);
+                    setSelectedBond(null);
+                  }}
+                  bond={selectedBond}
+                  userId={userId}
+                  onInvestSuccess={handleInvestSuccess}
+                />
+              )}
+              {isEditing && (
+                <EditBondModal
+                  bondId={selectedId}
+                  bond={selectedForEdit}
+                  onClose={onClose}
+                  userId={userId}
+                  refreshDetails={refreshDetails}
+                />
+              )}
+            </div>
+          ))
+        )}
+      </div>
+      <div style={{ marginTop: "30px" }}>
+        <input
+          style={{ marginLeft: "12px" }}
+          className="muted-button"
+          type="button"
+          value="Close"
+          onClick={() => {
+            fetchBonds();
             onClose();
           }}
-          selectedBond={selectedBond}
-          userId={userId}
-          selectedBondId={bondId}
         />
-      )}
-    </>
+      </div>
+    </div>
   );
 };
 

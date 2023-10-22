@@ -3,12 +3,16 @@ import "firebase/firestore";
 import { getAllIpos } from "../../firebaseConfig/firestore";
 import LoadingScreen from "../LoadingScreen";
 import InvestIpoModal from "./Modals/InvestModal";
+import EditIposUser from "./Modals/EditModal";
 
-const AddUserIpos = ({ userId, onClose, openEdit }) => {
+const AddUserIpos = ({ userId, onClose }) => {
   const [ipos, setIpos] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [iposModalOpen, setIposModalOpen] = useState(false);
   const [selectedIpo, setSelectedIpo] = useState(null);
+  const [selectedForEdit, setSelectedForEdit] = useState(false);
+  const [selectedId, setSelectedId] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   const fetchIpos = async () => {
     try {
@@ -22,15 +26,21 @@ const AddUserIpos = ({ userId, onClose, openEdit }) => {
     }
   };
 
-  useEffect (() => {
+  useEffect(() => {
     fetchIpos();
-  }
-  , []);
+  }, []);
+
+  const handleInvestSuccess = (investmentData, iposId) => {
+    setIposModalOpen(false);
+    setIsEditing(true);
+    setSelectedId(iposId);
+    setSelectedForEdit(investmentData);
+  };
 
   return (
     <div className="iposPage_Wrapper">
       <div className="headerSection">
-        <h2 className="title">IPOs</h2>
+        <h2 className="title">Choose IPOs</h2>
         <div className="svgWrapper">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -51,9 +61,10 @@ const AddUserIpos = ({ userId, onClose, openEdit }) => {
       </div>
       <div className="contentBody">
         {ipos.length === 0 && <h5>No IPOs Available.</h5>}
-        {isLoading ? (
+        {isLoading && (
           <LoadingScreen />
-        ) : (
+        )}
+        {!isLoading && (
           ipos.map((ipo, index) => (
             <div key={index} className="ipoCard">
               <div className="ipoDetails">
@@ -108,18 +119,28 @@ const AddUserIpos = ({ userId, onClose, openEdit }) => {
                   >
                     Invest Now
                   </button>
-                  <InvestIpoModal
-                    isOpen={iposModalOpen}
-                    onClose={() => {
-                      setIposModalOpen(false);
-                      setSelectedIpo(null);
-                    }}
-                    ipo={selectedIpo}
-                    userId={userId}
-                    openEdit={openEdit}
-                  />
                 </div>
               </div>
+              {iposModalOpen && (
+                <InvestIpoModal
+                  onClose={() => {
+                    setIposModalOpen(false);
+                    setSelectedIpo(null);
+                  }}
+                  ipo={selectedIpo}
+                  userId={userId}
+                  onInvestSuccess={handleInvestSuccess}
+                />
+              )}
+              {isEditing && (
+                <EditIposUser
+                  iposId={selectedId}
+                  ipo={selectedForEdit}
+                  onClose={onClose}
+                  userId={userId}
+                  refreshDetails={fetchIpos}
+                />
+              )}
             </div>
           ))
         )}

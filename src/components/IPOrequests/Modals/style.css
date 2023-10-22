@@ -18,7 +18,7 @@
     border-radius: 10px;
     width: 100%;
     max-width: 500px;
-    height: 590px;
+    max-height: 590px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     margin: 0.5rem;
     animation: scaleUp 0.3s forwards;
@@ -35,6 +35,10 @@
 .section_header .logo {
     width: 100px;
     height: 100px;
+    object-fit: contain;
+}
+
+.section_header .logo img{
     object-fit: contain;
 }
 
@@ -124,6 +128,7 @@
 .invest_ipo_overlay .buttons_wrap {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     gap: 1rem;
     flex-wrap: nowrap;
 }
@@ -132,10 +137,9 @@
     max-width: 200px;
     color: var(--white);
     font-size: var(--font-sixteen);
-    font-weight: 400;
+    font-weight: 600;
     width: 49%;
-    height: 2rem;
-    font-weight: 400;
+    height: 3rem;
     padding: .35rem 0.75rem;
     border: none;
     border-radius: 10px;
@@ -144,22 +148,31 @@
     cursor: pointer;
     transition: all 0.3s ease-in-out;
 }
-  
+
+.invest_ipo_modal .buttons_wrap .submit_btn:hover {
+  background-color: #3d8d00d3;
+}
+
 .invest_ipo_modal .buttons_wrap .cancel_btn {
     max-width: 200px;
     color: var(--white);
     font-size: var(--font-sixteen);
-    font-weight: 400;
+    font-weight: 600;
     width: 49%;
-    height: 2rem;
-    font-weight: 400;
+    height: 3rem;
     padding: .35rem 0.75rem;
     border: none;
     border-radius: 10px;
     margin-top: .5rem;
     background-color: var(--red);
+    border: var(--red) 1px solid;
     cursor: pointer;
     transition: all 0.3s ease-in-out;
+}
+
+.invest_ipo_modal .buttons_wrap .cancel_btn:hover {
+  background-color: #f81d1dd3;
+  border: #f81d1dd3 1px solid;
 }
   
 @media screen and (max-width: 415px) {

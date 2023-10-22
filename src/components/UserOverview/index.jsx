@@ -15,10 +15,9 @@ import Swal from "sweetalert2";
 import "./style.css";
 import EditDocument from "../DocumentManagement/Edit";
 import { deleteBankingDetails, formatNumber } from "../../firebaseConfig/firestore";
-import Edit from "../BankingDetails/Edit";
-import EditBond from "../BondRequestManagement/Edit";
-import EditTerm from "../TermRequestManagement/Edit";
-import EditIposUser from "../IPOrequests/Edit";
+import EditIposUser from "../IPOrequests/Modals/EditModal";
+import EditBondModal from "../BondRequestManagement/Modal/EditBondModal";
+import EditTermUser from "../TermRequestManagement/Modal/EditTermModal";
 
 const UserOverview = () => {
   const user = useParams();
@@ -30,11 +29,9 @@ const UserOverview = () => {
   const [ipos, setIpos] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [fixedTerm, setFixedTerm] = useState([]);
-  const [selectedUserForAdd, setSelectedUserForAdd] = useState(null);
   const [selectedDocument, setSelectedDocument] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedForEdit, setSelectedForEdit] = useState(null);
-  const [error, setError] = useState(null);
   const [modalState, setModalState] = useState({
     isAddTransactionOpen: false,
     isAddBondOpen: false,
@@ -139,7 +136,6 @@ const UserOverview = () => {
       fetchSubCollection("fixedTermDeposits", setFixedTerm);
       fetchSubCollection("ipos", setIpos);
       fetchSubCollection("docs", setDocs);
-      // console.log(bankingDetails, bankingDetails[0].id);
     } else {
       Swal.fire({
         icon: "error",
@@ -533,9 +529,10 @@ const UserOverview = () => {
                       <tr>
                         <th>Issuer Name</th>
                         <th>Current Value</th>
+                        <th>Amount</th>
                         <th>Maturity Date</th>
                         <th>Purchase Date</th>
-                        <th>Quantity</th>
+                        {/* <th>Quantity</th> */}
                       </tr>
                     </thead>
                     <tbody>
@@ -555,16 +552,16 @@ const UserOverview = () => {
                               <td>
                                 <div className="button_grid">
                                   <img
-                                    src={item[i].imagePreview}
+                                    src={item[i].image}
                                     alt="Bond image"
                                   />
                                   <p>{item[i].issuerName}</p>
                                 </div>
                               </td>
-                              <td>$ {item[i].currentValue}</td>
+                              <td>{item[i].currentValue}</td>
+                              <td>$ {formatNumber(item[i].amountRequested)}</td>
                               <td>{item[i].maturityDate}</td>
                               <td>{item[i].purchaseDate}</td>
-                              <td>{item[i].quantity}</td>
                             </tr>
                           );
                         }
@@ -691,7 +688,6 @@ const UserOverview = () => {
                         const rows = [];
 
                         for (let i = 0; i < maxLength; i++) {
-                          console.log(item[i]);
                           rows.push(
                             <tr
                               key={i} onClick={() => handleOpenModal("isEditIposOpen", item[i])}>
@@ -729,7 +725,7 @@ const UserOverview = () => {
 
           </div>
         )}
-
+        
       {modalState.isEditUserDetailsOpen && (
         <EditUser
           onClose={() => {
@@ -745,7 +741,6 @@ const UserOverview = () => {
         <AddBankingDetails
           onClose={() => {
             handleCloseModal("isAddBankingDetails");
-            setSelectedUserForAdd(null);
           }}
           userId={user}
           refreshDetails={() => {
@@ -758,7 +753,6 @@ const UserOverview = () => {
         <EditBankingDetails
           onClose={() => {
             handleCloseModal("isEditBankingDetails");
-            setSelectedUserForAdd(null);
           }}
           userId={user}
           bankingDetailsId={bankingDetails.id}
@@ -789,7 +783,6 @@ const UserOverview = () => {
         <EditTransaction
           onClose={() => {
             handleCloseModal("isEditTransactionOpen");
-            setSelectedUserForAdd(null);
           }}
           selectedTransaction={selectedForEdit}
           setTransactions={setTransactions}
@@ -807,25 +800,31 @@ const UserOverview = () => {
         <AddBond
           onClose={() => {
             handleCloseModal("isAddBondOpen");
-            setSelectedUserForAdd(null);
           }}
           bond={bondsHoldings}
           setBond={setBondsHoldings}
           userId={user}
+          refreshDetails={() => {
+            fetchSubCollection("bondsHoldings", setBondsHoldings);
+          }
+          }
         />
       )}
 
       {modalState.isEditBondOpen && (
-        <EditBond
+        <EditBondModal
           onClose={() => {
             handleCloseModal("isEditBondOpen");
             setSelectedForEdit(null);
+            fetchSubCollection("bondsHoldings", setBondsHoldings);
           }}
-          bond={bondsHoldings}
           setBond={setBondsHoldings}
-          selectedBondId={selectedForEdit.id}
-          selectedBond={selectedForEdit}
+          bondId={selectedForEdit.id}
+          bond={selectedForEdit}
           userId={user}
+          refreshDetails={ () => {
+            fetchSubCollection("bondsHoldings", setBondsHoldings);
+          }}
         />
       )}
 
@@ -833,7 +832,6 @@ const UserOverview = () => {
         <AddNewTerm
           onClose={() => {
             handleCloseModal("isAddNewTermOpen");
-            setSelectedUserForAdd(null);
           }}
           fixedTerm={fixedTerm}
           setFixedTerm={setFixedTerm}
@@ -842,16 +840,18 @@ const UserOverview = () => {
       )}
 
       {modalState.isEditTermOpen && (
-        <EditTerm
+        <EditTermUser
           onClose={() => {
             handleCloseModal("isEditTermOpen");
             setSelectedForEdit(null);
           }}
-          fixedTerm={fixedTerm}
           setFixedTerm={setFixedTerm}
           userId={user}
-          term={selectedForEdit}
+          fixedTerm={selectedForEdit}
           termId={selectedForEdit.id}
+          refreshDetails={() => {
+            fetchSubCollection("fixedTermDeposits", setFixedTerm);}
+          }
         />
       )}
 
@@ -859,7 +859,6 @@ const UserOverview = () => {
         <AddUserIpos
           onClose={() => {
             handleCloseModal("isAddNewIpos");
-            setSelectedUserForAdd(null);
             fetchSubCollection("ipos", setIpos);
           }}
           ipos={ipos}
@@ -874,10 +873,13 @@ const UserOverview = () => {
             handleCloseModal("isEditIposOpen");
             setSelectedForEdit(null);
           }}
-          setIpos={setIpos}
           userId={user}
+          setIpos={setIpos}
           ipo={selectedForEdit}
           iposId={selectedForEdit.id}
+          refreshDetails={() => {
+            fetchSubCollection("ipos", setIpos);
+          }}
         />
       )}
 
@@ -885,7 +887,6 @@ const UserOverview = () => {
         <AddDocument
           onClose={() => {
             handleCloseModal("isAddNewDocumentOpen");
-            setSelectedUserForAdd(null);
           }}
           docs={docs}
           setDocs={setDocs}
@@ -904,6 +905,7 @@ const UserOverview = () => {
           userId={user}
         />
       )}
+
     </div>
   );
 };
