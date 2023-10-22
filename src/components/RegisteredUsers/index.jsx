@@ -225,6 +225,7 @@ export default function RegisteredUsers() {
             setIsEditPageOpen(false);
             setSelectedUserForEdit(null);
           }}
+          refreshDetails={fetchUsers}
         />
       )}
     </div>

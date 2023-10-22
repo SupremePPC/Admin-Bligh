@@ -1,67 +1,82 @@
-import React, { useState } from "react";
-import Swal from "sweetalert2";
-import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../../firebaseConfig/firebase";
+import React, { useState } from 'react';
+import Swal from 'sweetalert2';
+import { doc, updateDoc } from 'firebase/firestore';
+import { updateUser } from "../../firebaseConfig/firestore";
+import LoadingScreen from "../LoadingScreen";
 
-const Edit = ({ user, onClose, details, refreshDetails }) => {
-  const id = user.userId;
-  const [title, setTitle] = useState(details.title);
-  const [fullName, setFullName] = useState(details.fullName);
-  const [email, setEmail] = useState(details.email);
-  const [mobile, setMobile] = useState(details.mobilePhone);
-  const [home, setHome] = useState(details.homePhone);
-  const [address, setAddress] = useState(details.address);
-  const [city, setCity] = useState(details.city);
-  const [country, setCountry] = useState(details.country);
-  const [postcode, setPostcode] = useState(details.postcode);
+const Edit = ({ user, onClose, refreshDetails }) => {
+  const id = user.uid;
+  const [formData, setFormData] = useState({
+    title: user.title,
+    fullName: user.fullName,
+    jointAccount: user.jointAccount,
+    secondaryAccountHolder: user.secondaryAccountHolder,
+    secondaryTitle: user.secondaryTitle,
+    email: user.email,
+    mobile: user.mobilePhone,
+    home: user.homePhone,
+    address: user.address,
+    city: user.city,
+    country: user.country,
+    postcode: user.postcode,
+  });
+  const [isLoading, setIsLoading] = useState(false);
+
   if (!user) return null;
 
   const handleUpdate = async (e) => {
     e.preventDefault();
 
-    if (!fullName || !email || !mobile || !address) {
-      return Swal.fire({
-        icon: "error",
-        title: "Error!",
-        text: "All fields are required.",
-        showConfirmButton: true,
-      });
-    }
-
-    let updatedUser = {
+    const {
       title,
       fullName,
+      jointAccount,
+      secondaryAccountHolder,
+      secondaryTitle,
       email,
-      mobilePhone: mobile,
-      homePhone: home,
+      mobile,
+      home,
       address,
       city,
       country,
       postcode,
-    };
+    } = formData;
+
+    // Check if required fields are filled
+    if (!fullName || !email || !mobile || !address) {
+      return Swal.fire({
+        icon: 'error',
+        title: 'Error!',
+        text: 'All fields are required.',
+        showConfirmButton: true,
+      });
+    }
 
     // Filter out empty fields
-    updatedUser = Object.fromEntries(
-      Object.entries(updatedUser).filter(([_, value]) => value)
+    const updatedUser = Object.fromEntries(
+      Object.entries(formData).filter(([_, value]) => value)
     );
-    // If updatedUser is empty, exit the function
+
+    // If no changes were made, exit the function
     if (Object.keys(updatedUser).length === 0) {
       Swal.fire({
-        icon: "info",
-        title: "No Changes",
-        text: "No changes were made.",
+        icon: 'info',
+        title: 'No Changes',
+        text: 'No changes were made.',
         showConfirmButton: true,
       });
       return;
     }
-
+    setIsLoading(true);
     try {
-      const userRef = doc(db, "users", id);
-      await updateDoc(userRef, updatedUser);
+      // Update the user in Firestore
+      await updateUser(id, updatedUser);
+
       // Notify the user of the successful update
       Swal.fire({
-        icon: "success",
-        title: "Updated!",
+        icon: 'success',
+        title: 'Updated!',
         text: `${updatedUser.fullName}'s data has been updated.`,
         showConfirmButton: false,
         timer: 2000,
@@ -71,28 +86,50 @@ const Edit = ({ user, onClose, details, refreshDetails }) => {
       onClose();
       refreshDetails();
     } catch (error) {
-      console.error("Error updating user:", error);
+      console.error('Error updating user:', error);
       Swal.fire({
-        icon: "error",
-        title: "Error!",
-        text: "There was an error updating the user.",
+        icon: 'error',
+        title: 'Error!',
+        text: 'There was an error updating the user.',
         showConfirmButton: true,
       });
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    const newValue = type === 'checkbox' ? checked : value;
+    setFormData({
+      ...formData,
+      [name]: newValue,
+    });
   };
 
   return (
     <div className="small-container">
       <form onSubmit={handleUpdate}>
         <h1>Edit User</h1>
+        {isLoading && <LoadingScreen />}
+        <div className="jointAcct_checkbox">
+          <input
+            id="jointAccount"
+            type="checkbox"
+            name="jointAccount"
+            checked={formData.jointAccount || false}
+            onChange={handleInputChange}
+          />
+          <label htmlFor="jointAccount">Joint Account</label>
+        </div>
 
         <label htmlFor="title">Title</label>
         <input
           id="title"
           type="text"
           name="title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          value={formData.title || ''}
+          onChange={handleInputChange}
         />
 
         <label htmlFor="fullName">Full Name</label>
@@ -100,17 +137,48 @@ const Edit = ({ user, onClose, details, refreshDetails }) => {
           id="fullName"
           type="text"
           name="fullName"
-          value={fullName}
-          onChange={(e) => setFullName(e.target.value)}
+          value={formData.fullName || ''}
+          onChange={handleInputChange}
         />
 
+        {formData.jointAccount && (
+          <>
+            <label htmlFor="secondaryAccountHolder">
+              Secondary Account Holder
+            </label>
+            <input
+              id="secondaryAccountHolder"
+              type="text"
+              name="secondaryAccountHolder"
+              value={formData.secondaryAccountHolder || ''}
+              onChange={handleInputChange}
+            />
+
+            <label htmlFor="secondaryTitle">Secondary Title</label>
+            <select
+              id="secondaryTitle"
+              name="secondaryTitle"
+              value={formData.secondaryTitle || ''}
+              onChange={handleInputChange}
+            >
+              <option value="">Select Title</option>
+              <option value="Miss">Miss</option>
+              <option value="Mrs">Mrs</option>
+              <option value="Mr">Mr</option>
+              <option value="Ms">Ms</option>
+              <option value="Dr">Dr</option>
+              <option value="Rev">Rev</option>
+              <option value="Other">Other</option>
+            </select>
+          </>
+        )}
         <label htmlFor="email">Email</label>
         <input
           id="email"
           type="email"
           name="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          value={formData.email || ''}
+          onChange={handleInputChange}
         />
 
         <label htmlFor="mobile">Mobile</label>
@@ -118,8 +186,8 @@ const Edit = ({ user, onClose, details, refreshDetails }) => {
           id="mobile"
           type="text"
           name="mobile"
-          value={mobile}
-          onChange={(e) => setMobile(e.target.value)}
+          value={formData.mobile || ''}
+          onChange={handleInputChange}
         />
 
         <label htmlFor="home">Home</label>
@@ -127,8 +195,8 @@ const Edit = ({ user, onClose, details, refreshDetails }) => {
           id="home"
           type="text"
           name="home"
-          value={home}
-          onChange={(e) => setHome(e.target.value)}
+          value={formData.home || ''}
+          onChange={handleInputChange}
         />
 
         <label htmlFor="address">Address</label>
@@ -136,8 +204,8 @@ const Edit = ({ user, onClose, details, refreshDetails }) => {
           id="address"
           type="text"
           name="address"
-          value={address}
-          onChange={(e) => setAddress(e.target.value)}
+          value={formData.address || ''}
+          onChange={handleInputChange}
         />
 
         <label htmlFor="city">City</label>
@@ -145,8 +213,8 @@ const Edit = ({ user, onClose, details, refreshDetails }) => {
           id="city"
           type="text"
           name="city"
-          value={city}
-          onChange={(e) => setCity(e.target.value)}
+          value={formData.city || ''}
+          onChange={handleInputChange}
         />
 
         <label htmlFor="country">Country</label>
@@ -154,8 +222,8 @@ const Edit = ({ user, onClose, details, refreshDetails }) => {
           id="country"
           type="text"
           name="country"
-          value={country}
-          onChange={(e) => setCountry(e.target.value)}
+          value={formData.country || ''}
+          onChange={handleInputChange}
         />
 
         <label htmlFor="postcode">Postcode</label>
@@ -163,14 +231,14 @@ const Edit = ({ user, onClose, details, refreshDetails }) => {
           id="postcode"
           type="text"
           name="postcode"
-          value={postcode}
-          onChange={(e) => setPostcode(e.target.value)}
+          value={formData.postcode || ''}
+          onChange={handleInputChange}
         />
 
-        <div style={{ marginTop: "30px" }}>
+        <div style={{ marginTop: '30px' }}>
           <input type="submit" value="Save" />
           <input
-            style={{ marginLeft: "12px" }}
+            style={{ marginLeft: '12px' }}
             className="muted-button"
             type="button"
             value="Cancel"
@@ -181,5 +249,6 @@ const Edit = ({ user, onClose, details, refreshDetails }) => {
     </div>
   );
 };
+
 
 export default Edit;

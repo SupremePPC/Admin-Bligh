@@ -56,7 +56,7 @@ export async function getUser(uid) {
   }
 }
 
-export function updateuser(uid, userData) {
+export function updateUser(uid, userData) {
   const userDoc = doc(db, USERS_COLLECTION, uid);
   return updateDoc(userDoc, userData);
 }

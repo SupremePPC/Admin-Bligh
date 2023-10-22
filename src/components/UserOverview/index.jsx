@@ -242,7 +242,7 @@ const UserOverview = () => {
                 <div className="text_wrap">
                   <p className="bold_text">Secondary Account Holder Title :</p>
                   <span className="reg_text">
-                    {userDetails.secondary_title}
+                    {userDetails.secondaryTitle}
                   </span>
                 </div>
                 <div className="text_wrap">
