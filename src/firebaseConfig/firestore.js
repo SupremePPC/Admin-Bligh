@@ -865,7 +865,7 @@ export async function updateTermInUserCollection(userId, termData, termId) {
   try {
     const userTermsHoldingsPath = collection(
       db,
-      `users/${userId}/fixedTermDeposits/`
+      `${USERS_COLLECTION}/${userId}/fixedTermDeposits/`
     );
     const docRef = doc(userTermsHoldingsPath, termId);
     await updateDoc(docRef, termData);

@@ -42,9 +42,7 @@ export default function AddBondModal({ onInvestSuccess, onClose, bond, userId })
       sector: bond.sector,
       couponFrequency: bond.couponFrequency,
       minimumAmount: bond.minimumAmount,
-      // quantity: numberOfBondsBought,
     };
-    console.log(bondData);
     setIsLoading(true);
     try {
      const result= await addBondUser(

@@ -169,6 +169,7 @@ export default function EditBondModal({
             onClick={() => {
               onClose();
               setBondsAmount(0);
+              refreshDetails();
             }}
           />
         </div>
