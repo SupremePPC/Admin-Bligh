@@ -20,10 +20,14 @@ export default function EditTermUser({
   const onDeposit = async () => {
     try {
       setIsLoading(true);
-
-      // Check if there is a selectedFixedTerm before proceeding
       if (!fixedTerm) {
-        console.error("No selected fixed term deposit.");
+        Swal.fire({
+          icon: "error",
+          title: "Error!",
+          text: "Please select a term to deposit into.",
+          showConfirmButton: false,
+          timer: 2000,
+        });
         return;
       }
 
@@ -44,29 +48,33 @@ export default function EditTermUser({
       const newDeposit = {
         date: getCurrentDate(),
         principalAmount: parseFloat(depositAmount),
-        status: "Pending",
+        status: "Approved",
         bankName: fixedTerm.bankName,
         term: fixedTerm.term,
         interestRate: fixedTerm.interestRate,
         type: "deposit",
         logo: fixedTerm.logo,
         minAmount: fixedTerm.minAmount,
-      };
-      console.log(newDeposit);
-
+      }
       await updateTermInUserCollection(userId.userId, termId, newDeposit);
       Swal.fire({
         icon: "success",
         title: "Request Sent!",
         text: `You have successfully updated a deposit of $${depositAmount} on behalf of this user.`,
         showConfirmButton: false,
-        timer: 4000,
+        timer: 2000,
       });
       setDepositAmount(0);
       refreshDetails();
       onClose();
     } catch (error) {
-      console.error("Error adding deposit transaction: ", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error!",
+        text: `There was an issue adding this deposit: ${error}`,
+        showConfirmButton: false,
+        timer: 2000,
+      });
     }
   };
 
@@ -97,7 +105,6 @@ export default function EditTermUser({
     }
   };
 
-
   return (
     <div className="invest_ipo_overlay">
       <div className="invest_ipo_modal">
@@ -127,16 +134,19 @@ export default function EditTermUser({
             prefix="$"
             name="depositAmount"
             placeholder="0.00"
-            defaultValue={depositAmount} // Use the formData value here
+            defaultValue={depositAmount}
             decimalsLimit={2}
             onValueChange={(value) => {
               const formattedValue = parseFloat(value).toFixed(2);
-              setDepositAmount(parseFloat(formattedValue)); // Store as a number
+              setDepositAmount(parseFloat(formattedValue));
             }}
           />
         </div>
         <div style={{ display: "flex" }}>
           <input type="submit" value="Save" onClick={onDeposit} />
+          {isLoading && (
+            <div className="spinner" style={{ marginLeft: "12px" }}></div>
+          )}
           <input
             style={{ marginLeft: "12px" }}
             className="reject_btn"
@@ -144,15 +154,13 @@ export default function EditTermUser({
             value="Delete"
             onClick={handleDelete}
           />
-          {isLoading && (
-            <div className="spinner" style={{ marginLeft: "12px" }}></div>
-          )}
           <input
             style={{ marginLeft: "auto", marginRight: "0" }}
             className="muted-button"
             type="button"
             value="Cancel"
             onClick={() => {
+              refreshDetails();
               onClose();
               setDepositAmount(0);
             }}

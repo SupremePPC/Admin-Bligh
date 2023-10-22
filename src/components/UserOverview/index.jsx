@@ -844,6 +844,7 @@ const UserOverview = () => {
           onClose={() => {
             handleCloseModal("isEditTermOpen");
             setSelectedForEdit(null);
+            fetchSubCollection("fixedTermDeposits", setFixedTerm);
           }}
           setFixedTerm={setFixedTerm}
           userId={user}
@@ -872,6 +873,7 @@ const UserOverview = () => {
           onClose={() => {
             handleCloseModal("isEditIposOpen");
             setSelectedForEdit(null);
+            fetchSubCollection("ipos", setIpos);
           }}
           userId={user}
           setIpos={setIpos}

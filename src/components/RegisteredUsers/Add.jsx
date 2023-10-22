@@ -86,7 +86,27 @@ const Add = ({ setUsers, setIsAdding }) => {
       const userEmail = user.email;
 
       // Send password reset email
-      await sendPasswordResetEmail(auth, userEmail);
+     
+      sendPasswordResetEmail(auth, userEmail)
+        .then(() => {
+          Swal.fire({
+            icon: "success",
+            title: "Email Sent!",
+            text: `Password reset email has been sent to ${userEmail}.`,
+            showConfirmButton: false,
+            timer: 2000,
+          });
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          Swal.fire({
+            icon: "error",
+            title: "Error!",
+            text: `There was an error sending the password reset email. ${errorCode}: ${errorMessage}`,
+            showConfirmButton: true,
+          });
+        });
 
       // Add user to Firestore using user.uid as the document ID
       const newUser = {
