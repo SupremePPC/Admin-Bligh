@@ -14,7 +14,10 @@ import AddDocument from "../DocumentManagement/Add";
 import Swal from "sweetalert2";
 import "./style.css";
 import EditDocument from "../DocumentManagement/Edit";
-import { deleteBankingDetails, formatNumber } from "../../firebaseConfig/firestore";
+import {
+  deleteBankingDetails,
+  formatNumber,
+} from "../../firebaseConfig/firestore";
 import EditIposUser from "../IPOrequests/Modals/EditModal";
 import EditBondModal from "../BondRequestManagement/Modal/EditBondModal";
 import EditTermUser from "../TermRequestManagement/Modal/EditTermModal";
@@ -197,7 +200,6 @@ const UserOverview = () => {
     return maturityAmount.toFixed(2);
   };
 
-
   return (
     <div className="container">
       {!modalState.isAddBondOpen &&
@@ -220,14 +222,36 @@ const UserOverview = () => {
             {/* User Details */}
             {userDetails && (
               <div className="user_details">
-                <h2>Overview of {userDetails.fullName}'s account</h2>
+                <h2>
+                  Overview of {userDetails.fullName}
+                  {userDetails.jointAccount &&
+                    ` and ${userDetails.secondaryAccountHolder}`}
+                  {!userDetails.jointAccount && " Account"}
+                  {userDetails.jointAccount && " Joint Account"}
+                </h2>
                 <div className="text_wrap">
-                  <p className="bold_text">Title :</p>
+                  <p className="bold_text">Primary Account Holder Title :</p>
                   <span className="reg_text">{userDetails.title}</span>
                 </div>
                 <div className="text_wrap">
-                  <p className="bold_text">Full Name :</p>
+                  <p className="bold_text">
+                    Primary Account Holder Full Name :
+                  </p>
                   <span className="reg_text">{userDetails.fullName}</span>
+                </div>
+                <div className="text_wrap">
+                  <p className="bold_text">Secondary Account Holder Title :</p>
+                  <span className="reg_text">
+                    {userDetails.secondary_title}
+                  </span>
+                </div>
+                <div className="text_wrap">
+                  <p className="bold_text">
+                    Secondary Account Holder Full Name :
+                  </p>
+                  <span className="reg_text">
+                    {userDetails.secondaryAccountHolder}
+                  </span>
                 </div>
                 <div className="text_wrap">
                   <p className="bold_text">Email :</p>
@@ -274,14 +298,14 @@ const UserOverview = () => {
               {bankingDetails.length === 0 ? (
                 <>
                   <table className="overview_table">
-                  <tbody>
-                    <tr>
-                      <td className="no_holding">
-                    This user hasn't added any banking details yet.
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+                    <tbody>
+                      <tr>
+                        <td className="no_holding">
+                          This user hasn't added any banking details yet.
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
                   <div className="dropdown_btn">
                     <button
                       style={{ marginLeft: "12px" }}
@@ -348,7 +372,7 @@ const UserOverview = () => {
                   <tbody>
                     <tr>
                       <td className="no_holding">
-                      No document has been added yet.
+                        No document has been added yet.
                       </td>
                     </tr>
                   </tbody>
@@ -397,14 +421,14 @@ const UserOverview = () => {
               </h3>
               {accountTypes.length === 0 ? (
                 <table className="overview_table">
-                <tbody>
-                  <tr>
-                    <td className="no_holding">
-                  This user has no account or balance at the moment.
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                  <tbody>
+                    <tr>
+                      <td className="no_holding">
+                        This user has no account or balance at the moment.
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               ) : (
                 <ul className="user_wrap">
                   {accountTypes.map((item, index) => (
@@ -551,10 +575,7 @@ const UserOverview = () => {
                             >
                               <td>
                                 <div className="button_grid">
-                                  <img
-                                    src={item[i].image}
-                                    alt="Bond image"
-                                  />
+                                  <img src={item[i].image} alt="Bond image" />
                                   <p>{item[i].issuerName}</p>
                                 </div>
                               </td>
@@ -681,8 +702,8 @@ const UserOverview = () => {
                         <th>Current Price</th>
                       </tr>
                     </thead>
-                      <tbody>
-                        {(() => {
+                    <tbody>
+                      {(() => {
                         const item = ipos;
                         const maxLength = Math.max(ipos.length);
                         const rows = [];
@@ -690,23 +711,27 @@ const UserOverview = () => {
                         for (let i = 0; i < maxLength; i++) {
                           rows.push(
                             <tr
-                              key={i} onClick={() => handleOpenModal("isEditIposOpen", item[i])}>
-                          <td>
-                            <div className="button_grid">
-                              <img src={item[i].logo} alt="logo" />
-                              <p>{item[i].name}</p>
-                            </div>
-                          </td>
-                          <td>{item[i].date}</td>
-                          <td>$ {formatNumber(item[i].amountInvested)}</td>
-                          <td>{item[i].numberOfShares}</td>
-                          <td>$ {item[i].sharePrice}</td>
-                        </tr>
+                              key={i}
+                              onClick={() =>
+                                handleOpenModal("isEditIposOpen", item[i])
+                              }
+                            >
+                              <td>
+                                <div className="button_grid">
+                                  <img src={item[i].logo} alt="logo" />
+                                  <p>{item[i].name}</p>
+                                </div>
+                              </td>
+                              <td>{item[i].date}</td>
+                              <td>$ {formatNumber(item[i].amountInvested)}</td>
+                              <td>{item[i].numberOfShares}</td>
+                              <td>$ {item[i].sharePrice}</td>
+                            </tr>
                           );
                         }
                         return rows;
                       })()}
-                      </tbody>
+                    </tbody>
                   </>
                 ) : (
                   <tbody>
@@ -722,10 +747,9 @@ const UserOverview = () => {
                 </button>
               </div>
             </div>
-
           </div>
         )}
-        
+
       {modalState.isEditUserDetailsOpen && (
         <EditUser
           onClose={() => {
@@ -806,8 +830,7 @@ const UserOverview = () => {
           userId={user}
           refreshDetails={() => {
             fetchSubCollection("bondsHoldings", setBondsHoldings);
-          }
-          }
+          }}
         />
       )}
 
@@ -822,7 +845,7 @@ const UserOverview = () => {
           bondId={selectedForEdit.id}
           bond={selectedForEdit}
           userId={user}
-          refreshDetails={ () => {
+          refreshDetails={() => {
             fetchSubCollection("bondsHoldings", setBondsHoldings);
           }}
         />
@@ -851,8 +874,8 @@ const UserOverview = () => {
           fixedTerm={selectedForEdit}
           termId={selectedForEdit.id}
           refreshDetails={() => {
-            fetchSubCollection("fixedTermDeposits", setFixedTerm);}
-          }
+            fetchSubCollection("fixedTermDeposits", setFixedTerm);
+          }}
         />
       )}
 
@@ -907,7 +930,6 @@ const UserOverview = () => {
           userId={user}
         />
       )}
-
     </div>
   );
 };

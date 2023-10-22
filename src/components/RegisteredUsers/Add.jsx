@@ -84,9 +84,8 @@ const Add = ({ setUsers, setIsAdding }) => {
       );
       const user = userCredential.user;
       const userEmail = user.email;
-
+      await sendEmailVerification(user);
       // Send password reset email
-     
       sendPasswordResetEmail(auth, userEmail)
         .then(() => {
           Swal.fire({
