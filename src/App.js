@@ -22,8 +22,8 @@ import TermsPage from "./components/FixedTermManagement";
 import IPOs from "./components/IPOs";
 import TermsRequestTable from "./components/TermRequestManagement";
 import IposRequestPage from "./components/IPOrequests";
-import "./App.css";
 import SettingsPage from "./components/Settings";
+import "./App.css";
 
 function App() {
   const { loadingAuthState } = useAuth();
