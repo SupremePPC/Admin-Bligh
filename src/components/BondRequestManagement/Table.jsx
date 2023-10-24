@@ -75,8 +75,8 @@ function Table({ bondRequests, handleUpdateRequest }) {
                       )}
                     </td>
                   </tr>
-                  {viewDetailId === request.id && (
                     <tr>
+                  {viewDetailId === request.id && (
                     <td colSpan={5}>
                       <div className="bonds_dropdownCol">
                         <div className="bonds_dropdownRow">
@@ -113,9 +113,9 @@ function Table({ bondRequests, handleUpdateRequest }) {
                         </div>
                       </div>
                     </td>
+                  )}
                   </tr>
                   
-                  )}
                 </>
               ))}
             </tbody>

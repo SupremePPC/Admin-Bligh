@@ -86,33 +86,38 @@ const BondsRequestTable = () => {
     }
 };
 
-  useEffect(() => {
-    const fetchBondRequests = async () => {
-      try {
-        setIsLoading(true);
-        const allRequests = await getBondRequests();
-  
-        if (allRequests.length === 0) {
-          // setNoRequestsFound(true);
-        } else {
-          const requestsWithUserDetails = await Promise.all(
-            allRequests.map(async (request) => {
-              const userDoc = await getDoc(doc(db, "users", request.userId));
-              const userDetails = userDoc.data();
-              return { ...request, userName: userDetails.fullName };
-            })
-          );
-          setBondRequests(requestsWithUserDetails);
-        }
-      } catch (error) {
-        console.error("Error fetching request:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-  
-    fetchBondRequests();
-  }, []);
+useEffect(() => {
+  const fetchBondRequests = async () => {
+    try {
+      setIsLoading(true);
+      const allRequests = await getBondRequests();
+      const requestsWithUserDetails = await Promise.all(
+        allRequests.map(async (request) => {
+          const userDocRef = doc(db, "users", request.userId);
+          
+          // Check if the user document exists
+          const userDocSnapshot = await getDoc(userDocRef);
+          
+          if (userDocSnapshot.exists()) {
+            const userDetails = userDocSnapshot.data();
+            return { ...request, userName: userDetails.fullName };
+          } else {
+            // Handle the case where the user document doesn't exist
+            return { ...request, userName: "Unknown User" };
+          }
+        })
+      );
+      setBondRequests(requestsWithUserDetails);
+    } catch (error) {
+      console.error("Error fetching request:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  fetchBondRequests();
+}, []);
+
   
   return (
     <div className="container">
