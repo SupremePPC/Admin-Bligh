@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { formatNumber } from "../../firebaseConfig/firestore";
 
 function Table({ ipoRequests, handleUpdateRequest }) {
   const [viewDetailId, setViewDetailId] = useState(null);
@@ -31,7 +32,7 @@ function Table({ ipoRequests, handleUpdateRequest }) {
                 <tbody key={index}>
                   <tr>
                     <td>{request.userName}</td>
-                    <td>${request.amountInvested}</td>
+                    <td>${formatNumber(request.amountInvested)}</td>
                     <td>{request.status}</td>
                     <td className="text-right">
                       <button
@@ -46,7 +47,7 @@ function Table({ ipoRequests, handleUpdateRequest }) {
                         Approve
                       </button>
                     </td>
-                    <td className="text-left">
+                    <td className="text-center">
                       <button
                         className="button muted-button"
                         onClick={() =>
@@ -60,7 +61,7 @@ function Table({ ipoRequests, handleUpdateRequest }) {
                         Decline
                       </button>
                     </td>
-                    <td>
+                    <td className="text-left">
                       {" "}
                       {viewDetailId === request.id ? (
                         <button onClick={() => handleViewClick(request.id)}>
@@ -82,7 +83,7 @@ function Table({ ipoRequests, handleUpdateRequest }) {
                               Expected Listing Price :
                             </p>
                             <span className="reg_text">
-                              $ {request.expListingPrice}{" "}
+                              $ {formatNumber(request.expListingPrice)}{" "}
                             </span>
                           </div>
                           <div className="dropdown_row">
@@ -95,7 +96,7 @@ function Table({ ipoRequests, handleUpdateRequest }) {
                           <div className="dropdown_row">
                             <p className="bold_text">Share Price :</p>
                             <span className="reg_text">
-                              $ {request.sharePrice}{" "}
+                              $ {formatNumber(request.sharePrice)}{" "}
                             </span>
                           </div>
                         </div>

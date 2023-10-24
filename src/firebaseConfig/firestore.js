@@ -1080,12 +1080,18 @@ export const handleIpoDecline = async (uid, requestId) => {
       console.error("Invalid requestId:", requestId);
       return;
     }
-
+    const requestRef = doc(
+      db,
+      ADMINDASH_COLLECTION,
+      uid,
+      IPOS_REQUESTS_COLLECTION,
+      requestId
+    );
     // Add Notification
     const userNotificationPath = `${USERS_COLLECTION}/${uid}/${NOTIFICATIONS_SUB_COLLECTION}`;
     await addDoc(userNotificationPath, {
       message: "Your IPO request has been declined.",
-      // timestamp: Timestamp.now(),
+      timestamp:getCurrentDate(),
       type: "Decline",
     });
     await deleteDoc(requestRef);
