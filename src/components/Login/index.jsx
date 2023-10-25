@@ -1,52 +1,50 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import logo from "../../assets/white_logo.png";
 import {
   browserSessionPersistence,
   setPersistence,
   signInWithEmailAndPassword,
+  onAuthStateChanged
 } from "firebase/auth";
-import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "../../firebaseConfig/firebase";
+import { doc, getDoc } from 'firebase/firestore';
+import { auth, db } from "../../firebaseConfig/firebase";
+import logo from "../../assets/white_logo.png";
 import "./style.css";
 
 const Login = () => {
-  const [user, setUser] = useState(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const validatePassword = (pass) => {
-    const regex = /^(?=.*\d)[\w]{8,}$/;
-    return regex.test(pass);
-  };
-
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        navigate("/dashboard");
-      } else {
-        // User is not authenticated
-        console.error("No user logged in");
+        // Check if user has admin role
+        const userRef = doc(db, 'adminUsers', user.uid);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists() && userSnap.data().role === 'admin') {
+          navigate("/dashboard");
+        } else {
+          setError("Unauthorized access!");
+        }
       }
     });
 
-    return () => unsubscribe(); // Cleanup listener on component unmount
-  }, [auth]);
+    return () => unsubscribe();
+  }, [auth, navigate]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    
+
     try {
       await setPersistence(auth, browserSessionPersistence);
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
+      await signInWithEmailAndPassword(auth, email, password);
       setIsLoading(false);
-      navigate("/dashboard");
-      
+      // Navigation happens in useEffect after verifying admin role
+
     } catch (error) {
       console.error("Error during login:", error);
       setError(error.message);
@@ -93,7 +91,7 @@ const Login = () => {
           </div>
           {error && <p className="error_msg">{error}</p>}
           {isLoading ? (
-            <button className="signin_btn" type="submit">
+            <button className="signin_btn" type="submit" disabled>
               <div className="spinner"></div>
             </button>
           ) : (
@@ -101,8 +99,6 @@ const Login = () => {
               Sign In
             </button>
           )}
-
-         
         </form>
       </div>
     </section>
