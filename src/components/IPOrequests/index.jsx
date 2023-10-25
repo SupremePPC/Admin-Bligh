@@ -17,27 +17,31 @@ const IposRequestPage = () => {
   const [ipoRequests, setIpoRequests] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    const fetchIpoRequests = async () => {
-      try {
-        setIsLoading(true);
-        const allRequests = await getIposRequests();
-        const requestsWithUserDetails = await Promise.all(
-          allRequests.map(async (request) => {
-            const userDoc = await getDoc(doc(db, "users", request.userId));
+  const fetchIpoRequests = async () => {
+    try {
+      setIsLoading(true);
+      const allRequests = await getIposRequests();
+      const requestsWithUserDetails = await Promise.all(
+        allRequests.map(async (request) => {
+          const userDoc = await getDoc(doc(db, "users", request.userId));
+          if (userDoc.exists()) {
             const userDetails = userDoc.data();
             return { ...request, userName: userDetails.fullName };
-          })
-        );
-        setIpoRequests(requestsWithUserDetails);
-        // console.log(`ipoRequests: ${ipoRequests}`)
-      } catch (error) {
-        console.error("Error fetching request:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+          } else {
+            // Handle the case where the user document doesn't exist
+            return { ...request, userName: "Unknown User" };
+          }
+        })
+      );
+      setIpoRequests(requestsWithUserDetails);
+    } catch (error) {
+      console.error("Error fetching request:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchIpoRequests();
   }, []);
 
@@ -63,8 +67,7 @@ const IposRequestPage = () => {
       // Reload IPO Requests
       const allRequests = await getIposRequests();
       setIpoRequests(allRequests);
-      
-      
+      fetchIpoRequests();
     } catch (err) {
       console.error("Error updating request:", err);
       Swal.fire({

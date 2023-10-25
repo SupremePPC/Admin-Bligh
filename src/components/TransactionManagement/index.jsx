@@ -1,10 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2";
-import {
-  doc,
-  updateDoc,
-  runTransaction,
-} from "firebase/firestore";
+import { doc, updateDoc, runTransaction } from "firebase/firestore";
 import Header from "./Header";
 import Table from "./Table";
 import Modal from "../CustomsModal";
@@ -37,12 +33,12 @@ const TransactionDashboard = () => {
       try {
         setIsLoading(true);
         const allTransactions = await getAllTransactions();
-        if(!allTransactions) {
+        if (!allTransactions) {
           setIsLoading(false);
           return;
         }
 
-        const filteredTransactions = 
+        const filteredTransactions =
           statusFilter === "All"
             ? allTransactions
             : allTransactions.filter(
@@ -103,30 +99,32 @@ const TransactionDashboard = () => {
       await runTransaction(db, async (transaction) => {
         // 1. Fetch the existing balance and type
         const accountTypeDoc = await transaction.get(accountTypeRef);
-        let currentBalance = 0;
-        let type = ""; // Initialize type variable
+        let currentAmount = 0;
+        let label = ""; // Initialize label variable
+
         if (accountTypeDoc.exists()) {
-          currentBalance = parseFloat(accountTypeDoc.data().balance || 0);
-          type = accountTypeDoc.data().type; // Fetch existing type
+          currentAmount = parseFloat(accountTypeDoc.data().amount || 0);
+          label = accountTypeDoc.data().label; // Fetch existing label
         }
 
         // 2. Update the balance based on the transaction type
-        let newBalance = currentBalance;
+        let newAmount = currentAmount;
+
         if (transactionType === "Deposit") {
-          newBalance = currentBalance + amount;
+          newAmount = currentAmount + amount;
         } else if (transactionType === "Withdrawal") {
-          newBalance = currentBalance - amount;
+          newAmount = currentAmount - amount;
         }
 
-        // Check if the new balance is negative (in case of withdrawal)
-        if (newBalance < 0) {
+        // Check if the new amount is negative (in case of withdrawal)
+        if (newAmount < 0) {
           throw new Error("Insufficient funds for withdrawal");
         }
 
-        // 3. Update the balance and type in Firestore
+        // 3. Update the label and amount in Firestore
         transaction.set(accountTypeRef, {
-          balance: newBalance.toFixed(2),
-          type: type,
+          label,
+          amount: newAmount.toFixed(2),
         });
 
         // 4. Mark the transaction as "Approved"
@@ -312,40 +310,38 @@ const TransactionDashboard = () => {
             handleFilter={handleStatusFilter}
             statusFilter={statusFilter}
           />
-          {isLoading && (
-            <LoadingScreen />
+          {isLoading && <LoadingScreen />}
+
+          <Table
+            transactions={transactions}
+            handleApproval={showApprovalModal}
+            handleRejection={showDeclineModal}
+          />
+
+          {isApproving && (
+            <Modal
+              isOpen={isApproving}
+              onClose={() => setIsApproving(false)}
+              title="Approve Transaction"
+              description="Are you sure you want to approve this transaction?"
+              onPositiveAction={() => handleApproval(selectedTransaction)}
+              positiveLabel={"Approve"}
+              negativeLabel={"Cancel"}
+            />
           )}
-           
-              <Table
-                transactions={transactions}
-                handleApproval={showApprovalModal}
-                handleRejection={showDeclineModal}
-              />
 
-              {isApproving && (
-                <Modal
-                  isOpen={isApproving}
-                  onClose={() => setIsApproving(false)}
-                  title="Approve Transaction"
-                  description="Are you sure you want to approve this transaction?"
-                  onPositiveAction={() => handleApproval(selectedTransaction)}
-                  positiveLabel={"Approve"}
-                  negativeLabel={"Cancel"}
-                />
-              )}
-
-              {isDeclining && (
-                <Modal
-                  isOpen={isDeclining}
-                  onClose={() => setIsDeclining(false)}
-                  onPositiveAction={handleRejection}
-                  title="Decline Transaction"
-                  description="Are you sure you want to decline this transaction?"
-                  positiveLabel={"Decline"}
-                  negativeLabel={"Cancel"}
-                />
-              )}
-            </>
+          {isDeclining && (
+            <Modal
+              isOpen={isDeclining}
+              onClose={() => setIsDeclining(false)}
+              onPositiveAction={handleRejection}
+              title="Decline Transaction"
+              description="Are you sure you want to decline this transaction?"
+              positiveLabel={"Decline"}
+              negativeLabel={"Cancel"}
+            />
+          )}
+        </>
       )}
       {isEditPageOpen && (
         <EditTransaction

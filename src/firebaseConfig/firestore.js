@@ -164,6 +164,7 @@ export async function addToAccount(userId, label, amount) {
         label: label,
         amount: amount,
       });
+      console.log(label, amount)
     }
 
     return { success: true };
@@ -294,7 +295,7 @@ export function deleteBankingDetails(uid, bankingDetailsId) {
 //BONDS REQUEST
 const BONDS_REQUEST_SUB_COLLECTION = "bondsRequest";
 
-export async function getBondRequests() {
+export async function getBondRequests(userId) {
   try {
     const adminDashRef = collection(db, ADMINDASH_COLLECTION);
     const adminDashSnapshot = await getDocs(adminDashRef);
@@ -315,7 +316,6 @@ export async function getBondRequests() {
         "bondsRequest"
       );
       const bondRequestsSnapshot = await getDocs(bondRequestsRef);
-
       if (bondRequestsSnapshot.empty) continue;
 
       const userBondRequests = bondRequestsSnapshot.docs.map((doc) => ({
@@ -323,10 +323,8 @@ export async function getBondRequests() {
         id: doc.id,
         userId: userId,
       }));
-
       allBondRequests = [...allBondRequests, ...userBondRequests];
     }
-
     return allBondRequests;
   } catch (error) {
     console.error("Error in getBondRequests: ", error);
@@ -634,7 +632,13 @@ export async function updateBondUser(userId, bondId, bondData) {
 
 export const deleteBondUser = async (uid, requestId) => {
   try {
-    const requestRef = doc(db, USERS_COLLECTION, uid, "bondsHoldings", requestId);
+    const requestRef = doc(
+      db,
+      USERS_COLLECTION,
+      uid,
+      "bondsHoldings",
+      requestId
+    );
     await deleteDoc(requestRef);
   } catch (error) {
     console.error("Error deleting IPO: ", error);
@@ -818,8 +822,6 @@ export async function handleDepositApproval(uid, termData) {
     console.error("Error in handleDepositApproval:", error);
   }
 }
-
-
 
 // 4.Function to update fixed term request status in the Firestore
 export async function updateFixedTermRequestStatus(
@@ -1079,12 +1081,18 @@ export const handleIpoDecline = async (uid, requestId) => {
       console.error("Invalid requestId:", requestId);
       return;
     }
-
+    const requestRef = doc(
+      db,
+      ADMINDASH_COLLECTION,
+      uid,
+      IPOS_REQUESTS_COLLECTION,
+      requestId
+    );
     // Add Notification
     const userNotificationPath = `${USERS_COLLECTION}/${uid}/${NOTIFICATIONS_SUB_COLLECTION}`;
     await addDoc(userNotificationPath, {
       message: "Your IPO request has been declined.",
-      // timestamp: Timestamp.now(),
+      timestamp:getCurrentDate(),
       type: "Decline",
     });
     await deleteDoc(requestRef);
