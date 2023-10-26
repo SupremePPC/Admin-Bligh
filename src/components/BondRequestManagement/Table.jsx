@@ -27,55 +27,54 @@ function Table({ bondRequests, handleUpdateRequest }) {
                 </th>
               </tr>
             </thead>
-            <tbody>
-              {bondRequests.map((request, index) => (
-                <>
-                  <tr key={index}>
-                    <td>{request.userName}</td>
-                    <td>${request.amountRequested}</td>
-                    <td>{request.requestStatus}</td>
-                    <td>{request.typeOfRequest}</td>
-                    <td className="text-right">
-                      <button
-                        onClick={() =>
-                          handleUpdateRequest(
-                            request.userId,
-                            request.id,
-                            "Approved"
-                          )
-                        }
-                      >
-                        Approve
-                      </button>
-                    </td>
-                    <td className="text-center">
-                      <button
+            {bondRequests.map((request, index) => (
+              <tbody  key={index}>
+                <tr>
+                  <td>{request.userName}</td>
+                  <td>${request.amountRequested}</td>
+                  <td>{request.requestStatus}</td>
+                  <td>{request.typeOfRequest}</td>
+                  <td className="text-right">
+                    <button
+                      onClick={() =>
+                        handleUpdateRequest(
+                          request.userId,
+                          request.id,
+                          "Approved"
+                        )
+                      }
+                    >
+                      Approve
+                    </button>
+                  </td>
+                  <td className="text-center">
+                    <button
                       className="button muted-button"
-                        onClick={() =>
-                          handleUpdateRequest(
-                            request.userId,
-                            request.id,
-                            "Declined"
-                          )
-                        }
-                      >
-                        Decline
+                      onClick={() =>
+                        handleUpdateRequest(
+                          request.userId,
+                          request.id,
+                          "Declined"
+                        )
+                      }
+                    >
+                      Decline
+                    </button>
+                  </td>
+                  <td className="text-left">
+                    {" "}
+                    {viewDetailId === request.id ? (
+                      <button onClick={() => handleViewClick(request.id)}>
+                        Close
                       </button>
-                    </td>
-                    <td className="text-left">
-                      {" "}
-                      {viewDetailId === request.id ? (
-                        <button onClick={() => handleViewClick(request.id)}>
-                          Close
-                        </button>
-                      ) : (
-                        <button onClick={() => handleViewClick(request.id)}>
-                          View
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                    <tr>
+                    ) : (
+                      <button onClick={() => handleViewClick(request.id)}>
+                        View
+                      </button>
+                    )}
+                  </td>
+                </tr>
+                <tr>
                   {viewDetailId === request.id && (
                     <td colSpan={5}>
                       <div className="bonds_dropdownCol">
@@ -87,7 +86,9 @@ function Table({ bondRequests, handleUpdateRequest }) {
                         </div>
                         <div className="bonds_dropdownRow">
                           <p className="bonds_bold-text">Sector :</p>
-                          <span className="bonds_reg-text">{request.sector}</span>
+                          <span className="bonds_reg-text">
+                            {request.sector}
+                          </span>
                         </div>
                         <div className="bonds_dropdownRow">
                           <p className="bonds_bold-text">Company Website :</p>
@@ -106,7 +107,9 @@ function Table({ bondRequests, handleUpdateRequest }) {
                           </span>
                         </div>
                         <div className="bonds_dropdownRow">
-                          <p className="bonds_bold-text">Minimum Investment Amount :</p>
+                          <p className="bonds_bold-text">
+                            Minimum Investment Amount :
+                          </p>
                           <span className="bonds_reg-text">
                             $ {request.minimumAmount}
                           </span>
@@ -114,11 +117,9 @@ function Table({ bondRequests, handleUpdateRequest }) {
                       </div>
                     </td>
                   )}
-                  </tr>
-                  
-                </>
-              ))}
-            </tbody>
+                </tr>
+              </tbody>
+            ))}
           </table>
         </>
       )}

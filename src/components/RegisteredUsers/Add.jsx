@@ -4,7 +4,6 @@ import { db } from "../../firebaseConfig/firebase";
 import {
   createUserWithEmailAndPassword,
   getAuth,
-  sendEmailVerification,
   sendPasswordResetEmail,
 } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
@@ -12,9 +11,10 @@ import { useDispatch } from "react-redux";
 import { addUser } from "../../store/userStore/userActions";
 import LoadingScreen from "../LoadingScreen";
 
-const Add = ({ setUsers, setIsAdding }) => {
+const Add = ({ setUsers, setIsAdding, refreshDetails }) => {
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
+  const [password, setPassword] = useState(123456)
 
   const [formData, setFormData] = useState({
     title: "",
@@ -23,7 +23,7 @@ const Add = ({ setUsers, setIsAdding }) => {
     jointAccount: false,
     secondaryAccountHolder: "",
     secondaryTitle: "",
-    password: "",
+    password: password,
     mobile: "",
     home: "",
     address: "",
@@ -90,7 +90,7 @@ const Add = ({ setUsers, setIsAdding }) => {
       );
       const user = userCredential.user;
       const userEmail = user.email;
-      await sendEmailVerification(user);
+
       // Send password reset email
       sendPasswordResetEmail(auth, userEmail)
         .then(() => {
@@ -131,10 +131,7 @@ const Add = ({ setUsers, setIsAdding }) => {
       };
       const usersRef = doc(db, "users", newUser.uid);
       await setDoc(usersRef, newUser);
-      // Update state
-      setUsers((prevUsers) => [...prevUsers, newUser]);
-      setIsAdding(false);
-
+      
       // Dispatch to Redux
       dispatch(addUser(newUser));
 
@@ -145,6 +142,10 @@ const Add = ({ setUsers, setIsAdding }) => {
         showConfirmButton: false,
         timer: 2000,
       });
+      // Update state
+      setUsers((prevUsers) => [...prevUsers, newUser]);
+      refreshDetails();
+      setIsAdding(false);
     } catch (error) {
       console.error("Error adding user:", error);
       Swal.fire({
@@ -160,9 +161,9 @@ const Add = ({ setUsers, setIsAdding }) => {
   return (
     <div className="small-container">
       <h3>Add New User</h3>
-      {isLoading ? (
-        <LoadingScreen />
-      ) : (
+      {isLoading && (
+        <LoadingScreen /> )}
+     
         <form onSubmit={handleAdd}>
           <div className="jointAcct_checkbox">
             <input
@@ -305,7 +306,7 @@ const Add = ({ setUsers, setIsAdding }) => {
             title="Postcode must be in the format like D02X88"
           />
 
-          <label htmlFor="password">Password</label>
+          {/* <label htmlFor="password">Password</label>
           <input
             id="password"
             type="password"
@@ -313,7 +314,7 @@ const Add = ({ setUsers, setIsAdding }) => {
             value={formData.password}
             onChange={handleInputChange}
             required
-          />
+          /> */}
 
           <div style={{ marginTop: "30px" }}>
             <input type="submit" value="Add" />
@@ -326,7 +327,7 @@ const Add = ({ setUsers, setIsAdding }) => {
             />
           </div>
         </form>
-      )}
+      
     </div>
   );
 };

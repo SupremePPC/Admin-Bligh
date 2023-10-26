@@ -45,7 +45,8 @@ const BondsRequestTable = () => {
           // Add bond to user's holdings
           await addBondToUserHoldings(userId, requestData);
         }
-      } else { // Assuming that newStatus here can only be "Approved" or "Declined"
+      } else {
+        // Assuming that newStatus here can only be "Approved" or "Declined"
         // Handle declined request
         if (requestData.typeOfRequest === "buy") {
           message = `Your bond request to buy $${requestData.amountRequested} worth of bonds has been declined.`;
@@ -84,55 +85,48 @@ const BondsRequestTable = () => {
     } finally {
       setIsLoading(false);
     }
-};
-
-useEffect(() => {
-  const fetchBondRequests = async () => {
-    try {
-      setIsLoading(true);
-      const allRequests = await getBondRequests();
-      const requestsWithUserDetails = await Promise.all(
-        allRequests.map(async (request) => {
-          const userDocRef = doc(db, "users", request.userId);
-          
-          // Check if the user document exists
-          const userDocSnapshot = await getDoc(userDocRef);
-          
-          if (userDocSnapshot.exists()) {
-            const userDetails = userDocSnapshot.data();
-            return { ...request, userName: userDetails.fullName };
-          } else {
-            // Handle the case where the user document doesn't exist
-            return { ...request, userName: "Unknown User" };
-          }
-        })
-      );
-      setBondRequests(requestsWithUserDetails);
-    } catch (error) {
-      console.error("Error fetching request:", error);
-    } finally {
-      setIsLoading(false);
-    }
   };
 
-  fetchBondRequests();
-}, []);
+  useEffect(() => {
+    const fetchBondRequests = async () => {
+      try {
+        setIsLoading(true);
+        const allRequests = await getBondRequests();
+        const requestsWithUserDetails = await Promise.all(
+          allRequests.map(async (request) => {
+            const userDocRef = doc(db, "users", request.userId);
 
-  
+            // Check if the user document exists
+            const userDocSnapshot = await getDoc(userDocRef);
+
+            if (userDocSnapshot.exists()) {
+              const userDetails = userDocSnapshot.data();
+              return { ...request, userName: userDetails.fullName };
+            } else {
+              // Handle the case where the user document doesn't exist
+              return { ...request, userName: "Unknown User" };
+            }
+          })
+        );
+        setBondRequests(requestsWithUserDetails);
+      } catch (error) {
+        console.error("Error fetching request:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchBondRequests();
+  }, []);
+
   return (
     <div className="container">
-
-      {isLoading ? (
-        <LoadingScreen />
-      ) : (
-        <>
-          <Header />
-          <Table
-            bondRequests={bondRequests}
-            handleUpdateRequest={handleUpdateRequest}
-          />
-        </>
-      )}
+      {isLoading && <LoadingScreen />}
+      <Header />
+      <Table
+        bondRequests={bondRequests}
+        handleUpdateRequest={handleUpdateRequest}
+      />
     </div>
   );
 };
