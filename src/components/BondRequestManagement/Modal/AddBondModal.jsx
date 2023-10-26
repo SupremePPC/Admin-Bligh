@@ -42,6 +42,7 @@ export default function AddBondModal({ onInvestSuccess, onClose, bond, userId })
       sector: bond.sector,
       couponFrequency: bond.couponFrequency,
       minimumAmount: bond.minimumAmount,
+      typeOfRequest: "buy",
     };
     setIsLoading(true);
     try {

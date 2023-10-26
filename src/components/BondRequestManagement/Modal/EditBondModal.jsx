@@ -50,6 +50,7 @@ export default function EditBondModal({
       sector: bond.sector,
       couponFrequency: bond.couponFrequency,
       minimumAmount: bond.minimumAmount,
+      typeOfRequest: "buy",
     };
     setIsLoading(true);
     try {
