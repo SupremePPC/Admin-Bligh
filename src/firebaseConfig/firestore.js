@@ -363,7 +363,7 @@ export async function handleSellApproval(uid, bondData) {
 // Function to handle buying bonds
 export async function handleBuyApproval(uid, bondData) {
   // Check if bondData and its id are defined
-  if (!bondData || !bondData.id) {
+  if (!bondData) {
     console.error("Invalid bondData:", bondData);
     return;
   }
@@ -374,8 +374,8 @@ export async function handleBuyApproval(uid, bondData) {
   const bondDoc = await getDoc(bondDocRef);
 
   // Calculate the quantity the user is buying
-  const minInvestmentAmount = bondData.minInvestmentAmount || 1;
-  const newQuantity = Math.floor(bondData.amount / minInvestmentAmount);
+  const minInvestmentAmount = bondData.minimumAmount || 1;
+  const newQuantity = Math.floor(bondData.amountRequested / minInvestmentAmount);
 
   if (bondDoc.exists()) {
     const currentData = bondDoc.data();
@@ -384,7 +384,7 @@ export async function handleBuyApproval(uid, bondData) {
     if (
       currentData.quantity === undefined ||
       currentData.currentValue === undefined ||
-      bondData.amount === undefined
+      bondData.amountRequested === undefined
     ) {
       console.error(
         "Undefined fields in currentData or bondData:",
@@ -395,7 +395,7 @@ export async function handleBuyApproval(uid, bondData) {
     }
 
     const updatedQuantity = currentData.quantity + newQuantity;
-    const updatedCurrentValue = currentData.currentValue + bondData.amount;
+    const updatedCurrentValue = currentData.currentValue + bondData.amountRequested;
 
     await updateDoc(bondDocRef, {
       quantity: updatedQuantity,
@@ -403,7 +403,7 @@ export async function handleBuyApproval(uid, bondData) {
     });
   } else {
     // Check if bondData.amount is defined
-    if (bondData.amount === undefined) {
+    if (bondData.amountRequested === undefined) {
       console.error("Undefined amount in bondData:", bondData);
       return;
     }
@@ -411,7 +411,7 @@ export async function handleBuyApproval(uid, bondData) {
     await setDoc(bondDocRef, {
       ...bondData,
       quantity: newQuantity,
-      currentValue: bondData.amount,
+      currentValue: bondData.amountRequested,
     });
   }
 }

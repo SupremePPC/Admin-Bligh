@@ -239,20 +239,26 @@ const UserOverview = () => {
                   </p>
                   <span className="reg_text">{userDetails.fullName}</span>
                 </div>
-                <div className="text_wrap">
-                  <p className="bold_text">Secondary Account Holder Title :</p>
-                  <span className="reg_text">
-                    {userDetails.secondaryTitle}
-                  </span>
-                </div>
-                <div className="text_wrap">
-                  <p className="bold_text">
-                    Secondary Account Holder Full Name :
-                  </p>
-                  <span className="reg_text">
-                    {userDetails.secondaryAccountHolder}
-                  </span>
-                </div>
+                {userDetails.jointAccount && (
+                  <>
+                    <div className="text_wrap">
+                      <p className="bold_text">
+                        Secondary Account Holder Title :
+                      </p>
+                      <span className="reg_text">
+                        {userDetails.secondaryTitle}
+                      </span>
+                    </div>
+                    <div className="text_wrap">
+                      <p className="bold_text">
+                        Secondary Account Holder Full Name :
+                      </p>
+                      <span className="reg_text">
+                        {userDetails.secondaryAccountHolder}
+                      </span>
+                    </div>
+                  </>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+                )}
                 <div className="text_wrap">
                   <p className="bold_text">Email :</p>
                   <span className="reg_text">{userDetails.email}</span>

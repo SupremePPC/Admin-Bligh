@@ -80,11 +80,7 @@ export default function RegisteredUsers() {
 
       // Update the local state
       setUsers((users) => users.filter((user) => user.id !== selectedUserId));
-
-      // Close the modal and reset the selected user ID
-      setIsDeleteModalOpen(false);
-      setSelectedUserId(null);
-
+      
       Swal.fire({
         icon: "success",
         title: "Deleted!",
@@ -92,6 +88,8 @@ export default function RegisteredUsers() {
         showConfirmButton: false,
         timer: 2000,
       });
+      setIsDeleteModalOpen(false);
+      setSelectedUserId(null);
       fetchUsers();
     } catch (error) {
       console.error("Failed to delete user:", error);
@@ -197,8 +195,8 @@ export default function RegisteredUsers() {
               handleDelete={handleDelete}
               handleEdit={handleEdit}
               searchResults={searchResults}
-            />
-          )}
+              />
+              )}
           <Modal
             isOpen={isDeleteModalOpen}
             onClose={() => setIsDeleteModalOpen(false)}
@@ -208,14 +206,15 @@ export default function RegisteredUsers() {
             onNegativeAction={() => setIsDeleteModalOpen(false)}
             positiveLabel={"Delete"}
             negativeLabel={"Cancel"}
-          />
+            />
         </>
       )}
       {isAdding && (
         <Add
-          onClose={() => setIsAdding(false)}
-          setIsAdding={setIsAdding}
-          setUsers={setUsers}
+        onClose={() => setIsAdding(false)}
+        setIsAdding={setIsAdding}
+        setUsers={setUsers}
+        refreshDetails={fetchUsers}
         />
       )}
       {isEditPageOpen && (
