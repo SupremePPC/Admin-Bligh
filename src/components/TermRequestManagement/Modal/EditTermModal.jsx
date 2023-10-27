@@ -161,7 +161,7 @@ export default function EditTermUser({
             type="button"
             value="Cancel"
             onClick={() => {
-              refreshDetails();
+              
               onClose();
               setDepositAmount(0);
             }}
