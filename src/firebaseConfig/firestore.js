@@ -164,7 +164,6 @@ export async function addToAccount(userId, label, amount) {
         label: label,
         amount: amount,
       });
-      console.log(label, amount);
     }
 
     return { success: true };

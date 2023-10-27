@@ -130,9 +130,6 @@ const EditTransaction = ({
         timer: 2000,
       });
     }
-    console.log( uid,
-      transactionId,
-      updatedTransaction)
     try {
       const result = await editTransaction(
         uid,
@@ -192,11 +189,6 @@ const EditTransaction = ({
             amount: updatedTransaction.amount,
           });
         }
-  
-        console.log({
-          label: accountType,
-          amount: updatedTransaction.amount,
-        });
   
         // If no changes were made, the form will not be updated and the function will return here
   
