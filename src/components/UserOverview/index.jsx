@@ -420,7 +420,7 @@ const UserOverview = () => {
             </div>
 
             {/* Account types and balances*/}
-            <div className="user_details">
+            {/* <div className="user_details">
               <h3>
                 Account Types and Balance with Total Balance of $
                 {formatNumber(totalBalance)}
@@ -447,7 +447,7 @@ const UserOverview = () => {
                   ))}
                 </ul>
               )}
-            </div>
+            </div> */}
 
             {/* Transactions List */}
             <div className="user_details">
