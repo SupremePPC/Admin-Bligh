@@ -69,6 +69,7 @@ const TransactionDashboard = () => {
   };
 
   const handleApproval = async () => {
+    setIsLoading(true);
     try {
       // Initialize Firestore references
       const userId = selectedTransaction.userId;
@@ -156,10 +157,13 @@ const TransactionDashboard = () => {
         text: `Failed to update the transaction.`,
         showConfirmButton: true,
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleRejection = async () => {
+    setIsLoading(true);
     try {
       // Update the local state and local storage
       const transactionsCopy = [...transactions];
@@ -200,6 +204,8 @@ const TransactionDashboard = () => {
         text: `Failed to update the transaction.`,
         showConfirmButton: true,
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 

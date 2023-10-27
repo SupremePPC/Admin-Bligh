@@ -75,6 +75,7 @@ export default function UserRequest() {
       );
 
       const user = userCredential.user;
+      const userEmail = user.email;
       // Send email verification
       await sendEmailVerification(user);
 
@@ -126,7 +127,7 @@ export default function UserRequest() {
         Swal.fire({
           icon: "error",
           title: "Oops...",
-          text: `Error; email already in use. Please try another email.`,
+          text: `Error; email already in use. Please try another.`,
           showConfirmButton: false,
           timer: 2000,
         });

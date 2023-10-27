@@ -491,13 +491,13 @@ img {
   color: var(--white);
 }
 
-/* .portfolio_dropdown {
+.portfolio_dropdown {
   background-color: #688fb7;
   border-radius: 8px;
   padding-left: 1.5rem;
   padding-right: 1.5rem;
   padding-bottom: 1.5rem;
-  color: #fff;
+  color: var(--black);
   font-size: 14px;
   margin-bottom: 2rem;
   max-height: 500px;
@@ -536,13 +536,13 @@ img {
 .bold_text {
   font-size: var(--font-sixteen);
   font-weight: 600;
-  color: var(--white);
+  color: var(--black);
 }
 
 .reg_text {
   font-size: var(--font-sixteen);
   font-weight: 400;
-  color: var(--white);
+  color: var(--black);
 }
 
 .dropdown_btn {
@@ -560,7 +560,7 @@ img {
   padding: 10px 0rem;
   font-weight: 600;
   cursor: pointer;
-} */
+}
 
 @media screen and (min-width: 900px) {
   .app_container {

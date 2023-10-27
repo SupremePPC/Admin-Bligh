@@ -164,7 +164,7 @@ export async function addToAccount(userId, label, amount) {
         label: label,
         amount: amount,
       });
-      console.log(label, amount)
+      console.log(label, amount);
     }
 
     return { success: true };
@@ -375,7 +375,9 @@ export async function handleBuyApproval(uid, bondData) {
 
   // Calculate the quantity the user is buying
   const minInvestmentAmount = bondData.minimumAmount || 1;
-  const newQuantity = Math.floor(bondData.amountRequested / minInvestmentAmount);
+  const newQuantity = Math.floor(
+    bondData.amountRequested / minInvestmentAmount
+  );
 
   if (bondDoc.exists()) {
     const currentData = bondDoc.data();
@@ -395,7 +397,8 @@ export async function handleBuyApproval(uid, bondData) {
     }
 
     const updatedQuantity = currentData.quantity + newQuantity;
-    const updatedCurrentValue = currentData.currentValue + bondData.amountRequested;
+    const updatedCurrentValue =
+      currentData.currentValue + bondData.amountRequested;
 
     await updateDoc(bondDocRef, {
       quantity: updatedQuantity,
@@ -1053,10 +1056,14 @@ export const handleIpoApproval = async (uid, requestId, requestData) => {
       return;
     }
 
-    // Move to `ipos` sub-collection
-    const userIposPath = USERS_COLLECTION / uid / IPOS_COLLECTION;
-    const iposDocRef = doc(db, `${userIposPath}/${requestId.id}`);
-    await setDoc(iposDocRef, { ...requestId, status: "Approved" }); // set the status to Approved
+    // Reference to the user's "ipos" subcollection
+    const userIposPath = collection(db, USERS_COLLECTION, uid, IPOS_COLLECTION);
+
+    // Reference to the specific "ipos" document within the subcollection
+    const iposDocRef = doc(userIposPath, requestId);
+
+    // Check if the user's "ipos" subcollection exists, and if not, create it
+    await setDoc(iposDocRef, { ...requestData, status: "Approved" });
 
     // Add Notification
     const userNotificationPath = collection(
@@ -1065,10 +1072,13 @@ export const handleIpoApproval = async (uid, requestId, requestData) => {
       uid,
       NOTIFICATIONS_SUB_COLLECTION
     );
+
     await addDoc(userNotificationPath, {
       message: "Your IPO request has been approved.",
       type: "Approved",
     });
+
+    console.log("Request granted", requestData, requestId, iposDocRef);
   } catch (error) {
     console.error("Error in Approval:", error);
   }
@@ -1092,7 +1102,7 @@ export const handleIpoDecline = async (uid, requestId) => {
     const userNotificationPath = `${USERS_COLLECTION}/${uid}/${NOTIFICATIONS_SUB_COLLECTION}`;
     await addDoc(userNotificationPath, {
       message: "Your IPO request has been declined.",
-      timestamp:getCurrentDate(),
+      timestamp: getCurrentDate(),
       type: "Decline",
     });
     await deleteDoc(requestRef);

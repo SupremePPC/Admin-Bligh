@@ -3,6 +3,7 @@ import CurrencyInput from "react-currency-input-field";
 import Swal from "sweetalert2";
 import {
   deleteTermFromUserCollection,
+  formatNumber,
   getCurrentDate,
   updateTermInUserCollection,
 } from "../../../firebaseConfig/firestore";
@@ -31,7 +32,7 @@ export default function EditTermUser({
         return;
       }
 
-      const MIN_AMOUNT = fixedTerm.minAmount;
+      const MIN_AMOUNT = formatNumber(fixedTerm.minAmount);
       if (depositAmount < MIN_AMOUNT) {
         Swal.fire({
           icon: "error",
@@ -60,7 +61,7 @@ export default function EditTermUser({
       Swal.fire({
         icon: "success",
         title: "Request Sent!",
-        text: `You have successfully updated a deposit of $${depositAmount} on behalf of this user.`,
+        text: `You have successfully updated a deposit of $${formatNumber(depositAmount)} on behalf of this user.`,
         showConfirmButton: false,
         timer: 2000,
       });
@@ -125,7 +126,7 @@ export default function EditTermUser({
         </div>
         <div className="input_group">
           <label className="">Minimum Amount:</label>
-          <span className="reg_text">$ {fixedTerm.minAmount} </span>
+          <span className="reg_text">$ {formatNumber(fixedTerm.minAmount)} </span>
         </div>
         <div className="input_group">
           <label>Input Amount ($):</label>

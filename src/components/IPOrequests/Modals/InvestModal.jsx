@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import {
   addIposToUserCollection,
+  formatNumber,
   getCurrentDate,
 } from "../../../firebaseConfig/firestore";
 import CurrencyInput from "react-currency-input-field";
@@ -18,7 +19,7 @@ export default function InvestIpoModal({ onInvestSuccess, onClose, ipo, userId }
       Swal.fire({
         icon: "error",
         title: "Error!",
-        text: `Investment amount must be greater than minimum investment value of $${ipo.minInvestment}`,
+        text: `Investment amount must be greater than minimum investment value of $${formatNumber(ipo.minInvestment)}`,
         showConfirmButton: true,
       });
       return;
@@ -61,7 +62,7 @@ export default function InvestIpoModal({ onInvestSuccess, onClose, ipo, userId }
 
   const totalCost = investmentAmount * ipo.sharePrice;
   const numberOfShares =
-    Math.ceil((investmentAmount / ipo.sharePrice) * 100) / 100;
+    (Math.ceil((investmentAmount / ipo.sharePrice) * 100) / 100).toFixed(2);
 
   return (
     <>
@@ -84,15 +85,15 @@ export default function InvestIpoModal({ onInvestSuccess, onClose, ipo, userId }
               </div>
               <div className="more_dets">
                 <p className="bold_text">IPO Share Price: </p>
-                <p className="reg_text">$ {ipo.sharePrice}</p>
+                <p className="reg_text">$ {formatNumber(ipo.sharePrice)}</p>
               </div>
               <div className="more_dets">
                 <p className="bold_text">Expected Listing Price:</p>
-                <p className="reg_text">$ {ipo.expListingPrice}</p>
+                <p className="reg_text">$ {formatNumber(ipo.expListingPrice)}</p>
               </div>
               <div className="more_dets">
                 <p className="bold_text">Minimum Investment Amount:</p>
-                <p className="reg_text">$ {ipo.minInvestment}</p>
+                <p className="reg_text">$ {formatNumber(ipo.minInvestment)}</p>
               </div>
               <div className="more_dets">
                 <p className="bold_text">Number of Shares:</p>
@@ -100,7 +101,7 @@ export default function InvestIpoModal({ onInvestSuccess, onClose, ipo, userId }
               </div>
               <div className="more_dets">
                 <p className="bold_text">Total Cost:</p>
-                <p className="reg_text">$ {totalCost || 0}</p>
+                <p className="reg_text">$ {formatNumber(totalCost) || 0}</p>
               </div>
               <div className="input_group">
                 <label htmlFor="title">Investment Amount:</label>
@@ -109,7 +110,7 @@ export default function InvestIpoModal({ onInvestSuccess, onClose, ipo, userId }
                   prefix="$"
                   name="investmentAmount"
                   placeholder="$0"
-                  defaultValue={investmentAmount}
+                  defaultValue={(investmentAmount)}
                   decimalsLimit={2}
                   onValueChange={(value) => {
                     const formattedValue = parseFloat(value).toFixed(2);

@@ -3,6 +3,7 @@ import {
   updateIposToUserCollection,
   deleteIposFromUserCollection,
   getCurrentDate,
+  formatNumber,
 } from "../../../firebaseConfig/firestore";
 import CurrencyInput from "react-currency-input-field";
 import Swal from "sweetalert2";
@@ -22,7 +23,7 @@ export default function EditIposUser({
       Swal.fire({
         icon: "error",
         title: "Error!",
-        text: `Investment amount must be greater than minimum investment value of $${ipo.minInvestment}`,
+        text: `Investment amount must be greater than minimum investment value of $${formatNumber(ipo.minInvestment)}`,
         showConfirmButton: true,
       });
       return;
@@ -95,7 +96,7 @@ export default function EditIposUser({
 
   const totalCost = ipo.amountInvested * ipo.sharePrice;
   const numberOfShares =
-    Math.ceil((investmentAmount / ipo.sharePrice) * 100) / 100;
+    (Math.ceil((investmentAmount / ipo.sharePrice) * 100) / 100).toFixed(2);
 
   return (
     <div className="invest_ipo_overlay" onClick={(e) => e.stopPropagation()}>
@@ -112,15 +113,15 @@ export default function EditIposUser({
           </div>
           <div className="more_dets">
             <p className="bold_text">IPO Share Price: </p>
-            <p className="reg_text">$ {ipo.sharePrice}</p>
+            <p className="reg_text">$ {formatNumber(ipo.sharePrice)}</p>
           </div>
           <div className="more_dets">
             <p className="bold_text">Expected Listing Price:</p>
-            <p className="reg_text">$ {ipo.expListingPrice}</p>
+            <p className="reg_text">$ {formatNumber(ipo.expListingPrice)}</p>
           </div>
           <div className="more_dets">
             <p className="bold_text">Minimum Investment Amount:</p>
-            <p className="reg_text">$ {ipo.minInvestment}</p>
+            <p className="reg_text">$ {formatNumber(ipo.minInvestment)}</p>
           </div>
           <div className="more_dets">
             <p className="bold_text">Number of Shares:</p>
@@ -130,7 +131,7 @@ export default function EditIposUser({
           </div>
           <div className="more_dets">
             <p className="bold_text">Total Cost:</p>
-            <p className="reg_text">$ {totalCost || 0}</p>
+            <p className="reg_text">$ {formatNumber(totalCost) || 0}</p>
           </div>
           <div className="input_group">
             <label htmlFor="title">Investment Amount:</label>

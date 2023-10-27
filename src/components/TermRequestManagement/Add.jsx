@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import LoadingScreen from "../LoadingScreen";
 import "firebase/firestore";
-import { getAllTerms } from "../../firebaseConfig/firestore";
+import { formatNumber, getAllTerms } from "../../firebaseConfig/firestore";
 import InvestTermModal from "./Modal/InvestTermModal";
 import EditTermUser from "./Modal/EditTermModal";
 
@@ -81,7 +81,7 @@ const AddNewTerm = ({ userId, onClose, refreshDetails }) => {
                     <div className="financialDetails">
                       <p className="boldText">Principal Amount:</p>
                       <span className="regularText">
-                        $ {fixedTerm.minAmount}
+                        $ {formatNumber(fixedTerm.minAmount)}
                       </span>
                     </div>
                   </div>
