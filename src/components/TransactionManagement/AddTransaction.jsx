@@ -191,14 +191,14 @@ const AddTransaction = ({
                 }
               >
                 <option value="">--Select--</option>
-                <option value="">--Select--</option>
                 <option value="Easy Access">Easy Access</option>
                 <option value="1 Year Fixed Saver">1 Year Fixed Saver</option>
                 <option value="3 Year Fixed Saver">3 Year Fixed Saver</option>
                 <option value="5 Year Fixed Saver">5 Year Fixed Saver</option>
-                <option value="Bond">Bond</option>
-                <option value="IPO">IPO</option>
-                <option value="Term Deposit">Term Deposit</option>
+                <option value="Bond Account">Bond Account</option>
+                <option value="IPO Account">IPO Account</option>
+                <option value="Term Deposit Account">Term Deposit Account</option>
+                <option value="NCIG">NCIG - 12.5%</option>
               </select>
 
               <label htmlFor="type">Transaction Type</label>
