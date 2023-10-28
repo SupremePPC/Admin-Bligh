@@ -19,6 +19,7 @@ export default function EditTermUser({
   const [isLoading, setIsLoading] = useState(false);
 
   const onDeposit = async () => {
+    setIsLoading(true);
     try {
       setIsLoading(true);
       if (!fixedTerm) {
@@ -32,12 +33,12 @@ export default function EditTermUser({
         return;
       }
 
-      const MIN_AMOUNT = formatNumber(fixedTerm.minAmount);
+      const MIN_AMOUNT = fixedTerm.minAmount;
       if (depositAmount < MIN_AMOUNT) {
         Swal.fire({
           icon: "error",
           title: "Error!",
-          text: `Cannot deposit less than $${MIN_AMOUNT}`,
+          text: `Cannot deposit less than $${formatNumber(MIN_AMOUNT)}`,
           showConfirmButton: false,
           timer: 2000,
         });
@@ -45,6 +46,7 @@ export default function EditTermUser({
         setDepositAmount("");
         return;
       }
+      console.log("deposit amount", depositAmount)
 
       const newDeposit = {
         date: getCurrentDate(),
@@ -57,7 +59,10 @@ export default function EditTermUser({
         logo: fixedTerm.logo,
         minAmount: fixedTerm.minAmount,
       }
+      console.log(userId.userId, termId, newDeposit)
+
       await updateTermInUserCollection(userId.userId, termId, newDeposit);
+      
       Swal.fire({
         icon: "success",
         title: "Request Sent!",
@@ -76,6 +81,8 @@ export default function EditTermUser({
         showConfirmButton: false,
         timer: 2000,
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -143,7 +150,7 @@ export default function EditTermUser({
             }}
           />
         </div>
-        <div style={{ display: "flex" }}>
+        <div style={{ display: "flex", alignItems: "center" }}>
           <input type="submit" value="Save" onClick={onDeposit} />
           {isLoading && (
             <div className="spinner" style={{ marginLeft: "12px" }}></div>
@@ -161,7 +168,6 @@ export default function EditTermUser({
             type="button"
             value="Cancel"
             onClick={() => {
-              
               onClose();
               setDepositAmount(0);
             }}
