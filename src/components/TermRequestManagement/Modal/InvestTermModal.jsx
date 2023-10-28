@@ -3,6 +3,7 @@ import CurrencyInput from "react-currency-input-field";
 import Swal from "sweetalert2";
 import {
   addTermToUserCollection,
+  formatNumber,
   getCurrentDate,
 } from "../../../firebaseConfig/firestore";
 
@@ -30,7 +31,7 @@ export default function InvestTermModal({
         Swal.fire({
           icon: "error",
           title: "Error!",
-          text: `Cannot deposit less than $${MIN_AMOUNT}`,
+          text: `Cannot deposit less than $${formatNumber(MIN_AMOUNT)}`,
           showConfirmButton: false,
           timer: 2000,
         });
@@ -58,7 +59,7 @@ export default function InvestTermModal({
       Swal.fire({
         icon: "success",
         title: "Request Sent!",
-        text: `You have successfully made a deposit of $${depositAmount} on behalf of this user.`,
+        text: `You have successfully made a deposit of $${formatNumber(depositAmount)} on behalf of this user.`,
         showConfirmButton: false,
         timer: 4000,
       });
@@ -88,7 +89,7 @@ export default function InvestTermModal({
         </div>
         <div className="input_group">
           <label className="">Minimum Amount:</label>
-          <span className="reg_text">$ {fixedTerm.minAmount} </span>
+          <span className="reg_text">$ {formatNumber(fixedTerm.minAmount)} </span>
         </div>
         <div className="input_group">
           <label>Input Amount ($):</label>

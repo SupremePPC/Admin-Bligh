@@ -105,18 +105,22 @@ const Add = ({ userId, onClose, refreshDetails }) => {
           <label htmlFor="bsbNumber">BSB Number</label>
           <input
             id="bsbNumber"
+            inputMode="numeric"
             type="number"
             name="bsbNumber"
             value={formData.bsbNumber}
             onChange={handleInputChange}
+            min={0}
           />
           <label htmlFor="accountNumber">Account Number</label>
           <input
             id="accountNumber"
-            type="text"
+            inputMode="numeric"
+            type="number"
             name="accountNumber"
             value={formData.accountNumber}
             onChange={handleInputChange}
+            min={0}
           />
           <div style={{ marginTop: "30px" }}>
             <input type="submit" value="Add" />

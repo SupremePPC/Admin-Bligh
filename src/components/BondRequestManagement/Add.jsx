@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2";
-import { addBondUser, getAllBonds } from "../../firebaseConfig/firestore";
+import { addBondUser, formatNumber, getAllBonds } from "../../firebaseConfig/firestore";
 import LoadingScreen from "../LoadingScreen";
 import AddBondModal from "./Modal/AddBondModal";
 import EditBondModal from "./Modal/EditBondModal";
@@ -107,7 +107,7 @@ const AddBond = ({ userId, onClose, refreshDetails }) => {
                         <div className="maturityRow">
                           <p className="boldText">Minimum Amount:</p>
                           <span className="regText">
-                            $ {bond.minimumAmount}{" "}
+                            $ {formatNumber(bond.minimumAmount)}{" "}
                           </span>
                         </div>
                       </div>
@@ -142,10 +142,7 @@ const AddBond = ({ userId, onClose, refreshDetails }) => {
                     <p className="boldText">Coupon Frequency :</p>
                     <span className="regText"> {bond.couponFrequency} </span>
                   </div>
-                  <div className="dropdownRow">
-                    <p className="boldText">Minimum Investment Amount :</p>
-                    <span className="regText">$ {bond.minimumAmount} </span>
-                  </div>
+                  
                 </div>
                 <div style={{ marginTop: "30px" }}>
                   <input

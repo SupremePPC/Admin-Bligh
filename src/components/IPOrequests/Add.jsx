@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "firebase/firestore";
-import { getAllIpos } from "../../firebaseConfig/firestore";
+import { formatNumber, getAllIpos } from "../../firebaseConfig/firestore";
 import LoadingScreen from "../LoadingScreen";
 import InvestIpoModal from "./Modals/InvestModal";
 import EditIposUser from "./Modals/EditModal";
@@ -91,21 +91,21 @@ const AddUserIpos = ({ userId, onClose }) => {
                         <p className="boldText">Pre-IPO Share Price:</p>
                         <span className="regularText">
                           {" "}
-                          $ {ipo.preSharePrice}{" "}
+                          $ {formatNumber(ipo.preSharePrice)}{" "}
                         </span>
                       </div>
                       <div className="detailsRow">
                         <p className="boldText">Minimum Investment:</p>
                         <span className="regularText">
                           {" "}
-                          $ {ipo.minInvestment}{" "}
+                          $ {formatNumber(ipo.minInvestment)}{" "}
                         </span>
                       </div>
                       <div className="detailsRow">
                         <p className="boldText">Expected Listing Price:</p>
                         <span className="regularText">
                           {" "}
-                          $ {ipo.expListingPrice}{" "}
+                          $ {formatNumber(ipo.expListingPrice)}{" "}
                         </span>
                       </div>
                     </div>

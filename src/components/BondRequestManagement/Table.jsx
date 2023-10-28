@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { formatNumber } from "../../firebaseConfig/firestore";
 
 function Table({ bondRequests, handleUpdateRequest }) {
   const [viewDetailId, setViewDetailId] = useState(null);
@@ -31,7 +32,7 @@ function Table({ bondRequests, handleUpdateRequest }) {
               <tbody  key={index}>
                 <tr>
                   <td>{request.userName}</td>
-                  <td>${request.amountRequested}</td>
+                  <td>$ {formatNumber(request.amountRequested)}</td>
                   <td>{request.requestStatus}</td>
                   <td>{request.typeOfRequest}</td>
                   <td className="text-right">
@@ -111,7 +112,7 @@ function Table({ bondRequests, handleUpdateRequest }) {
                             Minimum Investment Amount :
                           </p>
                           <span className="bonds_reg-text">
-                            $ {request.minimumAmount}
+                            $ {formatNumber(request.minimumAmount)}
                           </span>
                         </div>
                       </div>

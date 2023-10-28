@@ -420,7 +420,7 @@ const UserOverview = () => {
             </div>
 
             {/* Account types and balances*/}
-            <div className="user_details">
+            {/* <div className="user_details">
               <h3>
                 Account Types and Balance with Total Balance of $
                 {formatNumber(totalBalance)}
@@ -447,7 +447,7 @@ const UserOverview = () => {
                   ))}
                 </ul>
               )}
-            </div>
+            </div> */}
 
             {/* Transactions List */}
             <div className="user_details">
@@ -658,16 +658,16 @@ const UserOverview = () => {
                                   <p>{term[i].bankName}</p>
                                 </div>
                               </td>
-                              <td>$ {term[i].principalAmount}</td>
+                              <td>$ {formatNumber(term[i].principalAmount)}</td>
                               <td>{term[i].term}</td>
                               <td>{term[i].interestRate} %</td>
                               <td>
                                 ${" "}
-                                {calculateMaturityAmount(
+                                {formatNumber(calculateMaturityAmount(
                                   term[i].principalAmount,
                                   term[i].interestRate,
                                   term[i].term
-                                ) || 0}
+                                ) )|| 0}
                               </td>
                             </tr>
                           );

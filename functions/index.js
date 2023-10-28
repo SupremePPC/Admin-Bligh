@@ -42,20 +42,22 @@ exports.deleteUserAccount = functions.https.onCall(async (data, context) => {
   }
 
   try {
-    // Delete user document from Firestore
+    // Delete user document from Firestore user collection
     const userDoc = admin.firestore().doc(`users/${userId}`);
     await userDoc.delete();
+
+    // Delete user document from admin_users collection
+    const adminUserDoc = admin.firestore().doc(`admin_users/${userId}`);
+    await adminUserDoc.delete();
 
     // Delete user data from Firebase Storage
     const bucket = storage.bucket("gs://bligh-db.appspot.com");
     const userFolder = `users/${userId}`;
-    console.log(userFolder);
-
     await bucket.deleteFiles({
       prefix: userFolder,
     });
 
-    // Finally, delete user from Firebase Auth
+    // Finally, delete the user from Firebase Auth
     await admin.auth().deleteUser(userId);
 
     return {success: true, message: "User deleted successfully."};
@@ -63,7 +65,7 @@ exports.deleteUserAccount = functions.https.onCall(async (data, context) => {
     console.error("Error deleting user:", error);
 
     if (error.code === "auth/user-not-found") {
-      //  case where the user doesn't exist in Firebase Authentication.
+      // Case where the user doesn't exist in Firebase Authentication.
       throw new functions.https.HttpsError("not-found", "User not found.");
     } else {
       // Handle other errors.
