@@ -3,8 +3,8 @@ import Swal from 'sweetalert2';
 import { updateUser } from "../../firebaseConfig/firestore";
 import LoadingScreen from "../LoadingScreen";
 
-const Edit = ({ user, onClose, refreshDetails, details }) => {
-  const id = user.uid;
+const Edit = ({ onClose, refreshDetails, details }) => {
+  const id = details.uid;
   const [formData, setFormData] = useState({
     title: details.title,
     fullName: details.fullName,
@@ -19,10 +19,9 @@ const Edit = ({ user, onClose, refreshDetails, details }) => {
     country: details.country,
     postcode: details.postcode,
   });
-  console.log('user', details.title)
   const [isLoading, setIsLoading] = useState(false);
 
-  if (!user) return null;
+  if (!details) return null;
 
   const handleUpdate = async (e) => {
     e.preventDefault();

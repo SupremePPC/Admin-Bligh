@@ -219,7 +219,7 @@ export default function RegisteredUsers() {
       )}
       {isEditPageOpen && (
         <Edit
-          user={selectedUserForEdit}
+          details={selectedUserForEdit}
           onClose={() => {
             setIsEditPageOpen(false);
             setSelectedUserForEdit(null);
