@@ -46,7 +46,6 @@ export default function EditTermUser({
         setDepositAmount("");
         return;
       }
-      console.log("deposit amount", depositAmount)
 
       const newDeposit = {
         date: getCurrentDate(),
@@ -59,8 +58,6 @@ export default function EditTermUser({
         logo: fixedTerm.logo,
         minAmount: fixedTerm.minAmount,
       }
-      console.log(userId.userId, termId, newDeposit)
-
       await updateTermInUserCollection(userId.userId, termId, newDeposit);
       
       Swal.fire({
