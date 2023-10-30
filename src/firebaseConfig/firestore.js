@@ -1161,7 +1161,7 @@ export const getCashDeposits = async (uid, depositId) => {
 };
 
 // Handle Cash Deposits
-export const handleCashDeposit = async (uid, depositData) => {
+export const addCashDeposit = async (uid, depositData) => {
   try {
     const userAccountPath = doc(db, USERS_COLLECTION, uid, CASH_DEPOSITS);
     const userAccountSnapshot = await getDoc(userAccountPath, depositData);

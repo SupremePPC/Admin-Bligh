@@ -1,13 +1,9 @@
 import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2";
-import { doc, updateDoc, runTransaction } from "firebase/firestore";
 import Header from "./Header";
 import Table from "./Table";
-import Modal from "../CustomsModal";
-import { db } from "../../firebaseConfig/firebase";
 import LoadingScreen from "../LoadingScreen";
-import { getAllTransactions } from "../../firebaseConfig/firestore";
-import EditTransaction from "./Edit";
+import { getCashDeposits, updateCashDeposit, deleteCashDeposits, addCashDeposit  } from "../../firebaseConfig/firestore";
 
 const CashDeposits = () => {
   const [cashDeposits, setCashDeposits] = useState([]);
@@ -22,36 +18,26 @@ const CashDeposits = () => {
   const [statusFilter, setStatusFilter] = useState("All"); // 'All', 'Approved', 'Declined'
 
   // Function to toggle sorting
-  const toggleSort = () => {
+   // Function to toggle sorting
+   const toggleSort = () => {
     setIsSortToggled(!isSortToggled);
   };
 
+  // Function to load cash deposits from Firestore
+  const loadCashDeposits = async () => {
+    setIsLoading(true);
+    try {
+      const deposits = await getCashDeposits(); // Replace with your Firestore function
+      setCashDeposits(deposits);
+    } catch (error) {
+      console.error("Error fetching cash deposits:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const cashDeposits = async () => {
-      try {
-        setIsLoading(true);
-        const allTransactions = await getAllTransactions();
-        if (!allTransactions) {
-          setIsLoading(false);
-          return;
-        }
-
-        const filteredTransactions =
-          statusFilter === "All"
-            ? allTransactions
-            : allTransactions.filter(
-                (transaction) => transaction.status === statusFilter
-              );
-
-        setTransactions(filteredTransactions);
-      } catch (error) {
-        console.error("Error fetching transactions:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    cashDeposits();
+    loadCashDeposits();
   }, [statusFilter]);
 
 
