@@ -4,6 +4,7 @@ import {
   updateBondUser,
   getCurrentDate,
   deleteBondUser,
+  formatNumber,
 } from "../../../firebaseConfig/firestore";
 import "./style.css";
 import Swal from "sweetalert2";
@@ -24,7 +25,7 @@ export default function EditBondModal({
       Swal.fire({
         icon: "error",
         title: "Oops...",
-        text: `Cannot buy less than $${minimumInvestmentAmount}`,
+        text: `Cannot buy less than $${formatNumber(minimumInvestmentAmount)}`,
         showConfirmButton: false,
         timer: 2000,
       });
@@ -130,7 +131,7 @@ export default function EditBondModal({
               </div>
               <div className="maturity_row">
                 <p className="bold_text">Minimum Amount:</p>
-                <span className="reg_text">$ {bond.minimumAmount}</span>
+                <span className="reg_text">$ {formatNumber(bond.minimumAmount)}</span>
               </div>
             </div>
           </div>

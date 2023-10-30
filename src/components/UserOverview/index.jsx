@@ -865,6 +865,9 @@ const UserOverview = () => {
           fixedTerm={fixedTerm}
           setFixedTerm={setFixedTerm}
           userId={user}
+          refreshDetails={() => {
+            fetchSubCollection("fixedTermDeposits", setFixedTerm);}
+          }
         />
       )}
 

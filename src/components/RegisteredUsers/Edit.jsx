@@ -1,29 +1,27 @@
-import { db } from "../../firebaseConfig/firebase";
 import React, { useState } from 'react';
 import Swal from 'sweetalert2';
-import { doc, updateDoc } from 'firebase/firestore';
 import { updateUser } from "../../firebaseConfig/firestore";
 import LoadingScreen from "../LoadingScreen";
 
-const Edit = ({ user, onClose, refreshDetails }) => {
-  const id = user.uid;
+const Edit = ({ onClose, refreshDetails, details }) => {
+  const id = details.uid;
   const [formData, setFormData] = useState({
-    title: user.title,
-    fullName: user.fullName,
-    jointAccount: user.jointAccount,
-    secondaryAccountHolder: user.secondaryAccountHolder,
-    secondaryTitle: user.secondaryTitle,
-    email: user.email,
-    mobile: user.mobilePhone,
-    home: user.homePhone,
-    address: user.address,
-    city: user.city,
-    country: user.country,
-    postcode: user.postcode,
+    title: details.title,
+    fullName: details.fullName,
+    jointAccount: details.jointAccount,
+    secondaryAccountHolder: details.secondaryAccountHolder,
+    secondaryTitle: details.secondaryTitle,
+    email: details.email,
+    mobile: details.mobilePhone,
+    home: details.homePhone,
+    address: details.address,
+    city: details.city,
+    country: details.country,
+    postcode: details.postcode,
   });
   const [isLoading, setIsLoading] = useState(false);
 
-  if (!user) return null;
+  if (!details) return null;
 
   const handleUpdate = async (e) => {
     e.preventDefault();
@@ -83,8 +81,8 @@ const Edit = ({ user, onClose, refreshDetails }) => {
       });
 
       // Close the edit form
-      onClose();
       refreshDetails();
+      onClose();
     } catch (error) {
       console.error('Error updating user:', error);
       Swal.fire({

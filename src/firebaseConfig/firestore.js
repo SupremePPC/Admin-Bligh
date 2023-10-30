@@ -865,7 +865,7 @@ export async function addTermToUserCollection(userId, termData) {
 }
 
 // 7.Function to update term in user's terms subcollection
-export async function updateTermInUserCollection(userId, termData, termId) {
+export async function updateTermInUserCollection(userId, termId, termData) {
   try {
     const userTermsHoldingsPath = collection(
       db,
