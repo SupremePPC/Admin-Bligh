@@ -7,7 +7,7 @@ import {
 } from "react-icons/io5";
 import { CgMenuGridR } from "react-icons/cg";
 import { BiTransfer } from "react-icons/bi";
-import { BsCardChecklist, BsPerson, BsFileEarmarkText } from "react-icons/bs";
+import { BsCardChecklist, BsPerson, BsFileEarmarkText, BsCashCoin } from "react-icons/bs";
 import { CiMoneyCheck1, CiBank } from "react-icons/ci";
 import { PiBriefcase } from "react-icons/pi";
 import { IoMdNotificationsOutline, IoIosLogOut } from "react-icons/io";
@@ -59,6 +59,17 @@ function Sidebar() {
           >
             <BiTransfer fill="#fff" stroke="#fff"  size={20}/>
             {!collapsed && "Transactions Request"}
+          </Link>
+        </li>
+        <li className="menu_list">
+          <Link
+            className={`menu_link ${
+              isActive("/dashboard/cash-deposits") ? "active" : ""
+            }`}
+            to="/dashboard/cash-deposits"
+          >
+            <BsCashCoin fill="#fff" stroke="#fff"  size={20}/>
+            {!collapsed && "Cash Deposits"}
           </Link>
         </li>
         <li className="menu_list">

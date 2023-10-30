@@ -37,6 +37,24 @@ const ADMINUSER_COLLECTION = "admin_users";
 const ADMINDASH_COLLECTION = "admin_users";
 const USERS_COLLECTION = "users";
 
+//Get Current Date
+export function getCurrentDate() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0"); // Month is zero-based
+  const day = String(now.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+//Format Number
+export function formatNumber(number) {
+  return new Intl.NumberFormat("en-US", {
+    style: "decimal",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(number);
+}
+
 export function addAdminUser(uid, fullName, email) {
   // Use the uid directly as the document ID
   return setDoc(doc(db, ADMINUSER_COLLECTION, uid), {
@@ -1122,20 +1140,59 @@ export const getSpecificIpoRequest = async (requestId, uid) => {
   return requestSnapshot.data();
 };
 
-//Get Current Date
-export function getCurrentDate() {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, "0"); // Month is zero-based
-  const day = String(now.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
+const CASH_DEPOSITS = "cashDeposits";
+
+// Function to fetch all the cash deposits
+export const getCashDeposits = async (uid, depositId) => {
+  const cashDepositsQuery = query(
+    collection(db, USERS_COLLECTION, uid, CASH_DEPOSITS, depositId),
+    orderBy("timestamp", "desc")
+  );
+  const querySnapshot = await getDocs(cashDepositsQuery);
+
+  if (querySnapshot.empty) {
+    return null; // Return null if no cash deposits are found
+  }
+
+  return querySnapshot.docs.map((doc) => ({
+    ...doc.data(),
+    id: doc.id,
+  }));
+};
+
+// Handle Cash Deposits
+export const handleCashDeposit = async (uid, depositData) => {
+  try {
+    const userAccountPath = doc(db, USERS_COLLECTION, uid, CASH_DEPOSITS);
+    const userAccountSnapshot = await getDoc(userAccountPath, depositData);
+    const currentAmount = userAccountSnapshot.data().amount;
+    const newAmount = currentAmount + amount;
+    await updateDoc(userAccountPath, { amount: newAmount });
+  } catch (error) {
+    console.error("Error in handleCashDeposit:", error);
+  }
 }
 
-//Format Number
-export function formatNumber(number) {
-  return new Intl.NumberFormat("en-US", {
-    style: "decimal",
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(number);
-}
+// Update a cash deposit
+export const updateCashDeposit = async (uid, depositId, updatedDepositData) => {
+  try {
+    const cashDepositRef = doc(db, USERS_COLLECTION, uid, CASH_DEPOSITS, depositId);
+    
+    // Update the cash deposit document with the new data
+    await updateDoc(cashDepositRef, updatedDepositData);
+  } catch (error) {
+    console.error("Error in updateCashDeposit:", error);
+  }
+};
+
+// Delete a cash deposit
+export const deleteCashDeposit = async (uid, depositId) => {
+  try {
+    const cashDepositRef = doc(db, USERS_COLLECTION, uid, CASH_DEPOSITS, depositId);
+
+    // Delete the cash deposit document
+    await deleteDoc(cashDepositRef);
+  } catch (error) {
+    console.error("Error in deleteCashDeposit:", error);
+  }
+};
