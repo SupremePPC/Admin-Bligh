@@ -169,7 +169,7 @@ const EditCashDeposits = ({
           onChange={(e) => setFormData({ ...formData, status: e.target.value })}
         >
           {/* <option value="Pending">Pending</option> */}
-          <option value="Approved">Cleared</option>
+          <option value="Cleared">Cleared</option>
         </select>
 
         <label htmlFor="date">Date</label>

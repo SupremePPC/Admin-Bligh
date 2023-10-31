@@ -16,7 +16,7 @@ const AddCashDeposits = ({
         amount: 0.0,
         type: 'Deposit',
         depositRef: '',
-        status: 'Pending',
+        status: 'Cleared',
         date: '',
       });
   const [isEditing, setIsEditing] = useState(false);
