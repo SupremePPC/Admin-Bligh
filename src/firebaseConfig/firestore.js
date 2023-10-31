@@ -1191,9 +1191,10 @@ export const addCashDeposit = async (uid, depositData) => {
   try {
     // Reference to the cash deposits collection for the user
     const cashDepositsCollection = collection(db, USERS_COLLECTION, uid, CASH_DEPOSITS);
+    const docRef = await addDoc(cashDepositsCollection, depositData);
+    const docId = docRef.id;
 
-    // Add the new cash deposit to the collection
-    await addDoc(cashDepositsCollection, depositData);
+    return { success: true, id: docId };
   } catch (error) {
     console.error("Error in addCashDeposit:", error);
     throw new Error("Failed to add the cash deposit. Please try again later.");

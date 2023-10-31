@@ -1,11 +1,7 @@
 import React from "react";
+import { formatNumber } from "../../firebaseConfig/firestore";
 
-const CashDepositsTable = ({ cashDeposits, handleEdit, handleDelete }) => {
-  const formatter = new Intl.NumberFormat("en-MT", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: null,
-  });
+const CashDepositsTable = ({ cashDeposits, openEdit, handleDelete }) => {
 
   return (
     <div className="contain-table">
@@ -13,12 +9,13 @@ const CashDepositsTable = ({ cashDeposits, handleEdit, handleDelete }) => {
         <thead>
           <tr>
             <th>No.</th>
+            <th>Name</th>
             <th>Type</th>
             <th>Date</th>
             <th>Amount</th>
             <th>Reference</th>
             <th>Status</th>
-            <th>Actions</th>
+            {/* <th>Actions</th> */}
           </tr>
         </thead>
         <tbody>
@@ -39,25 +36,28 @@ const CashDepositsTable = ({ cashDeposits, handleEdit, handleDelete }) => {
               return (
                 <tr key={cashDeposit.id}>
                   <td>{i + 1}</td>
+                  <td>{cashDeposit.userName}</td>
                   <td>{cashDeposit.type}</td>
                   <td>{formattedDate}</td>
-                  <td>{formatter.format(cashDeposit.amount)}</td>
-                  <td>{cashDeposit.reference}</td>
+                  <td>$ {formatNumber(cashDeposit.amount)}</td>
+                  <td>{cashDeposit.depositRef}</td>
                   <td>{cashDeposit.status}</td>
-                  <td className="text-center">
+                  {/* <td className="text-right">
                     <button
-                      onClick={() => handleEdit(cashDeposit.id)} // Handle edit action
+                      onClick={openEdit} // Handle edit action
                       className="button edit_btn muted-button"
                     >
                       Edit
                     </button>
+                  </td>
+                  <td className="text-left">
                     <button
-                      onClick={() => handleDelete(cashDeposit.id)} // Handle delete action
+                      onClick={() => handleDelete(cashDeposit.id, )} // Handle delete action
                       className="button delete_btn muted-button"
                     >
                       Delete
                     </button>
-                  </td>
+                  </td> */}
                 </tr>
               );
             })

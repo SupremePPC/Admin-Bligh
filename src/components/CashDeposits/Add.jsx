@@ -10,11 +10,13 @@ const AddCashDeposits = ({
   userId,
   onClose,
 }) => {
-  const [formData, setFormData] = useState({
-    amount: 0.0,
-    type: "Deposit",
-    date: "",
-  });
+    const [formData, setFormData] = useState({
+        amount: 0.0,
+        type: 'Deposit',
+        depositRef: '',
+        status: 'Pending',
+        date: '',
+      });
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -22,7 +24,7 @@ const AddCashDeposits = ({
     e.preventDefault();
     setIsLoading(true);
 
-    const { amount, type, date } = formData;
+    const { amount, type, depositRef, status, date } = formData;
 
     if (!amount || !type || !date) {
       setIsLoading(false);
@@ -38,13 +40,16 @@ const AddCashDeposits = ({
     const formattedAmount = parseFloat(amount.replace(/,/g, "")).toFixed(2);
 
     const newCashDeposit = {
-      amount: formattedAmount,
-      type,
-      date,
-    };
+        amount: formattedAmount,
+        type,
+        depositRef,
+        status,
+        date,
+      };
+      console.log(newCashDeposit);
 
     try {
-      const result = await addCashDeposit(userId, newCashDeposit);
+      const result = await addCashDeposit(userId.userId, newCashDeposit);
 
       if (result.success) {
         Swal.fire({
@@ -52,7 +57,7 @@ const AddCashDeposits = ({
           title: "Added!",
           text: "Cash deposit has been added.",
           showConfirmButton: false,
-          timer: 3000,
+          timer: 2000,
         });
 
         // Update the state and form data
@@ -63,8 +68,10 @@ const AddCashDeposits = ({
 
         setFormData({
           amount: 0.0,
-          type: "Deposit",
-          date: "",
+          type: 'Deposit',
+          depositRef: '',
+          status: 'Pending',
+          date: '',
         });
 
         onClose();
@@ -89,83 +96,80 @@ const AddCashDeposits = ({
     <>
       {!isEditing && (
         <div className="small-container">
-          {isLoading ? (
-            <LoadingScreen />
-          ) : (
-            <form onSubmit={handleAdd}>
-              <h1>Add Cash Deposit</h1>
-              <label htmlFor="amount">Amount</label>
-              <CurrencyInput
-                decimalSeparator="."
-                prefix="$"
-                name="amount"
-                placeholder="0.00"
-                defaultValue={0.0}
-                decimalsLimit={2}
-                onValueChange={(value) => {
-                  setFormData((prevState) => ({
-                    ...prevState,
-                    amount: value,
-                  }));
-                }}
-              />
+          {isLoading && <LoadingScreen />}
+          <form onSubmit={handleAdd}>
+            <h1>Add Cash Deposit</h1>
+            <label htmlFor="amount">Amount</label>
+            <CurrencyInput
+              decimalSeparator="."
+              prefix="$"
+              name="amount"
+              placeholder="0.00"
+              defaultValue={0.0}
+              decimalsLimit={2}
+              onValueChange={(value) => {
+                setFormData((prevState) => ({
+                  ...prevState,
+                  amount: value,
+                }));
+              }}
+            />
 
-              <label htmlFor="type">Deposit Type</label>
-              <select
-                id="type"
-                value={formData.type}
-                onChange={(e) =>
-                  setFormData({ ...formData, type: e.target.value })
-                }
-              >
-                <option value="Deposit">Deposit</option>
-                <option value="Withdrawal">Withdrawal</option>
-              </select>
+            <label htmlFor="type">Deposit Type</label>
+            <select
+              id="type"
+              value={formData.type}
+              onChange={(e) =>
+                setFormData({ ...formData, type: e.target.value })
+              }
+            >
+              <option value="Deposit">Deposit</option>
+              <option value="Withdrawal">Withdrawal</option>
+            </select>
 
-              <label htmlFor="reference">Reference</label>
+            <label htmlFor="depositRef">Reference</label>
+            <input
+              name="depositRef"
+              type="text"
+              value={formData.depositRef}
+              onChange={(e) =>
+                setFormData({ ...formData, depositRef: e.target.value })
+              }
+            />
+
+            <label htmlFor="status">Status</label>
+            <select
+              id="status"
+              value={formData.status}
+              onChange={(e) =>
+                setFormData({ ...formData, status: e.target.value })
+              }
+            >
+              <option value="Pending">Pending</option>
+              <option value="Cleared">Cleared</option>
+            </select>
+
+            <label htmlFor="date">Date</label>
+            <input
+              id="date"
+              type="date"
+              value={formData.date}
+              onChange={(e) =>
+                setFormData({ ...formData, date: e.target.value })
+              }
+            />
+
+            <div style={{ marginTop: "30px" }}>
+              <input type="submit" value="Add" />
               <input
-                id="reference"
-                type="text"
-                value={formData.reference}
-                onChange={(e) =>
-                  setFormData({ ...formData, reference: e.target.value })
-                }
+                style={{ marginLeft: "12px" }}
+                className="muted-button"
+                type="button"
+                value="Cancel"
+                onClick={onClose}
               />
-
-              <label htmlFor="status">Status</label>
-                <select
-                    id="status"
-                    value={formData.status}
-                    onChange={(e) =>
-                        setFormData({ ...formData, status: e.target.value })
-                    }
-                >
-                    <option value="Pending">Pending</option>
-                    <option value="Approved">Cleared</option>
-                </select>
-
-              <label htmlFor="date">Date</label>
-              <input
-                id="date"
-                type="date"
-                value={formData.date}
-                onChange={(e) =>
-                  setFormData({ ...formData, date: e.target.value })
-                }
-              />
-
-              <div style={{ marginTop: "30px" }}>
-                <input type="submit" value="Add" />
-                <input
-                  style={{ marginLeft: "12px" }}
-                  className="muted-button"
-                  type="button"
-                  value="Cancel"
-                  onClick={onClose}
-                />
-              </div>
-            </form>
-          )}
+            </div>
+          </form>
         </div>
       )}
       {isEditing && selectedTransaction && (
@@ -181,6 +185,7 @@ const AddCashDeposits = ({
           totalBalance={totalBalance}
           refreshDetails={refreshDetails}
           transactionId={transactionId}
+          openEdit={isEditing}
         />
       )}
     </>

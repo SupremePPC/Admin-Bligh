@@ -3,7 +3,8 @@ import Swal from "sweetalert2";
 import Header from "./Header";
 import Table from "./Table";
 import LoadingScreen from "../LoadingScreen";
-import { getCashDeposits} from "../../firebaseConfig/firestore";
+import { deleteCashDeposit, getCashDeposits } from "../../firebaseConfig/firestore";
+import Modal from "../CustomsModal";
 
 const CashDeposits = () => {
   const [cashDeposits, setCashDeposits] = useState([]);
@@ -12,12 +13,14 @@ const CashDeposits = () => {
   const [depositForEdit, setDepositForEdit] = useState(false);
   const [isSortToggled, setIsSortToggled] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchField, setSearchField] = useState("userName"); // 'userName' or 'amount'
-  const [statusFilter, setStatusFilter] = useState("All"); // 'All', 'Approved', 'Declined'
+  const [searchField, setSearchField] = useState("userName");
+  const [statusFilter, setStatusFilter] = useState("All");
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [selectedDepositId, setSelectedDepositId] = useState(null);
 
   // Function to toggle sorting
-   // Function to toggle sorting
-   const toggleSort = () => {
+  // Function to toggle sorting
+  const toggleSort = () => {
     setIsSortToggled(!isSortToggled);
   };
 
@@ -37,7 +40,6 @@ const CashDeposits = () => {
   useEffect(() => {
     loadCashDeposits();
   }, [statusFilter]);
-
 
   // Function to handle status filtering
   const handleStatusFilter = (status) => {
@@ -81,24 +83,18 @@ const CashDeposits = () => {
     setTransactions(filteredTransactions);
   };
 
-  const handleDelete = (userId) => {
-    setSelectedUserId(userId); // set the user ID you want to delete
-    setIsDeleteModalOpen(true); // open the delete confirmation modal
+  const handleDelete = (depositId) => {
+    setSelectedDepositId(depositId); // set the user ID you want to delete
+    setIsDeleting(true); // open the delete confirmation modal
   };
 
   const confirmDelete = async () => {
     setIsLoading(true);
 
     try {
-      // Initialize the Cloud Function
-      const functionsInstance = getFunctions();
-      const deleteFunction = httpsCallable(
-        functionsInstance,
-        "deleteUserAccount"
-      );
-
+      
       // Call the Cloud Function to delete the user from Firestore and Authentication
-      const result = await deleteFunction({ userId: selectedUserId });
+      const result = await deleteCashDeposit({ depositId: selectedDepositId });
 
       console.log(result.data);
 
@@ -106,7 +102,7 @@ const CashDeposits = () => {
       setUsers((users) => users.filter((user) => user.id !== selectedUserId));
 
       // Close the modal and reset the selected user ID
-      setIsDeleteModalOpen(false);
+      setIsDeleting(false);
       setIsLoading(false);
       setSelectedUserId(null);
 
@@ -149,7 +145,22 @@ const CashDeposits = () => {
 
           <Table
             cashDeposits={cashDeposits}
+            openEdit={isEditPageOpen}
+            handleDelete={handleDelete}
+            // selectedUserId={set}
           />
+
+          {isDeleting && (
+            <Modal
+              isOpen={isDeleting}
+              onClose={() => setIsDeleting(false)}
+              onPositiveAction={confirmDelete}
+              title="Delete Deposit"
+              description="Are you sure you want to delete this deposit?"
+              positiveLabel={"Delete"}
+              negativeLabel={"Cancel"}
+            />
+          )}
         </>
       )}
       {isEditPageOpen && (
@@ -160,6 +171,7 @@ const CashDeposits = () => {
             setDepositForEdit(null);
           }}
           handleDelete={handleDelete}
+          openEdit={isEditPageOpen}
         />
       )}
     </div>

@@ -21,6 +21,8 @@ import {
 import EditIposUser from "../IPOrequests/Modals/EditModal";
 import EditBondModal from "../BondRequestManagement/Modal/EditBondModal";
 import EditTermUser from "../TermRequestManagement/Modal/EditTermModal";
+import AddCashDeposits from "../CashDeposits/Add";
+import EditCashDeposits from "../CashDeposits/Edit";
 
 const UserOverview = () => {
   const user = useParams();
@@ -30,6 +32,7 @@ const UserOverview = () => {
   const [bondsHoldings, setBondsHoldings] = useState([]);
   const [docs, setDocs] = useState([]);
   const [ipos, setIpos] = useState([]);
+  const [cashDeposits, setCashDeposits] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [fixedTerm, setFixedTerm] = useState([]);
   const [selectedDocument, setSelectedDocument] = useState(null);
@@ -136,6 +139,7 @@ const UserOverview = () => {
       fetchSubCollection("bankingDetails", setBankingDetails);
       fetchSubCollection("bondsHoldings", setBondsHoldings);
       fetchSubCollection("transactions", setTransactions);
+      fetchSubCollection("cashDeposits", setCashDeposits);
       fetchSubCollection("fixedTermDeposits", setFixedTerm);
       fetchSubCollection("ipos", setIpos);
       fetchSubCollection("docs", setDocs);
@@ -217,7 +221,9 @@ const UserOverview = () => {
         !modalState.isAddNewIpos &&
         !modalState.isEditIposOpen &&
         !modalState.isAddNewDocumentOpen &&
-        !modalState.isEditDocumentOpen && (
+        !modalState.isEditDocumentOpen &&
+        !modalState.isAddCashDepositOpen &&
+        !modalState.isEditCashDepositOpen && (
           <div className="userOverview_container">
             {/* User Details */}
             {userDetails && (
@@ -448,6 +454,106 @@ const UserOverview = () => {
                 </ul>
               )}
             </div> */}
+
+            {/* Cash Deposits List */}
+            <div className="user_details">
+              <h3>Cash Deposits List</h3>
+              <table className="overview_table">
+                {cashDeposits.length === 0 ? (
+                  <tbody>
+                    <tr>
+                      <td className="no_holding">
+                        This user hasn't made any cash deposits yet.
+                      </td>
+                    </tr>
+                  </tbody>
+                ) : (
+                  <>
+                    <thead>
+                      <tr>
+                        <th className="bold_text">Deposit amount</th>
+                        <th className="bold_text">Withdrawal amount</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(() => {
+                        const deposits = transactions.filter(
+                          (t) => t.type === "Deposit"
+                        );
+                        const withdrawals = transactions.filter(
+                          (t) => t.type === "Withdrawal"
+                        );
+                        const maxLength = Math.max(
+                          deposits.length,
+                          withdrawals.length
+                        );
+                        const rows = [];
+                          console.log(deposits)
+                        for (let i = 0; i < maxLength; i++) {
+                          rows.push(
+                            <tr key={i}>
+                              <td>
+                                {deposits[i] && (
+                                  <div
+                                    onClick={() =>
+                                      handleOpenModal(
+                                        "isEditCashDepositOpen",
+                                        deposits[i]
+                                      )
+                                    }
+                                  >
+                                    <span className="bold_text">
+                                      {deposits[i].status}
+                                    </span>{" "}
+                                    <span className="reg_text">
+                                      ${formatNumber(deposits[i].amount)}
+                                    </span>
+                                    <span> in </span>
+                                    <span className="bold_text">
+                                      {deposits[i].accountType}
+                                    </span>
+                                  </div>
+                                )}
+                              </td>
+                              <td>
+                                {withdrawals[i] && (
+                                  <div
+                                    onClick={() =>
+                                      handleOpenModal(
+                                        "isEditCashDepositOpen",
+                                        withdrawals[i]
+                                      )
+                                    }
+                                  >
+                                    <span className="bold_text">
+                                      {withdrawals[i].status}
+                                    </span>{" "}
+                                    <span className="reg_text">
+                                      ${formatNumber(withdrawals[i].amount)}
+                                    </span>
+                                    <span> in </span>
+                                    <span className="bold_text">
+                                      {withdrawals[i].accountType}
+                                    </span>
+                                  </div>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        }
+
+                        return rows;
+                      })()}
+                    </tbody>
+                  </>
+                )}
+              </table>
+              <div className="dropdown_btn">
+                <button onClick={() => handleOpenModal("isAddCashDepositOpen")}>
+                  Add Cash Deposit
+                </button>
+              </div>
+            </div>
 
             {/* Transactions List */}
             <div className="user_details">
@@ -790,6 +896,38 @@ const UserOverview = () => {
           refreshDetails={() => {
             fetchSubCollection("bankingDetails", setBankingDetails);
           }}
+        />
+      )}
+
+      {modalState.isAddCashDepositOpen && (
+        <AddCashDeposits
+          onClose={() => {
+            handleCloseModal("isAddCashDepositOpen");
+          }}
+          setCashDeposits={setCashDeposits}
+          cashDeposits={cashDeposits}
+          userId={user}
+          refreshDetails={() => {
+            fetchSubCollection("cashDeposits", setCashDeposits);
+          }}
+        />
+      )}
+
+      {modalState.isEditCashDepositOpen && (
+        <EditCashDeposits
+          onClose={() => {
+            handleCloseModal("isEditCashDepositOpen");
+            setSelectedForEdit(null);
+            fetchSubCollection("cashDeposits", setCashDeposits);
+          }}
+          setCashDeposits={setCashDeposits}
+          cashDeposits={selectedForEdit}
+          userId={user}
+          cashDepositId={selectedForEdit.id}
+          refreshDetails={() => {
+            fetchSubCollection("cashDeposits", setCashDeposits);
+          }}
+          openEdit={handleOpenModal("isEditCashDepositOpen")}
         />
       )}
 

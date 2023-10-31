@@ -10,6 +10,7 @@ import CurrencyInput from "react-currency-input-field";
 const EditCashDeposits = ({
   selectedCashDeposit,
   onClose,
+  openEdit,
   totalBalance,
   userId,
   refreshDetails,
@@ -127,80 +128,84 @@ const EditCashDeposits = ({
   };
 
   return (
-    <div className="small-container">
-        {isLoading && <LoadingScreen /> }
-      <form onSubmit={handleUpdate}>
-        <h1>Edit Cash Deposit</h1>
-        <label htmlFor="amount">Amount</label>
-        <CurrencyInput
-          decimalSeparator="."
-          prefix="$"
-          name="amount"
-          placeholder="0.00"
-          value={formData.amount}
-          decimalsLimit={2}
-          onValueChange={(value) => {
-            setFormData((prevState) => ({
-              ...prevState,
-              amount: value,
-            }));
-          }}
-        />
+    <>
+    {openEdit && (
+        <div className="small-container">
+            {isLoading && <LoadingScreen /> }
+        <form onSubmit={handleUpdate}>
+            <h1>Edit Cash Deposit</h1>
+            <label htmlFor="amount">Amount</label>
+            <CurrencyInput
+            decimalSeparator="."
+            prefix="$"
+            name="amount"
+            placeholder="0.00"
+            value={formData.amount}
+            decimalsLimit={2}
+            onValueChange={(value) => {
+                setFormData((prevState) => ({
+                ...prevState,
+                amount: value,
+                }));
+            }}
+            />
 
-        <label htmlFor="type">Deposit Type</label>
-        <select
-          id="type"
-          value={formData.type}
-          onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-        >
-          <option value="Deposit">Deposit</option>
-          <option value="Withdrawal">Withdrawal</option>
-        </select>
+            <label htmlFor="type">Deposit Type</label>
+            <select
+            id="type"
+            value={formData.type}
+            onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+            >
+            <option value="Deposit">Deposit</option>
+            <option value="Withdrawal">Withdrawal</option>
+            </select>
 
-        <label htmlFor="reference">Reference</label>
-        <input
-          id="reference"
-          type="text"
-          value={formData.reference}
-          onChange={(e) =>
-            setFormData({ ...formData, reference: e.target.value })
-          }
-        />
+            <label htmlFor="reference">Reference</label>
+            <input
+            id="reference"
+            type="text"
+            value={formData.reference}
+            onChange={(e) =>
+                setFormData({ ...formData, reference: e.target.value })
+            }
+            />
 
-        <label htmlFor="status">Status</label>
-        <select
-          id="status"
-          value={formData.status}
-          onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-        >
-          <option value="Pending">Pending</option>
-          <option value="Approved">Cleared</option>
-        </select>
+            <label htmlFor="status">Status</label>
+            <select
+            id="status"
+            value={formData.status}
+            onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+            >
+            <option value="Pending">Pending</option>
+            <option value="Approved">Cleared</option>
+            </select>
 
-        <label htmlFor="date">Date</label>
-        <input
-          id="date"
-          type="date"
-          value={formData.date}
-          onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-        />
+            <label htmlFor="date">Date</label>
+            <input
+            id="date"
+            type="date"
+            value={formData.date}
+            onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+            />
 
-        <div style={{ marginTop: "30px" }}>
-          <input type="submit" value="Save" />
-          <input
-            type="button"
-            value="Delete"
-            onClick={handleDelete}
-            className="reject_btn"
-          />
-          <input
-            type="button"
-            value="Cancel"
-            onClick={onClose}
-          />
+            <div style={{ marginTop: "30px" }}>
+            <input type="submit" value="Save" />
+            <input
+                type="button"
+                value="Delete"
+                onClick={handleDelete}
+                className="reject_btn"
+            />
+            <input
+                type="button"
+                value="Cancel"
+                onClick={onClose}
+            />
+            </div>
+        </form>
         </div>
-      </form>
-    </div>
+    )}
+    </>
   );
 };
 
