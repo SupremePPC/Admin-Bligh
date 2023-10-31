@@ -3,14 +3,12 @@ import Swal from "sweetalert2";
 import Header from "./Header";
 import Table from "./Table";
 import LoadingScreen from "../LoadingScreen";
-import { getCashDeposits, updateCashDeposit, deleteCashDeposits, addCashDeposit  } from "../../firebaseConfig/firestore";
+import { getCashDeposits} from "../../firebaseConfig/firestore";
 
 const CashDeposits = () => {
   const [cashDeposits, setCashDeposits] = useState([]);
-  const [selectedCashDeposits, setSelectedCashDeposits] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isEditPageOpen, setIsEditPageOpen] = useState(false);
-  const [isAdding, setIsAdding] = useState(false);
   const [depositForEdit, setDepositForEdit] = useState(false);
   const [isSortToggled, setIsSortToggled] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -137,7 +135,6 @@ const CashDeposits = () => {
       {!isEditPageOpen && (
         <>
           <Header
-            setIsAdding={setIsAdding}
             isSortToggled={isSortToggled}
             toggleSort={toggleSort}
             onSort={handleSort}

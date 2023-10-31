@@ -32,6 +32,7 @@ import {
   getDownloadURL,
   uploadBytesResumable,
 } from "firebase/storage";
+import { all } from "axios";
 
 const ADMINUSER_COLLECTION = "admin_users";
 const ADMINDASH_COLLECTION = "admin_users";
@@ -1143,56 +1144,86 @@ export const getSpecificIpoRequest = async (requestId, uid) => {
 const CASH_DEPOSITS = "cashDeposits";
 
 // Function to fetch all the cash deposits
-export const getCashDeposits = async (uid, depositId) => {
-  const cashDepositsQuery = query(
-    collection(db, USERS_COLLECTION, uid, CASH_DEPOSITS, depositId),
-    orderBy("timestamp", "desc")
-  );
-  const querySnapshot = await getDocs(cashDepositsQuery);
+export async function getCashDeposits() {
+  try {
+    // Get a reference to the USERS_COLLECTION
+    const usersRef = collection(db, USERS_COLLECTION);
+    const usersSnapshot = await getDocs(usersRef);
 
-  if (querySnapshot.empty) {
-    return null; // Return null if no cash deposits are found
+    let allCashDeposits = [];
+
+    // Iterate over each user and get their cash deposits
+    for (const userDoc of usersSnapshot.docs) {
+      const userUid = userDoc.id;
+      const userName = userDoc.data().fullName;
+      const cashDepositsRef = collection(
+        db,
+        USERS_COLLECTION,
+        userUid,
+        CASH_DEPOSITS,
+      );
+      const cashDepositsSnapshot = await getDocs(cashDepositsRef);
+
+      const userCashDeposits = cashDepositsSnapshot.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+        userId: userUid,
+        userName: userName,
+      }));
+
+      allCashDeposits = [...allCashDeposits, ...userCashDeposits];
+    }
+
+    // If there are no cash deposits at all, return null
+    if (allCashDeposits.length === 0 || allCashDeposits === null) {
+      return null;
+    }
+
+    return allCashDeposits;
+  } catch (error) {
+    console.error("Error in getCashDeposits:", error);
+    throw new Error("Failed to retrieve cash deposits. Please try again later.");
   }
-
-  return querySnapshot.docs.map((doc) => ({
-    ...doc.data(),
-    id: doc.id,
-  }));
-};
+}
 
 // Handle Cash Deposits
 export const addCashDeposit = async (uid, depositData) => {
   try {
-    const userAccountPath = doc(db, USERS_COLLECTION, uid, CASH_DEPOSITS);
-    const userAccountSnapshot = await getDoc(userAccountPath, depositData);
-    const currentAmount = userAccountSnapshot.data().amount;
-    const newAmount = currentAmount + amount;
-    await updateDoc(userAccountPath, { amount: newAmount });
+    // Reference to the cash deposits collection for the user
+    const cashDepositsCollection = collection(db, USERS_COLLECTION, uid, CASH_DEPOSITS);
+
+    // Add the new cash deposit to the collection
+    await addDoc(cashDepositsCollection, depositData);
   } catch (error) {
-    console.error("Error in handleCashDeposit:", error);
+    console.error("Error in addCashDeposit:", error);
+    throw new Error("Failed to add the cash deposit. Please try again later.");
   }
-}
+};
 
 // Update a cash deposit
 export const updateCashDeposit = async (uid, depositId, updatedDepositData) => {
   try {
+    // Reference to the specific cash deposit document
     const cashDepositRef = doc(db, USERS_COLLECTION, uid, CASH_DEPOSITS, depositId);
-    
+
     // Update the cash deposit document with the new data
     await updateDoc(cashDepositRef, updatedDepositData);
   } catch (error) {
     console.error("Error in updateCashDeposit:", error);
+    throw new Error("Failed to update the cash deposit. Please try again later.");
   }
 };
 
 // Delete a cash deposit
 export const deleteCashDeposit = async (uid, depositId) => {
   try {
+    // Reference to the specific cash deposit document
     const cashDepositRef = doc(db, USERS_COLLECTION, uid, CASH_DEPOSITS, depositId);
 
     // Delete the cash deposit document
     await deleteDoc(cashDepositRef);
   } catch (error) {
     console.error("Error in deleteCashDeposit:", error);
+    throw new Error("Failed to delete the cash deposit. Please try again later.");
   }
 };

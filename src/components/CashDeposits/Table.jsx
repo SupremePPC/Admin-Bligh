@@ -22,7 +22,11 @@ const CashDepositsTable = ({ cashDeposits, handleEdit, handleDelete }) => {
           </tr>
         </thead>
         <tbody>
-          {cashDeposits.length > 0 ? (
+          {cashDeposits === null || cashDeposits.length === 0 ? ( // Check if cashDeposits is null or empty
+            <tr>
+              <td colSpan={7}>No Cash Deposits</td>
+            </tr>
+          ) : (
             cashDeposits.map((cashDeposit, i) => {
               const dateObject = cashDeposit.date.toDate
                 ? cashDeposit.date.toDate()
@@ -57,10 +61,6 @@ const CashDepositsTable = ({ cashDeposits, handleEdit, handleDelete }) => {
                 </tr>
               );
             })
-          ) : (
-            <tr>
-              <td colSpan={7}>No Cash Deposits</td>
-            </tr>
           )}
         </tbody>
       </table>
