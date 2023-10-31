@@ -240,6 +240,13 @@ img {
   color: var(--white) !important;
 }
 
+.button_wrap{
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-top: 1em;
+}
+
 .btn_wrap {
   display: flex;
   gap: 1.5rem;

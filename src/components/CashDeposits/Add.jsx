@@ -3,12 +3,14 @@ import Swal from "sweetalert2";
 import CurrencyInput from "react-currency-input-field";
 import { addCashDeposit } from "../../firebaseConfig/firestore";
 import LoadingScreen from "../LoadingScreen";
+import EditCashDeposits from "./Edit";
 
 const AddCashDeposits = ({
   cashDeposits,
   setCashDeposits,
   userId,
   onClose,
+  refreshDetails
 }) => {
     const [formData, setFormData] = useState({
         amount: 0.0,
@@ -19,6 +21,8 @@ const AddCashDeposits = ({
       });
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedCashDeposit, setSelectedCashDeposit] = useState(null);
+  
 
   const handleAdd = async (e) => {
     e.preventDefault();
@@ -46,7 +50,6 @@ const AddCashDeposits = ({
         status,
         date,
       };
-      console.log(newCashDeposit);
 
     try {
       const result = await addCashDeposit(userId.userId, newCashDeposit);
@@ -74,7 +77,8 @@ const AddCashDeposits = ({
           date: '',
         });
 
-        onClose();
+        setSelectedCashDeposit({ ...newCashDeposit, id: result.id });
+        setIsEditing(true);
       } else {
         throw new Error("Failed to add cash deposit.");
       }
@@ -145,7 +149,7 @@ const AddCashDeposits = ({
                 setFormData({ ...formData, status: e.target.value })
               }
             >
-              <option value="Pending">Pending</option>
+              {/* <option value="Pending">Pending</option> */}
               <option value="Cleared">Cleared</option>
             </select>
 
@@ -172,20 +176,16 @@ const AddCashDeposits = ({
           </form>
         </div>
       )}
-      {isEditing && selectedTransaction && (
-        <EditTransaction
+      {isEditing && (
+        <EditCashDeposits
           onClose={() => {
             setIsEditing(false);
-            setSelectedTransaction(null);
+            setSelectedCashDeposit(null);
             onClose();
           }}
-          selectedTransaction={selectedTransaction}
-          setTransactions={setTransactions}
+          selectedCashDeposit={selectedCashDeposit}
           userId={userId}
-          totalBalance={totalBalance}
           refreshDetails={refreshDetails}
-          transactionId={transactionId}
-          openEdit={isEditing}
         />
       )}
     </>

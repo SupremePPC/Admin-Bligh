@@ -471,16 +471,16 @@ const UserOverview = () => {
                   <>
                     <thead>
                       <tr>
-                        <th className="bold_text">Deposit amount</th>
-                        <th className="bold_text">Withdrawal amount</th>
+                        <th className="bold_text">Deposit </th>
+                        <th className="bold_text">Withdrawal</th>
                       </tr>
                     </thead>
                     <tbody>
                       {(() => {
-                        const deposits = transactions.filter(
+                        const deposits = cashDeposits.filter(
                           (t) => t.type === "Deposit"
                         );
-                        const withdrawals = transactions.filter(
+                        const withdrawals = cashDeposits.filter(
                           (t) => t.type === "Withdrawal"
                         );
                         const maxLength = Math.max(
@@ -488,7 +488,6 @@ const UserOverview = () => {
                           withdrawals.length
                         );
                         const rows = [];
-                          console.log(deposits)
                         for (let i = 0; i < maxLength; i++) {
                           rows.push(
                             <tr key={i}>
@@ -508,9 +507,10 @@ const UserOverview = () => {
                                     <span className="reg_text">
                                       ${formatNumber(deposits[i].amount)}
                                     </span>
-                                    <span> in </span>
+                                    {" "}
+                                    {/* <span> in </span> */}
                                     <span className="bold_text">
-                                      {deposits[i].accountType}
+                                      {deposits[i].depositRef}
                                     </span>
                                   </div>
                                 )}
@@ -917,17 +917,14 @@ const UserOverview = () => {
         <EditCashDeposits
           onClose={() => {
             handleCloseModal("isEditCashDepositOpen");
-            setSelectedForEdit(null);
-            fetchSubCollection("cashDeposits", setCashDeposits);
           }}
           setCashDeposits={setCashDeposits}
-          cashDeposits={selectedForEdit}
+          selectedCashDeposit={selectedForEdit}
           userId={user}
-          cashDepositId={selectedForEdit.id}
+          // cashDepositId={selectedForEdit.id}
           refreshDetails={() => {
             fetchSubCollection("cashDeposits", setCashDeposits);
           }}
-          openEdit={handleOpenModal("isEditCashDepositOpen")}
         />
       )}
 
