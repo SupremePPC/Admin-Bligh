@@ -10,25 +10,25 @@ const AddCashDeposits = ({
   setCashDeposits,
   userId,
   onClose,
-  refreshDetails
+  refreshDetails,
 }) => {
-    const [formData, setFormData] = useState({
-        amount: 0.0,
-        type: 'Deposit',
-        depositRef: '',
-        status: 'Cleared',
-        date: '',
-      });
+  const [formData, setFormData] = useState({
+    amount: 0.0,
+    type: "Deposit",
+    depositRef: "",
+    status: "Cleared",
+    depositType: "",
+    date: "",
+  });
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedCashDeposit, setSelectedCashDeposit] = useState(null);
-  
 
   const handleAdd = async (e) => {
     e.preventDefault();
     setIsLoading(true);
 
-    const { amount, type, depositRef, status, date } = formData;
+    const { amount, type, depositRef, depositType, status, date } = formData;
 
     if (!amount || !type || !date) {
       setIsLoading(false);
@@ -44,12 +44,13 @@ const AddCashDeposits = ({
     const formattedAmount = parseFloat(amount.replace(/,/g, "")).toFixed(2);
 
     const newCashDeposit = {
-        amount: formattedAmount,
-        type,
-        depositRef,
-        status,
-        date,
-      };
+      amount: formattedAmount,
+      type: "Deposit",
+      depositType,
+      depositRef,
+      status,
+      date,
+    };
 
     try {
       const result = await addCashDeposit(userId.userId, newCashDeposit);
@@ -71,10 +72,11 @@ const AddCashDeposits = ({
 
         setFormData({
           amount: 0.0,
-          type: 'Deposit',
-          depositRef: '',
-          status: 'Pending',
-          date: '',
+          depositType,
+          type: "Deposit",
+          depositRef: "",
+          status: "Cleared",
+          date: "",
         });
 
         setSelectedCashDeposit({ ...newCashDeposit, id: result.id });
@@ -119,17 +121,15 @@ const AddCashDeposits = ({
               }}
             />
 
-            <label htmlFor="type">Deposit Type</label>
-            <select
-              id="type"
-              value={formData.type}
+            <label htmlFor="depositType">Type</label>
+            <input
+              type="text"
+              name="depositType"
+              value={formData.depositType}
               onChange={(e) =>
-                setFormData({ ...formData, type: e.target.value })
+                setFormData({ ...formData, depositType: e.target.value })
               }
-            >
-              <option value="Deposit">Deposit</option>
-              <option value="Withdrawal">Withdrawal</option>
-            </select>
+            />
 
             <label htmlFor="depositRef">Reference</label>
             <input
