@@ -24,6 +24,7 @@ import TermsRequestTable from "./components/TermRequestManagement";
 import IposRequestPage from "./components/IPOrequests";
 import SettingsPage from "./components/Settings";
 import "./App.css";
+import CashDeposits from "./components/CashDeposits";
 
 function App() {
   const { loadingAuthState } = useAuth();
@@ -54,6 +55,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <UserRequestDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="cash-deposits"
+                element={
+                  <ProtectedRoute>
+                    <CashDeposits />
                   </ProtectedRoute>
                 }
               />

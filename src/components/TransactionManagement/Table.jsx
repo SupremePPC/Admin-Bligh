@@ -3,7 +3,7 @@ import React from "react";
 const Table = ({ transactions, handleApproval, handleRejection }) => {
   const formatter = new Intl.NumberFormat("en-MT", {
     style: "currency",
-    currency: "EUR",
+    currency: "USD",
     minimumFractionDigits: null,
   });
 
