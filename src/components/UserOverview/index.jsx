@@ -263,7 +263,7 @@ const UserOverview = () => {
                         {userDetails.secondaryAccountHolder}
                       </span>
                     </div>
-                  </>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+                  </>
                 )}
                 <div className="text_wrap">
                   <p className="bold_text">Email :</p>
@@ -471,8 +471,11 @@ const UserOverview = () => {
                   <>
                     <thead>
                       <tr>
-                        <th className="bold_text">Deposit </th>
-                        <th className="bold_text">Withdrawal</th>
+                        <th className="bold_text">Amount</th>
+                        <th className="bold_text">Type</th>
+                        <th className="bold_text">Reference</th>
+                        <th className="bold_text">Status </th>
+                        <th className="bold_text">Date</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -480,64 +483,24 @@ const UserOverview = () => {
                         const deposits = cashDeposits.filter(
                           (t) => t.type === "Deposit"
                         );
-                        const withdrawals = cashDeposits.filter(
-                          (t) => t.type === "Withdrawal"
-                        );
-                        const maxLength = Math.max(
-                          deposits.length,
-                          withdrawals.length
-                        );
+                        const maxLength = Math.max(deposits.length);
                         const rows = [];
                         for (let i = 0; i < maxLength; i++) {
                           rows.push(
-                            <tr key={i}>
-                              <td>
-                                {deposits[i] && (
-                                  <div
-                                    onClick={() =>
-                                      handleOpenModal(
-                                        "isEditCashDepositOpen",
-                                        deposits[i]
-                                      )
-                                    }
-                                  >
-                                    <span className="bold_text">
-                                      {deposits[i].status}
-                                    </span>{" "}
-                                    <span className="reg_text">
-                                      ${formatNumber(deposits[i].amount)}
-                                    </span>
-                                    {" "}
-                                    {/* <span> in </span> */}
-                                    <span className="bold_text">
-                                      {deposits[i].depositRef}
-                                    </span>
-                                  </div>
-                                )}
-                              </td>
-                              <td>
-                                {withdrawals[i] && (
-                                  <div
-                                    onClick={() =>
-                                      handleOpenModal(
-                                        "isEditCashDepositOpen",
-                                        withdrawals[i]
-                                      )
-                                    }
-                                  >
-                                    <span className="bold_text">
-                                      {withdrawals[i].status}
-                                    </span>{" "}
-                                    <span className="reg_text">
-                                      ${formatNumber(withdrawals[i].amount)}
-                                    </span>
-                                    <span> in </span>
-                                    <span className="bold_text">
-                                      {withdrawals[i].accountType}
-                                    </span>
-                                  </div>
-                                )}
-                              </td>
+                            <tr
+                              key={i}
+                              onClick={() =>
+                                handleOpenModal(
+                                  "isEditCashDepositOpen",
+                                  deposits[i]
+                                )
+                              }
+                            >
+                              <td>$ {formatNumber(deposits[i].amount)}</td>
+                              <td>{deposits[i].depositType}</td>
+                              <td>{deposits[i].depositRef}</td>
+                              <td>{deposits[i].status}</td>
+                              <td>{deposits[i].date}</td>
                             </tr>
                           );
                         }
@@ -769,11 +732,13 @@ const UserOverview = () => {
                               <td>{term[i].interestRate} %</td>
                               <td>
                                 ${" "}
-                                {formatNumber(calculateMaturityAmount(
-                                  term[i].principalAmount,
-                                  term[i].interestRate,
-                                  term[i].term
-                                ) )|| 0}
+                                {formatNumber(
+                                  calculateMaturityAmount(
+                                    term[i].principalAmount,
+                                    term[i].interestRate,
+                                    term[i].term
+                                  )
+                                ) || 0}
                               </td>
                             </tr>
                           );
@@ -1001,8 +966,8 @@ const UserOverview = () => {
           setFixedTerm={setFixedTerm}
           userId={user}
           refreshDetails={() => {
-            fetchSubCollection("fixedTermDeposits", setFixedTerm);}
-          }
+            fetchSubCollection("fixedTermDeposits", setFixedTerm);
+          }}
         />
       )}
 

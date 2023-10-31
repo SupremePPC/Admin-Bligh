@@ -17,13 +17,14 @@ const EditCashDeposits = ({
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     amount: selectedCashDeposit.amount,
+    depositType: selectedCashDeposit.depositType,
     type: selectedCashDeposit.type,
     depositRef: selectedCashDeposit.depositRef,
     status: selectedCashDeposit.status,
     date: selectedCashDeposit.date,
   });
 
-  const { amount, type, depositRef, status, date } = formData;
+  const { amount, type, depositRef, depositType, status, date } = formData;
 
   const handleDelete = async (e) => {
     e.preventDefault();
@@ -69,6 +70,7 @@ const EditCashDeposits = ({
     const updatedCashDeposit = {
       amount: parseFloat(amount), // Convert the amount to a float
       type,
+      depositType,
       depositRef,
       status,
       date,
@@ -77,17 +79,12 @@ const EditCashDeposits = ({
     if (
       amount === selectedCashDeposit.amount &&
       type === selectedCashDeposit.type &&
+      depositType === selectedCashDeposit.depositType &&
       depositRef === selectedCashDeposit.depositRef &&
       status === selectedCashDeposit.status &&
       date === selectedCashDeposit.date
     ) {
-      Swal.fire({
-        icon: "warning",
-        title: "No changes were made",
-        text: "No updates were performed as no changes were detected.",
-        showConfirmButton: false,
-        timer: 2000,
-      });
+      return;
     }
 
     try {
@@ -142,15 +139,15 @@ const EditCashDeposits = ({
           }}
         />
 
-        <label htmlFor="type">Deposit Type</label>
-        <select
-          id="type"
-          value={formData.type}
-          onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-        >
-          <option value="Deposit">Deposit</option>
-          <option value="Withdrawal">Withdrawal</option>
-        </select>
+        <label htmlFor="depositType"> Type</label>
+        <input
+          type="text"
+          name="depositType"
+          value={formData.depositType}
+          onChange={(e) =>
+            setFormData({ ...formData, depositType: e.target.value })
+          }
+        />
 
         <label htmlFor="depositRef">Reference</label>
         <input
@@ -181,8 +178,11 @@ const EditCashDeposits = ({
         />
 
         <div className="button_wrap">
-          <input type="submit" value="Save" 
-            style={{ background: "green", borderColor: "green" }}/>
+          <input
+            type="submit"
+            value="Save"
+            style={{ background: "green", borderColor: "green" }}
+          />
           <input
             type="button"
             value="Delete"
