@@ -19,6 +19,7 @@ import {
   doc,
   getDoc,
   getDocs,
+  onSnapshot,
   query,
   setDoc,
   updateDoc,
@@ -32,7 +33,6 @@ import {
   getDownloadURL,
   uploadBytesResumable,
 } from "firebase/storage";
-import { all } from "axios";
 
 const ADMINUSER_COLLECTION = "admin_users";
 const ADMINDASH_COLLECTION = "admin_users";
@@ -1160,7 +1160,7 @@ export async function getCashDeposits() {
         db,
         USERS_COLLECTION,
         userUid,
-        CASH_DEPOSITS,
+        CASH_DEPOSITS
       );
       const cashDepositsSnapshot = await getDocs(cashDepositsRef);
 
@@ -1182,7 +1182,9 @@ export async function getCashDeposits() {
     return allCashDeposits;
   } catch (error) {
     console.error("Error in getCashDeposits:", error);
-    throw new Error("Failed to retrieve cash deposits. Please try again later.");
+    throw new Error(
+      "Failed to retrieve cash deposits. Please try again later."
+    );
   }
 }
 
@@ -1190,7 +1192,12 @@ export async function getCashDeposits() {
 export const addCashDeposit = async (uid, depositData) => {
   try {
     // Reference to the cash deposits collection for the user
-    const cashDepositsCollection = collection(db, USERS_COLLECTION, uid, CASH_DEPOSITS);
+    const cashDepositsCollection = collection(
+      db,
+      USERS_COLLECTION,
+      uid,
+      CASH_DEPOSITS
+    );
     const docRef = await addDoc(cashDepositsCollection, depositData);
     const docId = docRef.id;
 
@@ -1205,13 +1212,23 @@ export const addCashDeposit = async (uid, depositData) => {
 export const updateCashDeposit = async (uid, depositId, updatedDepositData) => {
   try {
     // Reference to the specific cash deposit document
-    const cashDepositRef = doc(db, USERS_COLLECTION, uid, CASH_DEPOSITS, depositId);
+    const cashDepositRef = doc(
+      db,
+      USERS_COLLECTION,
+      uid,
+      CASH_DEPOSITS,
+      depositId
+    );
 
     // Update the cash deposit document with the new data
-    await updateDoc(cashDepositRef, updatedDepositData);
+    await setDoc(cashDepositRef, updatedDepositData, { merge: true });
+
+    return { success: true, id: depositId };
   } catch (error) {
     console.error("Error in updateCashDeposit:", error);
-    throw new Error("Failed to update the cash deposit. Please try again later.");
+    throw new Error(
+      "Failed to update the cash deposit. Please try again later."
+    );
   }
 };
 
@@ -1219,12 +1236,142 @@ export const updateCashDeposit = async (uid, depositId, updatedDepositData) => {
 export const deleteCashDeposit = async (uid, depositId) => {
   try {
     // Reference to the specific cash deposit document
-    const cashDepositRef = doc(db, USERS_COLLECTION, uid, CASH_DEPOSITS, depositId);
+    const cashDepositRef = doc(
+      db,
+      USERS_COLLECTION,
+      uid,
+      CASH_DEPOSITS,
+      depositId
+    );
 
     // Delete the cash deposit document
     await deleteDoc(cashDepositRef);
   } catch (error) {
     console.error("Error in deleteCashDeposit:", error);
-    throw new Error("Failed to delete the cash deposit. Please try again later.");
+    throw new Error(
+      "Failed to delete the cash deposit. Please try again later."
+    );
   }
 };
+
+// Function to fetch all the notifications
+export async function getNotifications() {
+  try {
+    const adminDashRef = collection(db, "admin_users");
+    const notificationDashRef = doc(adminDashRef, "notifications");
+
+    const loginNotificationsRef = collection(
+      notificationDashRef,
+      "loginNotifications"
+    );
+    const logoutNotificationsRef = collection(
+      notificationDashRef,
+      "logoutNotifications"
+    );
+
+    const loginNotificationsSnapshot = await getDocs(loginNotificationsRef);
+    const logoutNotificationsSnapshot = await getDocs(logoutNotificationsRef);
+
+    const loginNotifications = loginNotificationsSnapshot.docs.map((doc) => ({
+      ...doc.data(),
+      id: doc.id,
+    }));
+
+    const logoutNotifications = logoutNotificationsSnapshot.docs.map((doc) => ({
+      ...doc.data(),
+      id: doc.id,
+    }));
+
+    const allNotifications = [...loginNotifications, ...logoutNotifications];
+
+    return allNotifications;
+  } catch (error) {
+    console.error("Error in getNotifications: ", error);
+    return [];
+  }
+}
+
+//sum up all notfications
+export async function SumNotifications(setNotifications) {
+  const adminDashRef = collection(db, "admin_users");
+  const notificationDashRef = doc(adminDashRef, "notifications");
+
+  const loginNotificationsRef = collection(
+    notificationDashRef,
+    "loginNotifications"
+  );
+  const logoutNotificationsRef = collection(
+    notificationDashRef,
+    "logoutNotifications"
+  );
+
+  let loginNotificationsCount = 0;
+  let logoutNotificationsCount = 0;
+
+  // Listen to changes in the loginNotifications collection
+  onSnapshot(loginNotificationsRef, (querySnapshot) => {
+    loginNotificationsCount = querySnapshot.size;
+    // Update your state here
+    setNotifications(loginNotificationsCount + logoutNotificationsCount);
+  });
+
+  // Listen to changes in the logoutNotifications collection
+  onSnapshot(logoutNotificationsRef, (querySnapshot) => {
+    logoutNotificationsCount = querySnapshot.size;
+    // Update your state here
+    setNotifications(loginNotificationsCount + logoutNotificationsCount);
+  });
+}
+
+
+
+// Function to delete all notifications
+export async function deleteAllNotifications() {
+  const adminDashRef = collection(db, "admin_users");
+  const notificationDashRef = doc(adminDashRef, "notifications");
+
+  const loginNotificationsRef = collection(
+    notificationDashRef,
+    "loginNotifications"
+  );
+  const logoutNotificationsRef = collection(
+    notificationDashRef,
+    "logoutNotifications"
+  );
+
+  try {
+    // Delete all documents in the 'loginNotifications' sub-collection
+    const loginQuerySnapshot = await getDocs(loginNotificationsRef);
+    loginQuerySnapshot.forEach(async (doc) => {
+      await deleteDoc(doc.ref);
+    });
+
+    // Delete all documents in the 'logoutNotifications' sub-collection
+    const logoutQuerySnapshot = await getDocs(logoutNotificationsRef);
+    logoutQuerySnapshot.forEach(async (doc) => {
+      await deleteDoc(doc.ref);
+    });
+
+  } catch (error) {
+    console.error("Error deleting all notifications:", error);
+  }
+}
+
+export async function deleteNotification(notificationId, isLoggedIn) {
+  const adminDashRef = collection(db, "admin_users");
+  const notificationDashRef = doc(adminDashRef, "notifications");
+  const subCollectionName = isLoggedIn
+    ? "loginNotifications"
+    : "logoutNotifications";
+
+  const notificationsRef = collection(notificationDashRef, subCollectionName);
+
+  try {
+    // Delete the notification document by its ID
+    await deleteDoc(doc(notificationsRef, notificationId));
+  } catch (error) {
+    console.error("Error deleting the notification:", error);
+  }
+}
+
+
