@@ -66,44 +66,46 @@ const EditCashDeposits = ({
   const handleUpdate = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-
+  
     const updatedCashDeposit = {
-      amount: parseFloat(amount), // Convert the amount to a float
+      amount: parseFloat(amount),
       type,
       depositType,
       depositRef,
       status,
       date,
     };
-
-    if (
-      amount === selectedCashDeposit.amount &&
-      type === selectedCashDeposit.type &&
-      depositType === selectedCashDeposit.depositType &&
-      depositRef === selectedCashDeposit.depositRef &&
-      status === selectedCashDeposit.status &&
-      date === selectedCashDeposit.date
-    ) {
-      return;
-    }
-
+  
     try {
       const result = await updateCashDeposit(
         userId.userId,
         selectedCashDeposit.id,
         updatedCashDeposit
       );
+  
+      if (result.success) {
+        Swal.fire({
+          icon: "success",
+          title: "Updated!",
+          text: "Cash deposit has been updated.",
+          showConfirmButton: false,
+          timer: 2000,
+        });
 
-      Swal.fire({
-        icon: "success",
-        title: "Updated!",
-        text: "Cash deposit has been updated.",
-        showConfirmButton: false,
-        timer: 2000,
-      });
-
-      refreshDetails();
-      onClose();
+        setFormData({
+          amount: 0.0,
+          depositType,
+          type: "Deposit",
+          depositRef: "",
+          status: "Cleared",
+          date: "",
+        });
+  
+        refreshDetails();
+        onClose();
+      } else {
+        throw new Error("Failed to update the cash deposit.");
+      }
     } catch (error) {
       console.error(error);
       Swal.fire({
@@ -117,6 +119,7 @@ const EditCashDeposits = ({
       setIsLoading(false);
     }
   };
+  
 
   return (
     <div className="small-container">

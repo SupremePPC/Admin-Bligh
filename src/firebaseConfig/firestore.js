@@ -1208,12 +1208,15 @@ export const updateCashDeposit = async (uid, depositId, updatedDepositData) => {
     const cashDepositRef = doc(db, USERS_COLLECTION, uid, CASH_DEPOSITS, depositId);
 
     // Update the cash deposit document with the new data
-    await updateDoc(cashDepositRef, updatedDepositData);
+    await setDoc(cashDepositRef, updatedDepositData, { merge: true });
+
+    return { success: true, id: depositId };
   } catch (error) {
     console.error("Error in updateCashDeposit:", error);
     throw new Error("Failed to update the cash deposit. Please try again later.");
   }
 };
+
 
 // Delete a cash deposit
 export const deleteCashDeposit = async (uid, depositId) => {
