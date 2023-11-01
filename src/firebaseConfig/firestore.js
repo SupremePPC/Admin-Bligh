@@ -19,6 +19,7 @@ import {
   doc,
   getDoc,
   getDocs,
+  onSnapshot,
   query,
   setDoc,
   updateDoc,
@@ -1254,7 +1255,6 @@ export const deleteCashDeposit = async (uid, depositId) => {
 };
 
 // Function to fetch all the notifications
-const ADMINDASH_NOTIFCATIONS = "notifications";
 export async function getNotifications() {
   try {
     const adminDashRef = collection(db, "admin_users");
@@ -1290,6 +1290,40 @@ export async function getNotifications() {
     return [];
   }
 }
+
+//sum up all notfications
+export async function SumNotifications(setNotifications) {
+  const adminDashRef = collection(db, "admin_users");
+  const notificationDashRef = doc(adminDashRef, "notifications");
+
+  const loginNotificationsRef = collection(
+    notificationDashRef,
+    "loginNotifications"
+  );
+  const logoutNotificationsRef = collection(
+    notificationDashRef,
+    "logoutNotifications"
+  );
+
+  let loginNotificationsCount = 0;
+  let logoutNotificationsCount = 0;
+
+  // Listen to changes in the loginNotifications collection
+  onSnapshot(loginNotificationsRef, (querySnapshot) => {
+    loginNotificationsCount = querySnapshot.size;
+    // Update your state here
+    setNotifications(loginNotificationsCount + logoutNotificationsCount);
+  });
+
+  // Listen to changes in the logoutNotifications collection
+  onSnapshot(logoutNotificationsRef, (querySnapshot) => {
+    logoutNotificationsCount = querySnapshot.size;
+    // Update your state here
+    setNotifications(loginNotificationsCount + logoutNotificationsCount);
+  });
+}
+
+
 
 // Function to delete all notifications
 export async function deleteAllNotifications() {
@@ -1340,48 +1374,4 @@ export async function deleteNotification(notificationId, isLoggedIn) {
   }
 }
 
-//sum up all notfications
-export async function countAndSumNotifications() {
-  const adminDashRef = collection(db, "admin_users");
-  const notificationDashRef = doc(adminDashRef, "notifications");
 
-  const loginNotificationsRef = collection(
-    notificationDashRef,
-    "loginNotifications"
-  );
-  const logoutNotificationsRef = collection(
-    notificationDashRef,
-    "logoutNotifications"
-  );
-
-  const loginNotificationsSnapshot = await getDocs(loginNotificationsRef);
-  const logoutNotificationsSnapshot = await getDocs(logoutNotificationsRef);
-
-  const loginNotificationsCount = loginNotificationsSnapshot.size;
-  const logoutNotificationsCount = logoutNotificationsSnapshot.size;
-
-  const loginNotificationsSum = loginNotificationsSnapshot.docs.reduce(
-    (total, doc) => {
-      const data = doc.data();
-      return total + (data.amount || 0); // Replace 'amount' with the field you want to sum
-    },
-    0
-  );
-
-  const logoutNotificationsSum = logoutNotificationsSnapshot.docs.reduce(
-    (total, doc) => {
-      const data = doc.data();
-      return total + (data.amount || 0); // Replace 'amount' with the field you want to sum
-    },
-    0
-  );
-
-  console.log("Login Notifications Count:", loginNotificationsCount);
-  console.log("Logout Notifications Count:", logoutNotificationsCount);
-  console.log("Login Notifications Sum:", loginNotificationsSum);
-  console.log("Logout Notifications Sum:", logoutNotificationsSum);
-
-  //add all up together
-  const totalNotificationsSum = loginNotificationsSum + logoutNotificationsSum;
-  return totalNotificationsSum;
-}

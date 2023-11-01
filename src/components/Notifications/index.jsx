@@ -104,7 +104,10 @@ const NotificationPage = () => {
       {isLoading && <LoadingScreen />}
       <div className="notification_page">
         <div className="notifications_container">
-          {notifications.map((notification, index) => (
+          {notifications.length === 0 || notifications === undefined ? (
+            <small>No notifications available.</small>
+          ) : 
+          ( notifications.map((notification, index) => (
             <div className="notification_wrap" key={index}>
               <p className="notification">
                 {notification.message} at {notification.time} on{" "}
@@ -121,10 +124,7 @@ const NotificationPage = () => {
                 />
               </div>
             </div>
-          ))}
-          {notifications.length === 0 && (
-            <small>No notifications available.</small>
-          )}
+          )))}
         </div>
       </div>
     </div>

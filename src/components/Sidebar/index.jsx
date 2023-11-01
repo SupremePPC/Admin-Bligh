@@ -1,5 +1,5 @@
 // Sidebar.js
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   IoHomeOutline,
@@ -14,6 +14,7 @@ import { IoMdNotificationsOutline, IoIosLogOut } from "react-icons/io";
 import { getAuth } from "firebase/auth";
 import Modal from "../CustomsModal";
 import "./style.css";
+import { SumNotifications } from "../../firebaseConfig/firestore";
 
 function Sidebar() {
   const [collapsed, setCollapsed] = useState(true);
@@ -21,8 +22,21 @@ function Sidebar() {
   const isActive = (path) => location.pathname === path;
   const [isLoading, setIsLoading] = useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+  const [notifications, setNotifications] = useState(0);
   const navigate = useNavigate();
   const auth = getAuth();
+
+  useEffect(() => {
+    // Call SumNotifications and pass the setter function for notifications
+   SumNotifications(setNotifications);
+  }, []);
+
+  const notificationBadge = (
+    <span className="notification_badge">
+      <IoMdNotificationsOutline  size={20}/>
+      <p className="notification_count">{notifications}</p>
+    </span>
+  );
 
   return (
     <aside className={`sidebar ${collapsed ? "collapsed" : ""}`}>
@@ -135,7 +149,7 @@ function Sidebar() {
             }`}
             to="/dashboard/notifications"
           >
-            <IoMdNotificationsOutline  size={20}/>
+           {notificationBadge}
             {!collapsed && "Notifications"}
           </Link>
         </li>
