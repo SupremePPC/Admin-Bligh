@@ -14,11 +14,30 @@
     flex-direction: column;
   }
   
-  .notification {
+  .notification_wrap {
     padding: 15px;
     margin-bottom: 10px;
     border-radius: 5px;
     box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .notification_wrap:hover {
+    box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+  }
+
+  .notification_wrap .notification{
+    font-size: var(--font-sixteen);
+    font-weight: 400;
+  }
+
+  .notification_wrap .delete_btn{
+    cursor: pointer;
+    color: #ff0000;
+    font-size: var(--font-twentyFour);
   }
 
   .notifications_container small{
