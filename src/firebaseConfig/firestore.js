@@ -1159,7 +1159,7 @@ export async function getCashDeposits() {
         db,
         USERS_COLLECTION,
         userUid,
-        CASH_DEPOSITS,
+        CASH_DEPOSITS
       );
       const cashDepositsSnapshot = await getDocs(cashDepositsRef);
 
@@ -1181,7 +1181,9 @@ export async function getCashDeposits() {
     return allCashDeposits;
   } catch (error) {
     console.error("Error in getCashDeposits:", error);
-    throw new Error("Failed to retrieve cash deposits. Please try again later.");
+    throw new Error(
+      "Failed to retrieve cash deposits. Please try again later."
+    );
   }
 }
 
@@ -1189,7 +1191,12 @@ export async function getCashDeposits() {
 export const addCashDeposit = async (uid, depositData) => {
   try {
     // Reference to the cash deposits collection for the user
-    const cashDepositsCollection = collection(db, USERS_COLLECTION, uid, CASH_DEPOSITS);
+    const cashDepositsCollection = collection(
+      db,
+      USERS_COLLECTION,
+      uid,
+      CASH_DEPOSITS
+    );
     const docRef = await addDoc(cashDepositsCollection, depositData);
     const docId = docRef.id;
 
@@ -1204,7 +1211,13 @@ export const addCashDeposit = async (uid, depositData) => {
 export const updateCashDeposit = async (uid, depositId, updatedDepositData) => {
   try {
     // Reference to the specific cash deposit document
-    const cashDepositRef = doc(db, USERS_COLLECTION, uid, CASH_DEPOSITS, depositId);
+    const cashDepositRef = doc(
+      db,
+      USERS_COLLECTION,
+      uid,
+      CASH_DEPOSITS,
+      depositId
+    );
 
     // Update the cash deposit document with the new data
     await setDoc(cashDepositRef, updatedDepositData, { merge: true });
@@ -1212,7 +1225,9 @@ export const updateCashDeposit = async (uid, depositId, updatedDepositData) => {
     return { success: true, id: depositId };
   } catch (error) {
     console.error("Error in updateCashDeposit:", error);
-    throw new Error("Failed to update the cash deposit. Please try again later.");
+    throw new Error(
+      "Failed to update the cash deposit. Please try again later."
+    );
   }
 };
 
@@ -1220,13 +1235,21 @@ export const updateCashDeposit = async (uid, depositId, updatedDepositData) => {
 export const deleteCashDeposit = async (uid, depositId) => {
   try {
     // Reference to the specific cash deposit document
-    const cashDepositRef = doc(db, USERS_COLLECTION, uid, CASH_DEPOSITS, depositId);
+    const cashDepositRef = doc(
+      db,
+      USERS_COLLECTION,
+      uid,
+      CASH_DEPOSITS,
+      depositId
+    );
 
     // Delete the cash deposit document
     await deleteDoc(cashDepositRef);
   } catch (error) {
     console.error("Error in deleteCashDeposit:", error);
-    throw new Error("Failed to delete the cash deposit. Please try again later.");
+    throw new Error(
+      "Failed to delete the cash deposit. Please try again later."
+    );
   }
 };
 
@@ -1234,11 +1257,17 @@ export const deleteCashDeposit = async (uid, depositId) => {
 const ADMINDASH_NOTIFCATIONS = "notifications";
 export async function getNotifications() {
   try {
-    const adminDashRef = collection(db, 'admin_users');
-    const notificationDashRef = doc(adminDashRef, 'notifications');
+    const adminDashRef = collection(db, "admin_users");
+    const notificationDashRef = doc(adminDashRef, "notifications");
 
-    const loginNotificationsRef = collection(notificationDashRef, 'loginNotifications');
-    const logoutNotificationsRef = collection(notificationDashRef, 'logoutNotifications');
+    const loginNotificationsRef = collection(
+      notificationDashRef,
+      "loginNotifications"
+    );
+    const logoutNotificationsRef = collection(
+      notificationDashRef,
+      "logoutNotifications"
+    );
 
     const loginNotificationsSnapshot = await getDocs(loginNotificationsRef);
     const logoutNotificationsSnapshot = await getDocs(logoutNotificationsRef);
@@ -1257,18 +1286,24 @@ export async function getNotifications() {
 
     return allNotifications;
   } catch (error) {
-    console.error('Error in getNotifications: ', error);
+    console.error("Error in getNotifications: ", error);
     return [];
   }
 }
 
 // Function to delete all notifications
 export async function deleteAllNotifications() {
-  const adminDashRef = collection(db, 'admin_users');
-  const notificationDashRef = doc(adminDashRef, 'notifications');
+  const adminDashRef = collection(db, "admin_users");
+  const notificationDashRef = doc(adminDashRef, "notifications");
 
-  const loginNotificationsRef = collection(notificationDashRef, 'loginNotifications');
-  const logoutNotificationsRef = collection(notificationDashRef, 'logoutNotifications');
+  const loginNotificationsRef = collection(
+    notificationDashRef,
+    "loginNotifications"
+  );
+  const logoutNotificationsRef = collection(
+    notificationDashRef,
+    "logoutNotifications"
+  );
 
   try {
     // Delete all documents in the 'loginNotifications' sub-collection
@@ -1283,36 +1318,41 @@ export async function deleteAllNotifications() {
       await deleteDoc(doc.ref);
     });
 
-    console.log('All notifications deleted successfully');
   } catch (error) {
-    console.error('Error deleting all notifications:', error);
+    console.error("Error deleting all notifications:", error);
   }
 }
 
 export async function deleteNotification(notificationId, isLoggedIn) {
-  const adminDashRef = collection(db, 'admin_users');
-  const notificationDashRef = doc(adminDashRef, 'notifications');
-  const subCollectionName = isLoggedIn ? 'loginNotifications' : 'logoutNotifications';
+  const adminDashRef = collection(db, "admin_users");
+  const notificationDashRef = doc(adminDashRef, "notifications");
+  const subCollectionName = isLoggedIn
+    ? "loginNotifications"
+    : "logoutNotifications";
 
   const notificationsRef = collection(notificationDashRef, subCollectionName);
 
   try {
     // Delete the notification document by its ID
     await deleteDoc(doc(notificationsRef, notificationId));
-    console.log('Notification deleted successfully');
   } catch (error) {
-    console.error('Error deleting the notification:', error);
+    console.error("Error deleting the notification:", error);
   }
 }
 
-
 //sum up all notfications
 export async function countAndSumNotifications() {
-  const adminDashRef = collection(db, 'admin_users');
-  const notificationDashRef = doc(adminDashRef, 'notifications');
+  const adminDashRef = collection(db, "admin_users");
+  const notificationDashRef = doc(adminDashRef, "notifications");
 
-  const loginNotificationsRef = collection(notificationDashRef, 'loginNotifications');
-  const logoutNotificationsRef = collection(notificationDashRef, 'logoutNotifications');
+  const loginNotificationsRef = collection(
+    notificationDashRef,
+    "loginNotifications"
+  );
+  const logoutNotificationsRef = collection(
+    notificationDashRef,
+    "logoutNotifications"
+  );
 
   const loginNotificationsSnapshot = await getDocs(loginNotificationsRef);
   const logoutNotificationsSnapshot = await getDocs(logoutNotificationsRef);
@@ -1320,20 +1360,26 @@ export async function countAndSumNotifications() {
   const loginNotificationsCount = loginNotificationsSnapshot.size;
   const logoutNotificationsCount = logoutNotificationsSnapshot.size;
 
-  const loginNotificationsSum = loginNotificationsSnapshot.docs.reduce((total, doc) => {
-    const data = doc.data();
-    return total + (data.amount || 0); // Replace 'amount' with the field you want to sum
-  }, 0);
+  const loginNotificationsSum = loginNotificationsSnapshot.docs.reduce(
+    (total, doc) => {
+      const data = doc.data();
+      return total + (data.amount || 0); // Replace 'amount' with the field you want to sum
+    },
+    0
+  );
 
-  const logoutNotificationsSum = logoutNotificationsSnapshot.docs.reduce((total, doc) => {
-    const data = doc.data();
-    return total + (data.amount || 0); // Replace 'amount' with the field you want to sum
-  }, 0);
+  const logoutNotificationsSum = logoutNotificationsSnapshot.docs.reduce(
+    (total, doc) => {
+      const data = doc.data();
+      return total + (data.amount || 0); // Replace 'amount' with the field you want to sum
+    },
+    0
+  );
 
-  console.log('Login Notifications Count:', loginNotificationsCount);
-  console.log('Logout Notifications Count:', logoutNotificationsCount);
-  console.log('Login Notifications Sum:', loginNotificationsSum);
-  console.log('Logout Notifications Sum:', logoutNotificationsSum);
+  console.log("Login Notifications Count:", loginNotificationsCount);
+  console.log("Logout Notifications Count:", logoutNotificationsCount);
+  console.log("Login Notifications Sum:", loginNotificationsSum);
+  console.log("Logout Notifications Sum:", logoutNotificationsSum);
 
   //add all up together
   const totalNotificationsSum = loginNotificationsSum + logoutNotificationsSum;

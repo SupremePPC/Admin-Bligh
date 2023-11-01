@@ -100,7 +100,7 @@ const NotificationPage = () => {
 
   return (
     <div className="container">
-      <Header handleDeleteAll={handleDeleteAll} />
+      <Header handleDeleteAll={handleDeleteAll} notifications={notifications} />
       {isLoading && <LoadingScreen />}
       <div className="notification_page">
         <div className="notifications_container">

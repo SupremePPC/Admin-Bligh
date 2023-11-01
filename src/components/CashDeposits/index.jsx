@@ -140,6 +140,7 @@ const CashDeposits = () => {
             setSearchField={setSearchField}
             handleFilter={handleStatusFilter}
             statusFilter={statusFilter}
+            cashDeposits={cashDeposits}
           />
           {isLoading && <LoadingScreen />}
 
