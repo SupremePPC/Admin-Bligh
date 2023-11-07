@@ -1,12 +1,13 @@
 import React, {useState} from 'react';
 import { FaAngleRight } from "react-icons/fa";
+import { BiImageAdd } from "react-icons/bi";
 import { RiLockPasswordFill } from "react-icons/ri";
-
-import "./style.css";
 import ChangePassword from '../ChangePassword';
+import ChangeLogo from '../ChangeLogo';
+import "./style.css";
 
 export default function SettingsPage() {
-    const [activeTab, setActiveTab] = useState("changePassword");
+    const [activeTab, setActiveTab] = useState("changeLogo");
 
     const handleTabClick = (tab) => {
       setActiveTab(tab);
@@ -18,18 +19,18 @@ export default function SettingsPage() {
       <div className="account_layout">
         <div className="account_menu">
           <ul className="account_list">
-            {/* <li
+            <li
               className={`account_item ${
-                activeTab === "accountInfo" ? "active" : ""
+                activeTab === "changeLogo" ? "active" : ""
               }`}
-              onClick={() => handleTabClick("accountInfo")}
+              onClick={() => handleTabClick("changeLogo")}
             >
               <span>
-                <GoPencil />
-                Account Information
+                <BiImageAdd />
+                Change Logo
               </span>
               <FaAngleRight size={20}/>
-            </li> */}
+            </li>
             <li
               className={`account_item ${
                 activeTab === "changePassword" ? "active" : ""
@@ -71,8 +72,8 @@ export default function SettingsPage() {
   
         <div className="content__area">
           {activeTab === "changePassword" && <ChangePasswordTab />}
-          {/* {activeTab === "accountInfo" && <AccountInfoTab />}
-          {activeTab === "documents" && <DocumentsTab />}
+          {activeTab === "changeLogo" && <ChangeLogo />}
+          {/* {activeTab === "documents" && <DocumentsTab />}
           {activeTab === "bankingDetails" && <BankingDetailsTab />} */}
         </div>
       </div>
