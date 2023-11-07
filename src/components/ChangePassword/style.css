@@ -96,3 +96,10 @@
         padding: 1rem;
     }
 }
+
+
+@media screen and (min-width: 768px) {
+    .changePassword_section{
+        padding: 0.65rem 2rem;
+    }
+}
