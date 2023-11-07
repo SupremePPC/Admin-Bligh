@@ -21,7 +21,6 @@ export default function ChangeLogo() {
     if (!logo) {
       return;
     }
-    console.log("Uploading logo...");
     const storageRef = ref(storage, "gs://bligh-db.appspot.com/logo/"); 
     const uploadTask = uploadBytes(storageRef, logo);
     setIsLoading(true);
@@ -37,7 +36,6 @@ export default function ChangeLogo() {
           showConfirmButton: false,
           timer: 1500,
         });
-        console.log("Logo uploaded successfully");
       })
       .catch((error) => {
         console.error("Error uploading logo:", error);
@@ -48,10 +46,9 @@ export default function ChangeLogo() {
           showConfirmButton: false,
           timer: 1500,
         });
-        console.log("Error uploading logo:", error);
       })
       .finally(() => {
-        setIsLoading(false); // Make sure to reset isLoading after upload completes or fails
+        setIsLoading(false); 
       });
   };
   
@@ -77,6 +74,7 @@ export default function ChangeLogo() {
           />
         </div>
 
+        {/* show logo available */}
         <div className="changeLogo_form_group">
           {logo && <img src={URL.createObjectURL(logo)} alt="Selected Logo" />}
         </div>

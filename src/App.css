@@ -173,7 +173,6 @@ img {
 
 .container {
   width: calc(100% - 50px);
-  /* max-width: 1200px; */
   margin-left: auto;
   margin-right: auto;
   margin-right: 0;
@@ -186,9 +185,6 @@ img {
   z-index: 0;
   height: 100vh;
   overflow: scroll;
-}
-
-.section_header {
 }
 
 .header_title {

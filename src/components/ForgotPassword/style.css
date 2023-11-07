@@ -94,20 +94,8 @@
 }
 
 .input_field:focus,
-.input_field:active {
-  border: none;
-  border-bottom: 1.5px solid var(--secondary);
-}
-
-.input_field:focus,
 .input_field:active::placeholder {
   color: var(--secondary);
-}
-
-.input_field:focus,
-.input_field:active {
-  border: none;
-  border-bottom: 1.5px solid var(--secondary);
 }
 
 .reset_btn {
