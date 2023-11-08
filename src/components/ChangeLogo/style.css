@@ -1,4 +1,4 @@
-.changePassword_section{
+.changeLogo_section{
     padding: 2rem;
     display: flex;
     flex-direction: column;
@@ -6,7 +6,7 @@
 }
 
 
-.changePassword_section .section_header{
+.changeLogo_section .section_header{
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -20,15 +20,14 @@
     color: var(--black);
 }
 
-.changePassword_section .changePassword_form{
+.changeLogo_section .changeLogo_form{
     display: grid;
-    /* gap: 1rem; */
     max-width: 500px;
     width: 100%;
 }
 
-.password_label{
-    border-left: solid 3px #FF4F68;
+.logo_label{
+    border-left: solid 3px var(--secondary);
     font-size: 14px;
     color: #72777a;
     font-size: var(--font-sixteen);
@@ -39,20 +38,21 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    /* gap: 1rem; */
 }
 
-.changePassword_form_group{
+.changeLogo_form_group{
     display: flex;
     flex-direction: column;
     width: 100%;
+    margin-bottom: 1rem;
 }
 
-.input_group .label{
+.changeLogo_form_group .label{
  font-size: var(--font-sixteen);
+ margin: 0;
 }
 
-.changePassword_form_group .input_group .input_field{
+.input_group .input_field{
     display: block;
     width: 100%;
     padding: 0.375rem 0.75rem;
@@ -70,9 +70,20 @@
     transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
 }
 
-.changePassword_form_group .input_group .input_field:focus, .changePassword_form_group .input_group .input_field:active{
-    border: 1px solid #ced4da;
+.input_group .input_field:focus{
     outline: none;
+    border: 1px solid var(--secondary);
+}
+
+.changeLogo_logo{
+    width: 100px;
+    height: 100px;
+    margin: .5rem 0;
+    border: 1px solid aliceblue;
+}
+
+.changeLogo_form img{
+    width: 100%;
 }
 
 .submit_btn{
@@ -92,14 +103,14 @@
 }
 
 @media screen and (max-width: 500px) {
-    .changePassword_section{
+    .changeLogo_section{
         padding: 1rem;
     }
 }
 
-
 @media screen and (min-width: 768px) {
-    .changePassword_section{
+    .changeLogo_section{
         padding: 0.65rem 2rem;
     }
+    
 }

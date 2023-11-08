@@ -15,7 +15,6 @@ export default function ChangePassword () {
     return regex.test(pass);
   };
 
-
   const handleChangePassword = (e) => {
     e.preventDefault();
 

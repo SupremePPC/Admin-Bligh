@@ -4,47 +4,66 @@ import {
   browserSessionPersistence,
   setPersistence,
   signInWithEmailAndPassword,
-  onAuthStateChanged
 } from "firebase/auth";
-import { doc, getDoc } from 'firebase/firestore';
-import { auth, db } from "../../firebaseConfig/firebase";
-import logo from "../../assets/white_logo.png";
+import { getDownloadURL, ref } from "firebase/storage";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth, storage } from "../../firebaseConfig/firebase";
 import "./style.css";
 
 const Login = () => {
+  const [user, setUser] = useState(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [whiteLogoUrl, setWhiteLogoUrl] = useState('');
   const navigate = useNavigate();
 
+  const fetchWhiteLogo = async () => {
+    const storageRef = ref(storage, 'gs://bligh-db.appspot.com/logos/whiteLogo/');
+    try {
+      const logoUrl = await getDownloadURL(storageRef);
+      setWhiteLogoUrl(logoUrl);
+    } catch (error) {
+      console.error('Error fetching whiteLogo:', error);
+      // Handle errors as needed
+    }
+  };
+
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    // Fetch the whiteLogo when the component mounts
+    fetchWhiteLogo();
+  }, []);
+
+  const validatePassword = (pass) => {
+    const regex = /^(?=.*\d)[\w]{8,}$/;
+    return regex.test(pass);
+  };
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        // Check if user has admin role
-        const userRef = doc(db, 'adminUsers', user.uid);
-        const userSnap = await getDoc(userRef);
-        if (userSnap.exists() && userSnap.data().role === 'admin') {
-          navigate("/dashboard");
-        } else {
-          setError("Unauthorized access!");
-        }
+        navigate("/dashboard");
+      } else {
+        // User is not authenticated
+        console.error("No user logged in");
       }
     });
 
-    return () => unsubscribe();
-  }, [auth, navigate]);
+    return () => unsubscribe(); // Cleanup listener on component unmount
+  }, [auth]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-
+    
     try {
       await setPersistence(auth, browserSessionPersistence);
-      await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
       setIsLoading(false);
-      // Navigation happens in useEffect after verifying admin role
-
+      navigate("/dashboard");
+      
     } catch (error) {
       console.error("Error during login:", error);
       setError(error.message);
@@ -58,7 +77,7 @@ const Login = () => {
   return (
     <section className="login_container">
       <div className="login_form">
-        <img src={logo} alt="Logo" className="logo" />
+        <img src={whiteLogoUrl} alt="Logo" className="logo" />
         <div className="header">
           <h1 className="title">Sign In</h1>
           <p className="subtitle">
@@ -91,7 +110,7 @@ const Login = () => {
           </div>
           {error && <p className="error_msg">{error}</p>}
           {isLoading ? (
-            <button className="signin_btn" type="submit" disabled>
+            <button className="signin_btn" type="submit">
               <div className="spinner"></div>
             </button>
           ) : (
@@ -99,6 +118,8 @@ const Login = () => {
               Sign In
             </button>
           )}
+
+         
         </form>
       </div>
     </section>

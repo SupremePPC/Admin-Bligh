@@ -1,5 +1,8 @@
 .account_layout{
     margin: 1rem auto;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
 }
 
 .account_menu{
@@ -16,10 +19,11 @@
 }
 
 .account_item{
-    /* margin-bottom: 1rem; */
+    margin-bottom: 1rem;
     cursor: pointer;
     display: flex;
     justify-content: space-between;
+    align-items: center;
     width: 100%;
 }
 
@@ -40,3 +44,8 @@
     gap: .5rem;
 }
 
+@media screen and (min-width: 768px) {
+    .account_layout{
+        flex-direction: row;
+    }
+}

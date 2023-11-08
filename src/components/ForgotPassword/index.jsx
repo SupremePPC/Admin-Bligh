@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { sendPasswordResetEmail } from 'firebase/auth';
-import logo from '../../assets/white_logo.png';
-import { auth } from '../../firebaseConfig/firebase';
+import { getDownloadURL, ref } from "firebase/storage";
+import { auth, storage } from "../../firebaseConfig/firebase";
 import './style.css';
 
 export default function ForgotPassword () {
@@ -10,7 +10,24 @@ export default function ForgotPassword () {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [whiteLogoUrl, setWhiteLogo] = useState('');
   const navigate = useNavigate();
+
+  const fetchWhiteLogo = async () => {
+    const storageRef = ref(storage, 'gs://bligh-db.appspot.com/logos/whiteLogo/');
+    try {
+      const logoUrl = await getDownloadURL(storageRef);
+      setWhiteLogo(logoUrl);
+    } catch (error) {
+      console.error('Error fetching whiteLogo:', error);
+      // Handle errors as needed
+    }
+  };
+
+  useEffect(() => {
+    // Fetch the whiteLogo when the component mounts
+    fetchWhiteLogo();
+  }, []);
 
   const handleResetPassword = (e) => {
     e.preventDefault();
@@ -38,7 +55,7 @@ export default function ForgotPassword () {
   return (
     <section className="forgotPassword_page">
       <div className="forgotPassword_form">
-        <img src={logo} alt="Logo" className="logo" />
+        <img src={whiteLogoUrl} alt="Logo" className="logo" />
         <div className="header">
           <h1 className="title">Forgot Password</h1>
           <p className="subtitle">
