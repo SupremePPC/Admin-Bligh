@@ -15,7 +15,7 @@
   max-width: 430px;
   height: 100%;
   max-height: 460px;
-  background-color: var(--tertiary);
+  background-color: var(--primary);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -26,8 +26,8 @@
 }
 
 .forgotPassword_form .logo {
-  width: 4rem;
-  height: 4rem;
+  width: 35%;
+  margin-bottom: 1rem;
 }
 
 .forgotPassword_page .header {

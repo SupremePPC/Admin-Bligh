@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import logo from "../../assets/white_logo.png";
 import {
   browserSessionPersistence,
   setPersistence,
   signInWithEmailAndPassword,
 } from "firebase/auth";
+import { getDownloadURL, ref } from "firebase/storage";
 import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "../../firebaseConfig/firebase";
+import { auth, storage } from "../../firebaseConfig/firebase";
 import "./style.css";
 
 const Login = () => {
@@ -16,7 +16,24 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [whiteLogoUrl, setWhiteLogoUrl] = useState('');
   const navigate = useNavigate();
+
+  const fetchWhiteLogo = async () => {
+    const storageRef = ref(storage, 'gs://bligh-db.appspot.com/logos/whiteLogo/');
+    try {
+      const logoUrl = await getDownloadURL(storageRef);
+      setWhiteLogoUrl(logoUrl);
+    } catch (error) {
+      console.error('Error fetching whiteLogo:', error);
+      // Handle errors as needed
+    }
+  };
+
+  useEffect(() => {
+    // Fetch the whiteLogo when the component mounts
+    fetchWhiteLogo();
+  }, []);
 
   const validatePassword = (pass) => {
     const regex = /^(?=.*\d)[\w]{8,}$/;
@@ -60,7 +77,7 @@ const Login = () => {
   return (
     <section className="login_container">
       <div className="login_form">
-        <img src={logo} alt="Logo" className="logo" />
+        <img src={whiteLogoUrl} alt="Logo" className="logo" />
         <div className="header">
           <h1 className="title">Sign In</h1>
           <p className="subtitle">

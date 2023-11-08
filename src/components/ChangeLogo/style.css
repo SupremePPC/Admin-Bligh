@@ -22,7 +22,6 @@
 
 .changeLogo_section .changeLogo_form{
     display: grid;
-    /* gap: 1rem; */
     max-width: 500px;
     width: 100%;
 }
@@ -39,19 +38,18 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    /* gap: 1rem; */
 }
 
 .changeLogo_form_group{
     display: flex;
     flex-direction: column;
     width: 100%;
-    max-width: 300px;
     margin-bottom: 1rem;
 }
 
-.input_group .label{
+.changeLogo_form_group .label{
  font-size: var(--font-sixteen);
+ margin: 0;
 }
 
 .input_group .input_field{
@@ -75,6 +73,17 @@
 .input_group .input_field:focus{
     outline: none;
     border: 1px solid var(--secondary);
+}
+
+.changeLogo_logo{
+    width: 100px;
+    height: 100px;
+    margin: .5rem 0;
+    border: 1px solid aliceblue;
+}
+
+.changeLogo_form img{
+    width: 100%;
 }
 
 .submit_btn{
