@@ -1375,3 +1375,33 @@ export async function deleteNotification(notificationId, isLoggedIn) {
 }
 
 
+// Function to fetch the password policy setting from Firestore
+export const fetchPasswordPolicySetting = async () => {
+  try {
+    const docRef = doc(db, 'adminUsers', 'strongPasswordPolicy');
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const isStrong = docSnap.data().isTrue;
+      return isStrong;
+    } else {;
+      return true; 
+    }
+  } catch (error) {
+    console.error('Error fetching password policy: ', error);
+    throw error;
+  }
+};
+
+// Function to update the password policy setting in Firestore
+export const updatePasswordPolicySetting = async (newValue) => {
+  try {
+    const docRef = doc(db, 'adminUsers', 'strongPasswordPolicy');
+    await updateDoc(docRef, {
+      isTrue: newValue,
+    });
+  } catch (error) {
+    console.error('Error updating password policy: ', error);
+    throw error;
+  }
+};
