@@ -1255,7 +1255,7 @@ export const deleteCashDeposit = async (uid, depositId) => {
 };
 
 // Function to fetch all the notifications
-export async function getNotifications() {
+export async function getLoginNotifications() {
   try {
     const adminDashRef = collection(db, "admin_users");
     const notificationDashRef = doc(adminDashRef, "notifications");
@@ -1286,7 +1286,7 @@ export async function getNotifications() {
 
     return allNotifications;
   } catch (error) {
-    console.error("Error in getNotifications: ", error);
+    console.error("Error in getLoginNotifications: ", error);
     return [];
   }
 }
@@ -1322,8 +1322,6 @@ export async function SumNotifications(setNotifications) {
     setNotifications(loginNotificationsCount + logoutNotificationsCount);
   });
 }
-
-
 
 // Function to delete all notifications
 export async function deleteAllNotifications() {

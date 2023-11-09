@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from "react";
 import {
-  listenToUserLoginStatus,
-  getNotifications,
+  getLoginNotifications,
   deleteAllNotifications,
   deleteNotification,
 } from "../../firebaseConfig/firestore";
 import Header from "./Header";
 import { MdCancel } from "react-icons/md";
 import { useParams } from "react-router-dom";
-import { doc, getDoc, collection, getDocs } from "firebase/firestore";
-import { db } from "../../firebaseConfig/firebase";
 import Swal from "sweetalert2";
 import LoadingScreen from "../LoadingScreen";
 import "./style.css";
@@ -23,7 +20,7 @@ const NotificationPage = () => {
     setIsLoading(true);
     try {
       // Fetch notifications for the specified user (userId) and set them in the component's state
-      const userNotifications = await getNotifications();
+      const userNotifications = await getLoginNotifications();
       setNotifications(userNotifications);
     } catch (error) {
       console.error("Failed to fetch notifications:", error);
@@ -93,6 +90,43 @@ const NotificationPage = () => {
     }
   };
 
+  function getHumanReadableTimestamp(timestamp) {
+    if (!timestamp) {
+      return 'Invalid timestamp';
+    }
+  
+    const now = new Date();
+    const timestampDate = timestamp.toDate(); // Convert Firestore Timestamp to JavaScript Date
+  
+    const diff = now - timestampDate;
+  
+    const seconds = Math.floor(diff / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+  
+    if (days >= 2) {
+      // More than 2 days, show the month and time
+      const options = { month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+      return timestampDate.toLocaleDateString(undefined, options);
+    } else if (days >= 1) {
+      // Yesterday
+      const options = { hour: '2-digit', minute: '2-digit' };
+      return `Yesterday at ${timestampDate.toLocaleTimeString(undefined, options)}`;
+    } else if (hours >= 1) {
+      // Hours ago
+      return `${hours} ${hours === 1 ? 'hour' : 'hours'} ago`;
+    } else if (minutes >= 1) {
+      // Minutes ago
+      return `${minutes} ${minutes === 1 ? 'minute' : 'minutes'} ago`;
+    } else {
+      // Seconds ago
+      return `${seconds} ${seconds === 1 ? 'second' : 'seconds'} ago`;
+    }
+  }
+  
+  
+
   useEffect(() => {
     // Fetch notifications when the component mounts
     handleFetchNotifications();
@@ -106,25 +140,26 @@ const NotificationPage = () => {
         <div className="notifications_container">
           {notifications.length === 0 || notifications === undefined ? (
             <small>No notifications available.</small>
-          ) : 
-          ( notifications.map((notification, index) => (
-            <div className="notification_wrap" key={index}>
-              <p className="notification">
-                {notification.message} at {notification.time} on{" "}
-                {notification.date}{" "}
-              </p>
-              <div className="delete_btn">
-                <MdCancel
-                  onClick={() =>
-                    handleDeleteNotification(
-                      notification.id,
-                      notification.isLoggedIn
-                    )
-                  }
-                />
+          ) : (
+            notifications.map((notification, index) => (
+              <div className="notification_wrap" key={index}>
+                <p className="notification">
+                  {notification.message} {" "}
+                  {getHumanReadableTimestamp(notification.timeStamp)}.
+                </p>
+                <div className="delete_btn">
+                  <MdCancel
+                    onClick={() =>
+                      handleDeleteNotification(
+                        notification.id,
+                        notification.isLoggedIn
+                      )
+                    }
+                  />
+                </div>
               </div>
-            </div>
-          )))}
+            ))
+          )}
         </div>
       </div>
     </div>
