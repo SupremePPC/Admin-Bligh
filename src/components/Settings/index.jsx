@@ -1,9 +1,11 @@
 import React, {useState} from 'react';
 import { FaAngleRight } from "react-icons/fa";
 import { BiImageAdd } from "react-icons/bi";
-import { RiLockPasswordFill } from "react-icons/ri";
+import { RiLockPasswordLine } from "react-icons/ri";
+import { PiPassword } from "react-icons/pi";
 import ChangePassword from '../ChangePassword';
 import ChangeLogo from '../ChangeLogo';
+import PasswordSetting from '../PasswordSetting';
 import "./style.css";
 
 export default function SettingsPage() {
@@ -38,24 +40,24 @@ export default function SettingsPage() {
               onClick={() => handleTabClick("changePassword")}
             >
               <span>
-                <RiLockPasswordFill />
+                <RiLockPasswordLine />
                 Change Password
               </span>
               <FaAngleRight size={20}/>
             </li>
-            {/* <li
+             <li
               className={`account_item ${
-                activeTab === "documents" ? "active" : ""
+                activeTab === "passwordSetting" ? "active" : ""
               }`}
-              onClick={() => handleTabClick("documents")}
+              onClick={() => handleTabClick("passwordSetting")}
             >
               <span>
-                <IoNewspaperOutline className="icon" />
-                Documents
+                <PiPassword className="icon" />
+                Password Setting
               </span>
               <FaAngleRight size={20}/>
             </li>
-            <li
+            {/*<li
               className={`account_item ${
                 activeTab === "bankingDetails" ? "active" : ""
               }`}
@@ -73,6 +75,7 @@ export default function SettingsPage() {
         <div className="content__area">
           {activeTab === "changePassword" && <ChangePasswordTab />}
           {activeTab === "changeLogo" && <ChangeLogo />}
+          {activeTab === "passwordSetting" && <PasswordSetting />}
           {/* {activeTab === "documents" && <DocumentsTab />}
           {activeTab === "bankingDetails" && <BankingDetailsTab />} */}
         </div>

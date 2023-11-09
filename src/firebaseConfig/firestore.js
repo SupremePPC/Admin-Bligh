@@ -1255,7 +1255,7 @@ export const deleteCashDeposit = async (uid, depositId) => {
 };
 
 // Function to fetch all the notifications
-export async function getNotifications() {
+export async function getLoginNotifications() {
   try {
     const adminDashRef = collection(db, "admin_users");
     const notificationDashRef = doc(adminDashRef, "notifications");
@@ -1286,7 +1286,7 @@ export async function getNotifications() {
 
     return allNotifications;
   } catch (error) {
-    console.error("Error in getNotifications: ", error);
+    console.error("Error in getLoginNotifications: ", error);
     return [];
   }
 }
@@ -1322,8 +1322,6 @@ export async function SumNotifications(setNotifications) {
     setNotifications(loginNotificationsCount + logoutNotificationsCount);
   });
 }
-
-
 
 // Function to delete all notifications
 export async function deleteAllNotifications() {
@@ -1375,3 +1373,33 @@ export async function deleteNotification(notificationId, isLoggedIn) {
 }
 
 
+// Function to fetch the password policy setting from Firestore
+export const fetchPasswordPolicySetting = async () => {
+  try {
+    const docRef = doc(db, 'adminUsers', 'strongPasswordPolicy');
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const isStrong = docSnap.data().isTrue;
+      return isStrong;
+    } else {;
+      return true; 
+    }
+  } catch (error) {
+    console.error('Error fetching password policy: ', error);
+    throw error;
+  }
+};
+
+// Function to update the password policy setting in Firestore
+export const updatePasswordPolicySetting = async (newValue) => {
+  try {
+    const docRef = doc(db, 'adminUsers', 'strongPasswordPolicy');
+    await updateDoc(docRef, {
+      isTrue: newValue,
+    });
+  } catch (error) {
+    console.error('Error updating password policy: ', error);
+    throw error;
+  }
+};

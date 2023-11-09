@@ -1,0 +1,37 @@
+.passwordSetting_section{
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.passwordSetting_section .section_header{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+.title{
+    font-size: var(--font-thirtyTwo);
+    font-weight: 500;
+    color: var(--black);
+}
+
+.passwordSetting_section .form_group{
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+}
+
+.passwordSetting_section .form_group label{
+    margin: 0;
+}
+
+@media screen and (min-width: 768px){
+    .passwordSetting_section{
+       padding: .65rem 2rem;
+    }
+    
+}
