@@ -25,6 +25,7 @@ import IposRequestPage from "./components/IPOrequests";
 import SettingsPage from "./components/Settings";
 import "./App.css";
 import CashDeposits from "./components/CashDeposits";
+import UpdateFavicon from "./favicon";
 
 function App() {
   const { loadingAuthState } = useAuth();
@@ -177,6 +178,7 @@ function App() {
           </Routes>
         </Router>
         {loadingAuthState && <LoadingScreen />}
+        <UpdateFavicon/>
       </div>
     </Provider>
   );
