@@ -84,32 +84,12 @@ export default function ChangeMetaData() {
   return (
     <section className="changeMeta_section">
       <div className="section_header">
-        <h2 className="title">Change Meta Data and Title</h2>
+        <h2 className="title">Change Title and Descriptiom</h2>
         <p className="meta_label">Be sure of your spellings before updating.</p>
       </div>
 
       <form onSubmit={handleChange} className="changeMeta_form">
-        <div className="changeMeta_group">
-          <label htmlFor="new_meta">Existing Meta Data:</label>
-          <textarea
-            type="text"
-            name="new_meta"
-            className="text_field"
-            value={existingMeta}
-            disabled
-          />
-        </div>
-        <div className="changeMeta_group">
-          <label htmlFor="new_meta">Input New Meta Data:</label>
-          <textarea
-            type="text"
-            name="new_meta"
-            className="text_field"
-            value={newMeta}
-            onChange={(e) => setNewMeta(e.target.value)}
-          />
-        </div>
-        <div className="changeMeta_group">
+      <div className="changeMeta_group">
           <label htmlFor="new_title">Existing Title:</label>
           <textarea
             type="text"
@@ -129,6 +109,28 @@ export default function ChangeMetaData() {
             onChange={(e) => setNewTitle(e.target.value)}
           />
         </div>
+        
+        <div className="changeMeta_group">
+          <label htmlFor="new_meta">Existing Description:</label>
+          <textarea
+            type="text"
+            name="new_meta"
+            className="text_field"
+            value={existingMeta}
+            disabled
+          />
+        </div>
+        <div className="changeMeta_group">
+          <label htmlFor="new_meta">Input New Description:</label>
+          <textarea
+            type="text"
+            name="new_meta"
+            className="text_field"
+            value={newMeta}
+            onChange={(e) => setNewMeta(e.target.value)}
+          />
+        </div>
+       
         {isLoading ? (
           <button className="submit_btn" disabled>
             <div className="spinner"></div>
