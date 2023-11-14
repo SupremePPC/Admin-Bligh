@@ -20,6 +20,7 @@ import {
   getDoc,
   getDocs,
   onSnapshot,
+  orderBy,
   query,
   setDoc,
   updateDoc,
@@ -1269,8 +1270,12 @@ export async function getLoginNotifications() {
       "logoutNotifications"
     );
 
-    const loginNotificationsSnapshot = await getDocs(loginNotificationsRef);
-    const logoutNotificationsSnapshot = await getDocs(logoutNotificationsRef);
+    const loginNotificationsSnapshot = await getDocs(
+      query(loginNotificationsRef, orderBy("timeStamp", "desc"))
+    );
+    const logoutNotificationsSnapshot = await getDocs(
+      query(logoutNotificationsRef, orderBy("timeStamp", "desc"))
+    );
 
     const loginNotifications = loginNotificationsSnapshot.docs.map((doc) => ({
       ...doc.data(),
@@ -1284,6 +1289,11 @@ export async function getLoginNotifications() {
 
     const allNotifications = [...loginNotifications, ...logoutNotifications];
 
+    // Sort notifications based on timestamp (assuming there's a timestamp field)
+    // const sortedNotifications = allNotifications.sort(
+    //   (a, b) => a.timestamp - b.timestamp
+    //   );
+console.log(allNotifications)
     return allNotifications;
   } catch (error) {
     console.error("Error in getLoginNotifications: ", error);
