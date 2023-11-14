@@ -1,0 +1,109 @@
+.changeMeta_section {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.changeMeta_section .section_header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.title {
+  font-size: var(--font-thirtyTwo);
+  font-weight: 500;
+  color: var(--black);
+}
+
+.changeMeta_section .changeMeta_form {
+  display: grid;
+  max-width: 500px;
+  width: 100%;
+}
+
+.meta_label {
+  border-left: solid 3px #ff4f68;
+  font-size: 14px;
+  color: #72777a;
+  font-size: var(--font-sixteen);
+  padding-left: 0.35rem;
+}
+
+.form_group {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.changeMeta_form_group {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.input_group .label {
+  font-size: var(--font-sixteen);
+}
+
+.changeMeta_group .text_field {
+  display: block;
+  width: 100%;
+  height: 100px;
+  padding: 0.375rem 0.75rem;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #212529;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid #ced4da;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border-radius: 0.25rem;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.changeMeta_group .text_field:focus,
+.changeMeta_group .text_field:active {
+  border: 1px solid #ced4da;
+  outline: none;
+}
+
+.changeMeta_group .text_field[disabled] {
+  color: var(--grey);
+}
+
+.submit_btn {
+  display: grid;
+  place-items: center;
+  background-color: var(--secondary);
+  color: var(--white);
+  font-size: var(--font-twenty);
+  font-weight: 400;
+  width: 100%;
+  height: 3rem;
+  font-weight: 400;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 10px;
+  margin-top: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+@media screen and (max-width: 500px) {
+  .changeMeta_section {
+    padding: 1rem;
+  }
+}
+
+@media screen and (min-width: 768px) {
+  .changeMeta_section {
+    padding: 0.65rem 2rem;
+  }
+}
