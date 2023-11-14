@@ -1290,11 +1290,10 @@ export async function getLoginNotifications() {
     const allNotifications = [...loginNotifications, ...logoutNotifications];
 
     // Sort notifications based on timestamp (assuming there's a timestamp field)
-    // const sortedNotifications = allNotifications.sort(
-    //   (a, b) => a.timestamp - b.timestamp
-    //   );
-console.log(allNotifications)
-    return allNotifications;
+    const sortedNotifications = allNotifications.sort(
+      (a, b) => b.timeStamp - a.timeStamp
+      );
+    return sortedNotifications;
   } catch (error) {
     console.error("Error in getLoginNotifications: ", error);
     return [];
