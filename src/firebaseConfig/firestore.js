@@ -670,6 +670,7 @@ export const deleteBondUser = async (uid, requestId) => {
 
 //TERMS
 const TERMS_COLLECTION = "fixedTermDeposit";
+
 //get all terms
 export async function getAllTerms() {
   // Get a reference to the 'terms' collection
@@ -699,7 +700,7 @@ export async function addNewTerm(termData) {
   }
 }
 
-//uodate existing term
+//update existing term
 export async function updateTerm(termId, updatedData) {
   try {
     const termRef = doc(db, TERMS_COLLECTION, termId);
