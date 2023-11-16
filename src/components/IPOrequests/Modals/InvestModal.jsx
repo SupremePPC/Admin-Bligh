@@ -41,7 +41,7 @@ export default function InvestIpoModal({ onInvestSuccess, onClose, ipo, userId }
       const result = await addIposToUserCollection(userId.userId, investmentData);
       Swal.fire({
         icon: "success",
-        title: "Success!",
+        title: "Successful!",
         text: "You have successfully made an investment on behalf of this user.",
         showConfirmButton: false,
         timer: 2000,

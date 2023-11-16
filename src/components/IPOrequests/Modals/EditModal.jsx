@@ -45,7 +45,7 @@ export default function EditIposUser({
       await updateIposToUserCollection(userId.userId, iposId, investmentData);
       Swal.fire({
         icon: "success",
-        title: "Success!",
+        title: "Successful!",
         text: "You have successfully updated the investment on behalf of this user.",
         showConfirmButton: false,
         timer: 2000,
