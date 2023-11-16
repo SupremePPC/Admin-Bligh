@@ -26,19 +26,19 @@ export default function InvestTermModal({
         return;
       }
 
-      const MIN_AMOUNT = fixedTerm.minAmount;
-      if (depositAmount < MIN_AMOUNT) {
-        Swal.fire({
-          icon: "error",
-          title: "Error!",
-          text: `Cannot deposit less than $${formatNumber(MIN_AMOUNT)}`,
-          showConfirmButton: false,
-          timer: 2000,
-        });
-        setIsLoading(false);
-        setDepositAmount("");
-        return;
-      }
+      // const MIN_AMOUNT = fixedTerm.minAmount;
+      // if (depositAmount < MIN_AMOUNT) {
+      //   Swal.fire({
+      //     icon: "error",
+      //     title: "Error!",
+      //     text: `Cannot deposit less than $${formatNumber(MIN_AMOUNT)}`,
+      //     showConfirmButton: false,
+      //     timer: 2000,
+      //   });
+      //   setIsLoading(false);
+      //   setDepositAmount("");
+      //   return;
+      // }
 
       const newDeposit = {
         date: getCurrentDate(),
