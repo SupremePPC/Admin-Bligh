@@ -58,7 +58,7 @@ export default function InvestTermModal({
 
       Swal.fire({
         icon: "success",
-        title: "Request Sent!",
+        title: "Succesful!",
         text: `You have successfully made a deposit of $${formatNumber(depositAmount)} on behalf of this user.`,
         showConfirmButton: false,
         timer: 4000,

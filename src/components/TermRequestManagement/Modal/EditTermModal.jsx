@@ -62,7 +62,7 @@ export default function EditTermUser({
       
       Swal.fire({
         icon: "success",
-        title: "Request Sent!",
+        title: "Succesful!",
         text: `You have successfully updated a deposit of $${formatNumber(depositAmount)} on behalf of this user.`,
         showConfirmButton: false,
         timer: 2000,
