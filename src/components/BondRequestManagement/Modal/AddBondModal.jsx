@@ -11,7 +11,7 @@ export default function AddBondModal({ onInvestSuccess, onClose, bond, userId })
   const [isLoading, setIsLoading] = useState(false);
   
   const handleBuyBonds = async () => {
-    // const minimumInvestmentAmount = bond.minimumAmount;
+    const minimumInvestmentAmount = bond.minimumAmount;
     // if (bondsAmount < minimumInvestmentAmount) {
     //   Swal.fire({
     //     icon: "error",

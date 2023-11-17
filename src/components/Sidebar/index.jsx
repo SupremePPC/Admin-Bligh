@@ -11,10 +11,11 @@ import { BsCardChecklist, BsPerson, BsFileEarmarkText, BsCashCoin } from "react-
 import { CiMoneyCheck1, CiBank } from "react-icons/ci";
 import { PiBriefcase } from "react-icons/pi";
 import { IoMdNotificationsOutline, IoIosLogOut } from "react-icons/io";
+import { TbUsersGroup } from "react-icons/tb";
 import { getAuth } from "firebase/auth";
 import Modal from "../CustomsModal";
-import "./style.css";
 import { SumNotifications } from "../../firebaseConfig/firestore";
+import "./style.css";
 
 function Sidebar() {
   const [collapsed, setCollapsed] = useState(true);
@@ -49,7 +50,16 @@ function Sidebar() {
             className={`menu_link ${isActive("/dashboard/") ? "active" : ""}`}
             to="/dashboard/"
           >
-            <IoHomeOutline  size={18}/>
+            <IoHomeOutline size={18}/>
+            {!collapsed && "Dashboard"}
+          </Link>
+        </li>
+        <li className="menu_list">
+          <Link
+            className={`menu_link ${isActive("/dashboard/registered-users/") ? "active" : ""}`}
+            to="/dashboard/registered-users/"
+          >
+            <TbUsersGroup  size={18}/>
             {!collapsed && "Registered Users"}
           </Link>
         </li>
