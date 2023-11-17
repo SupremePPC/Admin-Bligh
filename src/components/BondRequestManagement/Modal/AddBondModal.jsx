@@ -11,17 +11,17 @@ export default function AddBondModal({ onInvestSuccess, onClose, bond, userId })
   const [isLoading, setIsLoading] = useState(false);
   
   const handleBuyBonds = async () => {
-    const minimumInvestmentAmount = bond.minimumAmount;
-    if (bondsAmount < minimumInvestmentAmount) {
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: `Cannot buy less than $${formatNumber(minimumInvestmentAmount)}`,
-        showConfirmButton: false,
-        timer: 2000,
-      });
-      return;
-    }
+    // const minimumInvestmentAmount = bond.minimumAmount;
+    // if (bondsAmount < minimumInvestmentAmount) {
+    //   Swal.fire({
+    //     icon: "error",
+    //     title: "Oops...",
+    //     text: `Cannot buy less than $${formatNumber(minimumInvestmentAmount)}`,
+    //     showConfirmButton: false,
+    //     timer: 2000,
+    //   });
+    //   return;
+    // }
   
     // Calculate how many bonds the user is buying
     const amountAsNumber = parseFloat(bondsAmount);

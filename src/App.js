@@ -26,6 +26,7 @@ import SettingsPage from "./components/Settings";
 import "./App.css";
 import CashDeposits from "./components/CashDeposits";
 import UpdateFavicon from "./favicon";
+import UpdateHeaderData from "./metaData";
 
 function App() {
   const { loadingAuthState } = useAuth();
@@ -179,6 +180,7 @@ function App() {
         </Router>
         {loadingAuthState && <LoadingScreen />}
         <UpdateFavicon/>
+        <UpdateHeaderData/>
       </div>
     </Provider>
   );

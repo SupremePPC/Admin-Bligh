@@ -19,15 +19,15 @@ export default function EditIposUser({
   const [isLoading, setIsLoading] = useState(false);
 
   const handleUpdate = async () => {
-    if (!investmentAmount || investmentAmount < ipo.minInvestment) {
-      Swal.fire({
-        icon: "error",
-        title: "Error!",
-        text: `Investment amount must be greater than minimum investment value of $${formatNumber(ipo.minInvestment)}`,
-        showConfirmButton: true,
-      });
-      return;
-    }
+    // if (!investmentAmount || investmentAmount < ipo.minInvestment) {
+    //   Swal.fire({
+    //     icon: "error",
+    //     title: "Error!",
+    //     text: `Investment amount must be greater than minimum investment value of $${formatNumber(ipo.minInvestment)}`,
+    //     showConfirmButton: true,
+    //   });
+    //   return;
+    // }
 
     const investmentData = {
       amountInvested: parseFloat(investmentAmount),
@@ -45,7 +45,7 @@ export default function EditIposUser({
       await updateIposToUserCollection(userId.userId, iposId, investmentData);
       Swal.fire({
         icon: "success",
-        title: "Success!",
+        title: "Successful!",
         text: "You have successfully updated the investment on behalf of this user.",
         showConfirmButton: false,
         timer: 2000,

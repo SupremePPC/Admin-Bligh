@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import "./style.css";
+import { formatNumber } from '../../firebaseConfig/firestore';
 
 export default function List({
     ipos, handleDelete, handleEditClick
@@ -51,21 +52,21 @@ export default function List({
                       <p className="boldText">Pre-IPO Share Price:</p>
                       <span className="regularText">
                         {" "}
-                        $ {ipo.preSharePrice}{" "}
+                        $ {formatNumber(ipo.preSharePrice)}{" "}
                       </span>
                     </div>
                     <div className="detailsRow">
                       <p className="boldText">Minimum Investment:</p>
                       <span className="regularText">
                         {" "}
-                        $ {ipo.minInvestment}{" "}
+                        $ {formatNumber(ipo.minInvestment)}{" "}
                       </span>
                     </div>
                     <div className="detailsRow">
                       <p className="boldText">Expected Listing Price:</p>
                       <span className="regularText">
                         {" "}
-                        $ {ipo.expListingPrice}{" "}
+                        $ {formatNumber(ipo.expListingPrice)}{" "}
                       </span>
                     </div>
                   </div>

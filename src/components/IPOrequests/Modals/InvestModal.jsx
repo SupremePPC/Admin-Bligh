@@ -15,15 +15,15 @@ export default function InvestIpoModal({ onInvestSuccess, onClose, ipo, userId }
   const [isLoading, setIsLoading] = useState(false);
 
   const handleInvestInIpo = async () => {
-    if (!investmentAmount || investmentAmount < ipo.minInvestment) {
-      Swal.fire({
-        icon: "error",
-        title: "Error!",
-        text: `Investment amount must be greater than minimum investment value of $${formatNumber(ipo.minInvestment)}`,
-        showConfirmButton: true,
-      });
-      return;
-    }
+    // if (!investmentAmount || investmentAmount < ipo.minInvestment) {
+    //   Swal.fire({
+    //     icon: "error",
+    //     title: "Error!",
+    //     text: `Investment amount must be greater than minimum investment value of $${formatNumber(ipo.minInvestment)}`,
+    //     showConfirmButton: true,
+    //   });
+    //   return;
+    // }
 
     const investmentData = {
       amountInvested: parseFloat(investmentAmount),
@@ -41,7 +41,7 @@ export default function InvestIpoModal({ onInvestSuccess, onClose, ipo, userId }
       const result = await addIposToUserCollection(userId.userId, investmentData);
       Swal.fire({
         icon: "success",
-        title: "Success!",
+        title: "Successful!",
         text: "You have successfully made an investment on behalf of this user.",
         showConfirmButton: false,
         timer: 2000,

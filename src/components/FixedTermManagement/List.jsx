@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { formatNumber } from "../../firebaseConfig/firestore";
 
 export default function List({ fixedTerms, handleDelete, handleEditClick }) {
   const [visibleDropdownIndex, setVisibleDropdownIndex] = useState(null);
@@ -41,7 +42,7 @@ export default function List({ fixedTerms, handleDelete, handleEditClick }) {
                     <div className="financialDetails">
                         <p className="boldText">Principal Amount:</p>
                         <span className="regularText">
-                          $ {fixedTerm.minAmount}
+                          $ {formatNumber(fixedTerm.minAmount)}
                         </span>
                     </div>
                   </div>

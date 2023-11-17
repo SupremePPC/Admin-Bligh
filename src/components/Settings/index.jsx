@@ -3,10 +3,12 @@ import { FaAngleRight } from "react-icons/fa";
 import { BiImageAdd } from "react-icons/bi";
 import { RiLockPasswordLine } from "react-icons/ri";
 import { PiPassword } from "react-icons/pi";
+import { MdDescription } from "react-icons/md"
 import ChangePassword from '../ChangePassword';
 import ChangeLogo from '../ChangeLogo';
 import PasswordSetting from '../PasswordSetting';
 import "./style.css";
+import ChangeMetaData from '../ChangeMeta';
 
 export default function SettingsPage() {
     const [activeTab, setActiveTab] = useState("changeLogo");
@@ -35,6 +37,18 @@ export default function SettingsPage() {
             </li>
             <li
               className={`account_item ${
+                activeTab === "changeMeta" ? "active" : ""
+              }`}
+              onClick={() => handleTabClick("changeMeta")}
+            >
+              <span>
+                <MdDescription className="icon" />
+                Change Meta
+              </span>
+              <FaAngleRight size={20}/>
+            </li>
+            <li
+              className={`account_item ${
                 activeTab === "changePassword" ? "active" : ""
               }`}
               onClick={() => handleTabClick("changePassword")}
@@ -57,26 +71,16 @@ export default function SettingsPage() {
               </span>
               <FaAngleRight size={20}/>
             </li>
-            {/*<li
-              className={`account_item ${
-                activeTab === "bankingDetails" ? "active" : ""
-              }`}
-              onClick={() => handleTabClick("bankingDetails")}
-            >
-              <span>
-                <BsBank className="icon" />
-                Banking Details
-              </span>
-              <FaAngleRight size={20}/>
-            </li> */}
+           
           </ul>
         </div>
   
         <div className="content__area">
-          {activeTab === "changePassword" && <ChangePasswordTab />}
           {activeTab === "changeLogo" && <ChangeLogo />}
+          {activeTab === "changeMeta" && <ChangeMetaData />}
+          {activeTab === "changePassword" && <ChangePasswordTab />}
           {activeTab === "passwordSetting" && <PasswordSetting />}
-          {/* {activeTab === "documents" && <DocumentsTab />}
+          {/* 
           {activeTab === "bankingDetails" && <BankingDetailsTab />} */}
         </div>
       </div>

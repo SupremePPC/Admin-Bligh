@@ -20,6 +20,7 @@ import {
   getDoc,
   getDocs,
   onSnapshot,
+  orderBy,
   query,
   setDoc,
   updateDoc,
@@ -669,6 +670,7 @@ export const deleteBondUser = async (uid, requestId) => {
 
 //TERMS
 const TERMS_COLLECTION = "fixedTermDeposit";
+
 //get all terms
 export async function getAllTerms() {
   // Get a reference to the 'terms' collection
@@ -698,7 +700,7 @@ export async function addNewTerm(termData) {
   }
 }
 
-//uodate existing term
+//update existing term
 export async function updateTerm(termId, updatedData) {
   try {
     const termRef = doc(db, TERMS_COLLECTION, termId);
@@ -1269,8 +1271,12 @@ export async function getLoginNotifications() {
       "logoutNotifications"
     );
 
-    const loginNotificationsSnapshot = await getDocs(loginNotificationsRef);
-    const logoutNotificationsSnapshot = await getDocs(logoutNotificationsRef);
+    const loginNotificationsSnapshot = await getDocs(
+      query(loginNotificationsRef, orderBy("timeStamp", "desc"))
+    );
+    const logoutNotificationsSnapshot = await getDocs(
+      query(logoutNotificationsRef, orderBy("timeStamp", "desc"))
+    );
 
     const loginNotifications = loginNotificationsSnapshot.docs.map((doc) => ({
       ...doc.data(),
@@ -1284,7 +1290,11 @@ export async function getLoginNotifications() {
 
     const allNotifications = [...loginNotifications, ...logoutNotifications];
 
-    return allNotifications;
+    // Sort notifications based on timestamp (assuming there's a timestamp field)
+    const sortedNotifications = allNotifications.sort(
+      (a, b) => b.timeStamp - a.timeStamp
+      );
+    return sortedNotifications;
   } catch (error) {
     console.error("Error in getLoginNotifications: ", error);
     return [];
@@ -1400,6 +1410,64 @@ export const updatePasswordPolicySetting = async (newValue) => {
     });
   } catch (error) {
     console.error('Error updating password policy: ', error);
+    throw error;
+  }
+};
+
+//Fetch meta data from adminUsers collection
+export const fetchMetaData = async () => {
+  try {
+    const docRef = doc(db, 'adminUsers', 'metaData');
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists) {
+      return docSnap.data().data || '';
+    }
+
+    return '';
+  } catch (error) {
+    console.error('Error fetching existing meta data:', error);
+    throw error;
+  }
+};
+
+//Fetch title data from adminUsers collection
+export const fetchTitleData = async () => {
+  try {
+    const docRef = doc(db, 'adminUsers', 'title');
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists) {
+      return docSnap.data().text || '';
+    }
+
+    return '';
+  } catch (error) {
+    console.error('Error fetching existing meta data:', error);
+    throw error;
+  }
+};
+
+// handle update meta data
+export const updateMetaData = async (newMeta) => {
+  try {
+    const docRef = doc(db, 'adminUsers', 'metaData');
+    await updateDoc(docRef, { data: newMeta });
+    return 'Meta data updated successfully.';
+  } catch (error) {
+    console.error('Error updating meta data:', error);
+    throw error;
+  }
+};
+
+// handle update title data
+export const updateTitleText = async (newTitle) => {
+  try {
+    const docRef = doc(db, 'adminUsers', 'title');
+    await updateDoc(docRef, { text: newTitle });
+    return 'Title text updated successfully.';
+  } catch (error) {
+    console.error('Error updating meta data:', error);
     throw error;
   }
 };

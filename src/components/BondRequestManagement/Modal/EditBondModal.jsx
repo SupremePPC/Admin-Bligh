@@ -21,16 +21,16 @@ export default function EditBondModal({
 
   const handleBuyBonds = async () => {
     const minimumInvestmentAmount = bond.minimumAmount;
-    if (bondsAmount < minimumInvestmentAmount) {
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: `Cannot buy less than $${formatNumber(minimumInvestmentAmount)}`,
-        showConfirmButton: false,
-        timer: 2000,
-      });
-      return;
-    }
+    // if (bondsAmount < minimumInvestmentAmount) {
+    //   Swal.fire({
+    //     icon: "error",
+    //     title: "Oops...",
+    //     text: `Cannot buy less than $${formatNumber(minimumInvestmentAmount)}`,
+    //     showConfirmButton: false,
+    //     timer: 2000,
+    //   });
+    //   return;
+    // }
 
     // Calculate how many bonds the user is buying
     const amountAsNumber = parseFloat(bondsAmount);
@@ -58,7 +58,7 @@ export default function EditBondModal({
       await updateBondUser(userId.userId, bondId, bondData);
       Swal.fire({
         icon: "success",
-        title: "Success!",
+        title: "Successful!",
         text: "You have successfully updated the investment on behalf of this user.",
         showConfirmButton: false,
         timer: 2000,

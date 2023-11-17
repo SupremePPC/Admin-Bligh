@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import {
   getDocs,
   collection,
+  query,
 } from "firebase/firestore";
 import Header from "./Header";
 import Table from "./Table";
 import Edit from "./Edit";
 import LoadingScreen from "../LoadingScreen";
 import { getBankingDetails } from '../../firebaseConfig/firestore';
+import { db } from '../../firebaseConfig/firebase';
 
 const BankingDetails = () => {
   const [bankingDetails, setBankingDetails] = useState([]);  
@@ -18,7 +20,9 @@ const BankingDetails = () => {
   const fetchBankingDetailsForAllUsers = async () => {
     setIsLoading(true);
     try {
-      const usersQuery = query(collection(db, USERS_COLLECTION));
+
+      // const bankingDetails = await getBankingDetails(uid);
+      const usersQuery = query(collection(db, 'users'));
       const querySnapshot = await getDocs(usersQuery);
   
       const bankingDetailsByUser = [];
@@ -26,7 +30,6 @@ const BankingDetails = () => {
       if (!querySnapshot.empty) {
         querySnapshot.forEach((userDoc) => {
           const uid = userDoc.id;
-          // const bankingDetails = await getBankingDetails(uid);
   
           if (bankingDetails) {
             bankingDetailsByUser.push({
@@ -37,7 +40,7 @@ const BankingDetails = () => {
         });
   
         // bankingDetailsByUser now contains banking details for all users
-        console.log("Banking details for all users:", bankingDetailsByUser);
+        // console.log("Banking details for all users:", bankingDetailsByUser);
       } else {
         console.error("No users found");
       }
