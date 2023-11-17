@@ -1,20 +1,24 @@
 // Sidebar.js
 import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import {
-  IoHomeOutline,
-  IoSettingsOutline
-} from "react-icons/io5";
+import { IoHomeOutline, IoSettingsOutline } from "react-icons/io5";
 import { CgMenuGridR } from "react-icons/cg";
 import { BiTransfer } from "react-icons/bi";
-import { BsCardChecklist, BsPerson, BsFileEarmarkText, BsCashCoin } from "react-icons/bs";
-import { CiMoneyCheck1, CiBank } from "react-icons/ci";
-import { PiBriefcase } from "react-icons/pi";
+import {
+  BsCardChecklist,
+  BsPerson,
+  BsFileEarmarkText,
+  BsCashCoin,
+  BsBriefcase,
+} from "react-icons/bs";
+import { CiBank } from "react-icons/ci";
+import { LiaMoneyCheckAltSolid } from "react-icons/lia";
 import { IoMdNotificationsOutline, IoIosLogOut } from "react-icons/io";
+import { TbUsersGroup } from "react-icons/tb";
 import { getAuth } from "firebase/auth";
 import Modal from "../CustomsModal";
-import "./style.css";
 import { SumNotifications } from "../../firebaseConfig/firestore";
+import "./style.css";
 
 function Sidebar() {
   const [collapsed, setCollapsed] = useState(true);
@@ -28,12 +32,12 @@ function Sidebar() {
 
   useEffect(() => {
     // Call SumNotifications and pass the setter function for notifications
-   SumNotifications(setNotifications);
+    SumNotifications(setNotifications);
   }, []);
 
   const notificationBadge = (
     <span className="notification_badge">
-      <IoMdNotificationsOutline  size={20}/>
+      <IoMdNotificationsOutline size={20} />
       <p className="notification_count">{notifications}</p>
     </span>
   );
@@ -49,7 +53,18 @@ function Sidebar() {
             className={`menu_link ${isActive("/dashboard/") ? "active" : ""}`}
             to="/dashboard/"
           >
-            <IoHomeOutline  size={18}/>
+            <IoHomeOutline size={18} />
+            {!collapsed && "Dashboard"}
+          </Link>
+        </li>
+        <li className="menu_list">
+          <Link
+            className={`menu_link ${
+              isActive("/dashboard/registered-users/") ? "active" : ""
+            }`}
+            to="/dashboard/registered-users/"
+          >
+            <TbUsersGroup size={18} />
             {!collapsed && "Registered Users"}
           </Link>
         </li>
@@ -60,7 +75,7 @@ function Sidebar() {
             }`}
             to="/dashboard/user-requests"
           >
-            <BsPerson  size={18} />
+            <BsPerson size={18} />
             {!collapsed && "User Requests"}
           </Link>
         </li>
@@ -71,7 +86,7 @@ function Sidebar() {
             }`}
             to="/dashboard/transactions"
           >
-            <BiTransfer fill="#fff" stroke="#fff"  size={20}/>
+            <BiTransfer fill="#fff" stroke="#fff" size={20} />
             {!collapsed && "Transactions Request"}
           </Link>
         </li>
@@ -82,7 +97,7 @@ function Sidebar() {
             }`}
             to="/dashboard/cash-deposits"
           >
-            <BsCashCoin fill="#fff" stroke="#fff"  size={20}/>
+            <BsCashCoin stroke="#fff" size={20} />
             {!collapsed && "Cash Deposits"}
           </Link>
         </li>
@@ -93,7 +108,7 @@ function Sidebar() {
             }`}
             to="/dashboard/bonds"
           >
-            <BsCardChecklist  size={18} />
+            <BsCardChecklist size={18} />
             {!collapsed && "Bonds"}
           </Link>
         </li>
@@ -104,7 +119,7 @@ function Sidebar() {
             }`}
             to="/dashboard/fixed-term-deposits"
           >
-            <CiMoneyCheck1 size={22} />
+            <LiaMoneyCheckAltSolid size={22} />
             {!collapsed && "Fixed Term Deposits"}
           </Link>
         </li>
@@ -115,7 +130,7 @@ function Sidebar() {
             }`}
             to="/dashboard/ipos"
           >
-            <PiBriefcase size={20} fill="#fff" />
+            <BsBriefcase size={20} />
             {!collapsed && "IPOs"}
           </Link>
         </li>
@@ -126,7 +141,7 @@ function Sidebar() {
             }`}
             to="/dashboard/banking-details"
           >
-            <CiBank  size={20} />
+            <CiBank size={20} />
             {!collapsed && "Banking Details"}
           </Link>
         </li>
@@ -141,7 +156,7 @@ function Sidebar() {
             {!collapsed && "Docs Management"}
           </Link>
         </li>
-        
+
         <li className="menu_list">
           <Link
             className={`menu_link ${
@@ -149,11 +164,11 @@ function Sidebar() {
             }`}
             to="/dashboard/notifications"
           >
-           {notificationBadge}
+            {notificationBadge}
             {!collapsed && "Notifications"}
           </Link>
         </li>
-        
+
         <li className="menu_list">
           <Link
             className={`menu_link ${
@@ -161,7 +176,7 @@ function Sidebar() {
             }`}
             to="/dashboard/settings"
           >
-            <IoSettingsOutline  size={20}/>
+            <IoSettingsOutline size={20} />
             {!collapsed && "Settings"}
           </Link>
         </li>
@@ -173,7 +188,7 @@ function Sidebar() {
               setIsLogoutModalOpen(true);
             }}
           >
-            <IoIosLogOut  size={20} className="menu_icon" />
+            <IoIosLogOut size={20} className="menu_icon" />
             {!collapsed && "Logout"}
             <Modal
               isOpen={isLogoutModalOpen}

@@ -50,8 +50,9 @@
   cursor: pointer;
 }
 
-.sidebar .menu_link .active {
-  background-color: var(--secondary);
+.sidebar .menu_link.active {
+  color: var(--secondary);
+  font-size: 20px;
 }
 
 .sidebar .menu_link:hover {
@@ -90,6 +91,6 @@
   font-weight: 700;
   color: var(--red);
   position: absolute;
-  left: 87%;
+  left: 54%;
   top: -50%;
 }

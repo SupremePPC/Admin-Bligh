@@ -27,6 +27,7 @@ import "./App.css";
 import CashDeposits from "./components/CashDeposits";
 import UpdateFavicon from "./favicon";
 import UpdateHeaderData from "./metaData";
+import HomePage from "./components/HomePage";
 
 function App() {
   const { loadingAuthState } = useAuth();
@@ -46,6 +47,14 @@ function App() {
             >
               <Route
                 index
+                element={
+                  <ProtectedRoute>
+                    <HomePage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="registered-users"
                 element={
                   <ProtectedRoute>
                     <RegisteredUsers />

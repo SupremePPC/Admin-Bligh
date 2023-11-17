@@ -1,0 +1,84 @@
+.homePage {
+  background-color: var(--white);
+  padding: 2rem 1rem;
+}
+
+.homePage_cards {
+  display: flex;
+  flex-direction: column;
+  list-style: none;
+}
+
+.card {
+  box-shadow: 0 5px 15px rgba(57, 98, 254, 0.02),
+    0 3px 6px rgba(117, 108, 254, 0.12);
+  border: none;
+  border-radius: 8px;
+  background-color: #ffffff;
+  margin-bottom: 25px;
+  margin-right: 12.5px;
+  margin-left: 12.5px;
+  padding: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.card:hover{
+    transition: ease-in-out .3s;
+    transform: scale(.95, .95);
+}
+
+
+.card_body {
+  width: 100%;
+  display: grid;
+  place-items: center;
+  min-height: 1px;
+  padding: 1.25rem;
+}
+
+.homePage_link {
+  text-decoration: none;
+  color: var(--white);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+}
+
+.homePage_icon svg {
+  margin-bottom: 5px;
+  color: var(--primary);
+  width: 50px;
+  height: 50px;
+}
+
+.homePage_label {
+  font-size: var(--font-eighteen);
+  font-weight: bold;
+  margin: 0;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.notification_badge {
+  display: flex;
+  align-items: center;
+}
+
+.notification_count {
+  margin-left: 5px;
+  font-size: 14px;
+}
+
+@media screen and (min-width: 768px) {
+    .homePage_cards {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+      }
+}
+
+@media screen and (min-width: 900px) {
+  .homePage_cards {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
