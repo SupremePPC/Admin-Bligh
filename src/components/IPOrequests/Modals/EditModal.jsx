@@ -2,11 +2,11 @@ import React, { useState } from "react";
 import {
   updateIposToUserCollection,
   deleteIposFromUserCollection,
-  getCurrentDate,
   formatNumber,
 } from "../../../firebaseConfig/firestore";
 import CurrencyInput from "react-currency-input-field";
 import Swal from "sweetalert2";
+import './style.css';
 
 export default function EditIposUser({
   iposId,
@@ -16,6 +16,7 @@ export default function EditIposUser({
   userId,
 }) {
   const [investmentAmount, setInvestmentAmount] = useState(ipo.amountInvested);
+  const [purchaseDate, setPurchaseDate] = useState(ipo.date);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleUpdate = async () => {
@@ -36,7 +37,7 @@ export default function EditIposUser({
       expectedDate: ipo.expectedDate,
       sharePrice: ipo.sharePrice,
       expListingPrice: ipo.expListingPrice,
-      date: getCurrentDate(),
+      date: purchaseDate,
       minInvestment: ipo.minInvestment,
       numberOfShares: numberOfShares,
     };
@@ -147,6 +148,10 @@ export default function EditIposUser({
                 setInvestmentAmount(parseFloat(formattedValue)); // Store as a number
               }}
             />
+          </div>
+          <div className="input_group">
+            <label htmlFor="purchaseDate">Purchase Date</label>
+            <input type="date" name="purchase-date" value={purchaseDate} onChange={(e) => setPurchaseDate(e.target.value)} />
           </div>
         </div>
         <div style={{ display: "flex" }}>

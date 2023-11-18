@@ -16,7 +16,7 @@ export default function EditBondModal({
   userId,
 }) {
   const [bondsAmount, setBondsAmount] = useState(bond.amountRequested);
-  const [purchaseDate, setPurchasedate] = useState(bond.purchaseDate);
+  const [purchaseDate, setPurchaseDate] = useState(bond.purchaseDate);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleBuyBonds = async () => {
@@ -152,7 +152,7 @@ export default function EditBondModal({
           </div>
           <div className="input_group">
             <label htmlFor="purchaseDate">Purchase Date</label>
-            <input type="date" name="purchase-date" value={purchaseDate} onChange={(e) => setPurchasedate(e.target.value)} />
+            <input type="date" name="purchase-date" value={purchaseDate} onChange={(e) => setPurchaseDate(e.target.value)} />
           </div>
         </div>
         <div className="buttons_wrap">
