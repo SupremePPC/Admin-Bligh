@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { IoSettingsOutline } from "react-icons/io5";
 import { BiTransfer } from "react-icons/bi";
 import {
@@ -32,8 +32,6 @@ const DashboardCard = ({ to, icon, label }) => {
 };
 
 function HomePage() {
-  //   const [collapsed, setCollapsed] = useState(true);
-  const location = useLocation();
   const [isLoading, setIsLoading] = useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [notifications, setNotifications] = useState(0);
@@ -41,7 +39,6 @@ function HomePage() {
   const auth = getAuth();
 
   useEffect(() => {
-    // Call SumNotifications and pass the setter function for notifications
     SumNotifications(setNotifications);
   }, []);
 
@@ -55,11 +52,7 @@ function HomePage() {
   return (
     <div className="container homePage">
       <ul className="homePage_cards">
-        {/* <DashboardCard
-          to="/dashboard/"
-          icon={<IoHomeOutline size={18} />}
-          label="Dashboard"
-        /> */}
+      
         <DashboardCard
           to="/dashboard/registered-users"
           icon={<TbUsersGroup size={18} />}
