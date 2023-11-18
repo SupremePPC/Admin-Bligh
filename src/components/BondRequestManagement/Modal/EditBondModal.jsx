@@ -2,12 +2,11 @@ import React, { useState } from "react";
 import CurrencyInput from "react-currency-input-field";
 import {
   updateBondUser,
-  getCurrentDate,
   deleteBondUser,
   formatNumber,
 } from "../../../firebaseConfig/firestore";
-import "./style.css";
 import Swal from "sweetalert2";
+import "./style.css";
 
 export default function EditBondModal({
   bondId,
@@ -17,6 +16,7 @@ export default function EditBondModal({
   userId,
 }) {
   const [bondsAmount, setBondsAmount] = useState(bond.amountRequested);
+  const [purchaseDate, setPurchasedate] = useState(bond.purchaseDate);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleBuyBonds = async () => {
@@ -45,7 +45,7 @@ export default function EditBondModal({
       companyWebsite: bond.companyWebsite,
       isin: bond.isin,
       maturityDate: bond.maturityDate,
-      purchaseDate: getCurrentDate(),
+      purchaseDate: purchaseDate,
       currentValue: numberOfBondsBought,
       issuerName: bond.issuerName,
       sector: bond.sector,
@@ -108,8 +108,8 @@ export default function EditBondModal({
   };
 
   return (
-    <div className="invest_ipo_overlay" onClick={(e) => e.stopPropagation()}>
-      <div className="invest_ipo_modal">
+    <div className="bondModal_overlay" onClick={(e) => e.stopPropagation()}>
+      <div className="bondModal">
         <div className="section_header">
           <h2 className="title">Edit {bond.issuerName} Bond for User</h2>
           <img src={bond.image} alt={`${bond.name} Logo`} className="logo" />
@@ -150,8 +150,12 @@ export default function EditBondModal({
               }}
             />
           </div>
+          <div className="input_group">
+            <label htmlFor="purchaseDate">Purchase Date</label>
+            <input type="date" name="purchase-date" value={purchaseDate} onChange={(e) => setPurchasedate(e.target.value)} />
+          </div>
         </div>
-        <div style={{ display: "flex" }}>
+        <div className="buttons_wrap">
           <input type="submit" value="Save" onClick={handleBuyBonds} />
           <input
             style={{ marginLeft: "12px" }}
