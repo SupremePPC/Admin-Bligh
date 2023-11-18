@@ -1,17 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { IoHomeOutline, IoSettingsOutline } from "react-icons/io5";
-import { CgMenuGridR } from "react-icons/cg";
+import { IoSettingsOutline } from "react-icons/io5";
 import { BiTransfer } from "react-icons/bi";
 import {
-  BsCardChecklist,
+    BsCreditCard2Front,
   BsPerson,
   BsFileEarmarkText,
   BsCashCoin,
   BsBriefcase,
+  BsBank
 } from "react-icons/bs";
-import { CiBank } from "react-icons/ci";
-import { LiaMoneyCheckAltSolid } from "react-icons/lia";
+import { PiMoneyLight } from "react-icons/pi";
 import { IoMdNotificationsOutline, IoIosLogOut } from "react-icons/io";
 import { TbUsersGroup } from "react-icons/tb";
 import { getAuth } from "firebase/auth";
@@ -83,12 +82,12 @@ function HomePage() {
         />
         <DashboardCard
           to="/dashboard/bonds"
-          icon={<BsCardChecklist stroke="#fff" size={18} />}
+          icon={<BsCreditCard2Front stroke="#fff" size={18} />}
           label="Bonds"
         />
         <DashboardCard
           to="/dashboard/fixed-term-deposits"
-          icon={<LiaMoneyCheckAltSolid stroke="#fff" size={22} />}
+          icon={<PiMoneyLight stroke="#fff" size={22} />}
           label="Fixed Term Deposits"
         />
         <DashboardCard
@@ -98,7 +97,7 @@ function HomePage() {
         />
         <DashboardCard
           to="/dashboard/banking-details"
-          icon={<CiBank stroke="#fff" size={20} />}
+          icon={<BsBank stroke="#fff" size={20} />}
           label="Banking Details"
         />
         <DashboardCard

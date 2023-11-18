@@ -5,14 +5,14 @@ import { IoHomeOutline, IoSettingsOutline } from "react-icons/io5";
 import { CgMenuGridR } from "react-icons/cg";
 import { BiTransfer } from "react-icons/bi";
 import {
-  BsCardChecklist,
   BsPerson,
   BsFileEarmarkText,
   BsCashCoin,
   BsBriefcase,
+  BsCreditCard2Front,
+  BsBank
 } from "react-icons/bs";
-import { CiBank } from "react-icons/ci";
-import { LiaMoneyCheckAltSolid } from "react-icons/lia";
+import { PiMoneyLight } from "react-icons/pi";
 import { IoMdNotificationsOutline, IoIosLogOut } from "react-icons/io";
 import { TbUsersGroup } from "react-icons/tb";
 import { getAuth } from "firebase/auth";
@@ -108,7 +108,7 @@ function Sidebar() {
             }`}
             to="/dashboard/bonds"
           >
-            <BsCardChecklist size={18} />
+            <BsCreditCard2Front size={18} />
             {!collapsed && "Bonds"}
           </Link>
         </li>
@@ -119,7 +119,7 @@ function Sidebar() {
             }`}
             to="/dashboard/fixed-term-deposits"
           >
-            <LiaMoneyCheckAltSolid size={22} />
+            <PiMoneyLight size={22} />
             {!collapsed && "Fixed Term Deposits"}
           </Link>
         </li>
@@ -141,7 +141,7 @@ function Sidebar() {
             }`}
             to="/dashboard/banking-details"
           >
-            <CiBank size={20} />
+            <BsBank size={20} />
             {!collapsed && "Banking Details"}
           </Link>
         </li>
