@@ -705,6 +705,9 @@ const UserOverview = () => {
                         <th title="The amount receivable upon maturity.">
                           Maturity Amount
                         </th>
+                        <th title="The purchase date.">
+                          Purchase Date
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
@@ -740,6 +743,7 @@ const UserOverview = () => {
                                   )
                                 ) || 0}
                               </td>
+                              <td>{term[i].date}</td>
                             </tr>
                           );
                         }
@@ -773,10 +777,10 @@ const UserOverview = () => {
                     <thead>
                       <tr>
                         <th>Company Name</th>
-                        <th>Purchase Date</th>
                         <th>Purchase Price</th>
                         <th>Number of Shares</th>
                         <th>Current Price</th>
+                        <th>Purchase Date</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -799,10 +803,10 @@ const UserOverview = () => {
                                   <p>{item[i].name}</p>
                                 </div>
                               </td>
-                              <td>{item[i].date}</td>
                               <td>$ {formatNumber(item[i].amountInvested)}</td>
                               <td>{item[i].numberOfShares}</td>
                               <td>$ {item[i].sharePrice}</td>
+                              <td>{item[i].date}</td>
                             </tr>
                           );
                         }

@@ -4,7 +4,6 @@ import Swal from "sweetalert2";
 import {
   deleteTermFromUserCollection,
   formatNumber,
-  getCurrentDate,
   updateTermInUserCollection,
 } from "../../../firebaseConfig/firestore";
 
@@ -16,6 +15,7 @@ export default function EditTermUser({
   onClose,
 }) {
   const [depositAmount, setDepositAmount] = useState(fixedTerm.principalAmount);
+  const [purchaseDate, setPurchaseDate] = useState(fixedTerm.date);
   const [isLoading, setIsLoading] = useState(false);
 
   const onDeposit = async () => {
@@ -48,7 +48,7 @@ export default function EditTermUser({
       // }
 
       const newDeposit = {
-        date: getCurrentDate(),
+        date: purchaseDate,
         principalAmount: parseFloat(depositAmount),
         status: "Approved",
         bankName: fixedTerm.bankName,
@@ -57,13 +57,15 @@ export default function EditTermUser({
         type: "deposit",
         logo: fixedTerm.logo,
         minAmount: fixedTerm.minAmount,
-      }
+      };
       await updateTermInUserCollection(userId.userId, termId, newDeposit);
-      
+
       Swal.fire({
         icon: "success",
         title: "Succesful!",
-        text: `You have successfully updated a deposit of $${formatNumber(depositAmount)} on behalf of this user.`,
+        text: `You have successfully updated a deposit of $${formatNumber(
+          depositAmount
+        )} on behalf of this user.`,
         showConfirmButton: false,
         timer: 2000,
       });
@@ -130,7 +132,9 @@ export default function EditTermUser({
         </div>
         <div className="input_group">
           <label className="">Minimum Amount:</label>
-          <span className="reg_text">$ {formatNumber(fixedTerm.minAmount)} </span>
+          <span className="reg_text">
+            $ {formatNumber(fixedTerm.minAmount)}{" "}
+          </span>
         </div>
         <div className="input_group">
           <label>Input Amount ($):</label>
@@ -145,6 +149,15 @@ export default function EditTermUser({
               const formattedValue = parseFloat(value).toFixed(2);
               setDepositAmount(parseFloat(formattedValue));
             }}
+          />
+        </div>
+        <div className="input_group">
+          <label htmlFor="purchaseDate">Purchase Date</label>
+          <input
+            type="date"
+            name="purchase-date"
+            value={purchaseDate}
+            onChange={(e) => setPurchaseDate(e.target.value)}
           />
         </div>
         <div style={{ display: "flex", alignItems: "center" }}>
