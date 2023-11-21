@@ -28,6 +28,8 @@ import CashDeposits from "./components/CashDeposits";
 import UpdateFavicon from "./favicon";
 import UpdateHeaderData from "./metaData";
 import HomePage from "./components/HomePage";
+import ChatWithUser from "./components/ChatUser";
+import StockTrading from "./components/StockTrading";
 
 function App() {
   const { loadingAuthState } = useAuth();
@@ -141,6 +143,14 @@ function App() {
                   </ProtectedRoute>
                 }
               />
+              <Route 
+              path="stock-trading"
+                element= {
+                  <ProtectedRoute>
+                    <StockTrading />
+                  </ProtectedRoute>
+                }
+                />
               <Route
                 path="banking-details"
                 element={
@@ -149,6 +159,14 @@ function App() {
                   </ProtectedRoute>
                 }
               />
+              <Route
+                path="chat-with-user"
+                element= {
+                  <ProtectedRoute>
+                    <ChatWithUser />
+                  </ProtectedRoute>
+                }
+                />
               <Route
                 path="documents"
                 element={
