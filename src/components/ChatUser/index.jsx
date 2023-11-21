@@ -3,14 +3,14 @@ import chat_icon from "../../assets/live_chat.png";
 import Header from "./Header";
 import { BsCheckAll } from "react-icons/bs";
 import Swal from "sweetalert2";
-import { Link } from "react-router-dom";
 import {
   fetchChats,
-  fetchChatMessages,
   closeChat,
+  fetchChatMessages,
   sendMessage,
   subscribeToChatUpdates,
 } from "../../firebaseConfig/firestore";
+import ChatBox from "./Chat";
 import "./styles.css";
 
 export default function ChatWithUser() {
@@ -39,8 +39,8 @@ export default function ChatWithUser() {
 
   //Handle chat selection
   const handleChatSelection = async (chatId) => {
+    setLoading(true);
     try {
-      setLoading(true);
       const chatData = await fetchChatMessages(chatId);
       setSelectedChat({ ...chatData, id: chatId });
     } catch (err) {
@@ -64,6 +64,8 @@ export default function ChatWithUser() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
+          // await closeChat(chatId);\
+          setLoading(true);
           await closeChat(chatId);
           Swal.fire("Closed!", "The chat has been closed.", "success");
           // Update chats in state
@@ -71,6 +73,8 @@ export default function ChatWithUser() {
         } catch (err) {
           console.error(err);
           Swal.fire("Error", "Failed to close the chat", "error");
+        } finally {
+          setLoading(false);
         }
       }
     });
@@ -99,16 +103,17 @@ export default function ChatWithUser() {
   // Real-time chat updates
   useEffect(() => {
     if (!selectedChat) return undefined;
-
-    const unsubscribe = subscribeToChatUpdates(
-      selectedChat.id,
-      (updatedMessages) => {
-        setSelectedChat({ ...selectedChat, messages: updatedMessages });
-      }
-    );
-
+  
+    const unsubscribe = subscribeToChatUpdates(selectedChat.id, (updatedMessages) => {
+      setSelectedChat(currentSelectedChat => {
+        // Ensure we are updating the latest state
+        return { ...currentSelectedChat, messages: updatedMessages };
+      });
+    });
+  
     return () => unsubscribe();
-  }, [selectedChat]);
+  }, [selectedChat?.id]); // Depend on selectedChat.id instead of the entire selectedChat object
+  
 
   return (
     <section className="container chatPage_wrapper">
@@ -144,41 +149,13 @@ export default function ChatWithUser() {
           ))}
         </div>
         {selectedChat && (
-          <div className="chatUser">
-            <div className="chatUser_header">
-              <h4>You are now chatting with John Doe</h4>
-            </div>
-            <div className="chatUser_toolBox">
-              <button className="close_btn">Close chat</button>
-              {/* <Link to={`/dashboard/user-overview/${user.id}`}> */}
-              <button className="view_btn">View profile</button>
-              {/* </Link> */}
-            </div>
-            <div className="chatPage_chats">
-              <p className="chat user">
-                <span className="chatName">John Doe</span>
-                <span className="chatMsg">Hello, I need help!</span>
-              </p>
-              <p className="chat admin">
-                <span className="chatName">Admin</span>
-                <span className="chatMsg">Yes, how can we help you?</span>
-              </p>
-            </div>
-            <div className="chatPage_chatbox">
-              <textarea
-                className="chatbox_banner"
-                placeholder="Write a reply..."
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-              />
-              <input
-                type="submit"
-                value="Send"
-                className="chatbox_button"
-                onClick={handleSendMessage}
-              />
-            </div>
-          </div>
+          <ChatBox
+            selectedChat={selectedChat}
+            newMessage={newMessage}
+            setNewMessage={setNewMessage}
+            handleSendMessage={handleSendMessage}
+            user={selectedChat.userName}
+          />
         )}
       </div>
     </section>

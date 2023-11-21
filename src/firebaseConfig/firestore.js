@@ -1473,12 +1473,24 @@ export const updateTitleText = async (newTitle) => {
 };
 
 //LIVE CHAT
-// Fetch Chats
+// Fetch Chats from all users
 export const fetchChats = async () => {
   try {
-    const chatsRef = firebase.firestore().collection('adminUsers').doc('chatroom').collection('chats');
-    const snapshot = await chatsRef.get();
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    const usersRef = collection(db, USERS_COLLECTION);
+    const usersSnapshot = await getDocs(usersRef);
+    const chats = [];
+
+    for (const userDoc of usersSnapshot.docs) {
+      const userUid = userDoc.id;
+      const chatsQuery = query(collection(db, USERS_COLLECTION, userUid, 'chats'), orderBy('timeStamp', 'desc'));
+      const chatsSnapshot = await getDocs(chatsQuery);
+      chatsSnapshot.forEach(chatDoc => {
+        chats.push({ id: chatDoc.id, userId: userUid, ...chatDoc.data() });
+        console.log(chats);
+      });
+    }
+
+    return chats;
   } catch (err) {
     console.error(err);
     throw new Error('Failed to load chats');
@@ -1486,11 +1498,20 @@ export const fetchChats = async () => {
 };
 
 // Handle Chat Selection
-export const fetchChatMessages = async (chatId) => {
+export const fetchChatMessages = (userUid, chatId, callback) => {
   try {
-    const messagesRef = firebase.firestore().collection('adminUsers').doc('chatroom').collection('chats').doc(chatId);
-    const snapshot = await messagesRef.get();
-    return snapshot.data();
+    const messagesRef = doc(db, USERS_COLLECTION, userUid, 'chats', chatId);
+
+    const unsubscribe = onSnapshot(messagesRef, (doc) => {
+      if (doc.exists()) {
+        console.log('Document data:', doc.data());
+        callback(doc.data());
+      } else {
+        console.log('No such document!');
+      }
+    });
+
+    return unsubscribe; // This function should be called to stop listening to changes
   } catch (err) {
     console.error(err);
     throw new Error('Failed to load chat messages');
@@ -1498,12 +1519,12 @@ export const fetchChatMessages = async (chatId) => {
 };
 
 // Close Chat
-export const closeChat = async (chatId) => {
+export const closeChat = async (userUid, chatId) => {
   try {
-    await firebase.firestore().collection('adminUsers').doc('chatroom').collection('chats').doc(chatId).delete();
-    await firebase.firestore().collection('users').doc(chatId).collection('notifications').add({
+    await deleteDoc(doc(db, USERS_COLLECTION, userUid, 'chats', chatId));
+    await addDoc(collection(db, USERS_COLLECTION, chatId, 'notifications'), {
       message: 'Your issue has been resolved.',
-      timeStamp: firebase.firestore.FieldValue.serverTimestamp()
+      timeStamp: serverTimestamp()
     });
   } catch (err) {
     console.error(err);
@@ -1512,16 +1533,16 @@ export const closeChat = async (chatId) => {
 };
 
 // Send Message
-export const sendMessage = async (chatId, message) => {
+export const sendMessage = async (userUid, chatId, message) => {
   try {
     const newMessage = {
       user: 'admin',
       chat: message,
-      timeStamp: firebase.firestore.FieldValue.serverTimestamp(),
+      timeStamp: serverTimestamp(),
       read: false
     };
-    const chatRef = firebase.firestore().collection('adminUsers').doc('chatroom').collection('chats').doc(chatId);
-    await chatRef.update({
+    const chatRef = doc(db, USERS_COLLECTION, userUid, 'chats', chatId);
+    await updateDoc(chatRef, {
       messages: firebase.firestore.FieldValue.arrayUnion(newMessage)
     });
   } catch (err) {
@@ -1531,13 +1552,10 @@ export const sendMessage = async (chatId, message) => {
 };
 
 // Real-time Chat Updates
-export const subscribeToChatUpdates = (chatId, callback) => {
-  const unsubscribe = firebase.firestore().collection('adminUsers').doc('chatroom').collection('chats').doc(chatId)
-    .onSnapshot(snapshot => {
+export const subscribeToChatUpdates = (userUid, chatId, callback) => {
+  const unsubscribe = onSnapshot(doc(db, USERS_COLLECTION, userUid, 'chats', chatId), snapshot => {
       callback(snapshot.data().messages);
     });
 
   return unsubscribe;
 };
-
-// export { fetchChats, fetchChatMessages, closeChat, sendMessage, subscribeToChatUpdates };
