@@ -1471,3 +1471,73 @@ export const updateTitleText = async (newTitle) => {
     throw error;
   }
 };
+
+//LIVE CHAT
+// Fetch Chats
+export const fetchChats = async () => {
+  try {
+    const chatsRef = firebase.firestore().collection('adminUsers').doc('chatroom').collection('chats');
+    const snapshot = await chatsRef.get();
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  } catch (err) {
+    console.error(err);
+    throw new Error('Failed to load chats');
+  }
+};
+
+// Handle Chat Selection
+export const fetchChatMessages = async (chatId) => {
+  try {
+    const messagesRef = firebase.firestore().collection('adminUsers').doc('chatroom').collection('chats').doc(chatId);
+    const snapshot = await messagesRef.get();
+    return snapshot.data();
+  } catch (err) {
+    console.error(err);
+    throw new Error('Failed to load chat messages');
+  }
+};
+
+// Close Chat
+export const closeChat = async (chatId) => {
+  try {
+    await firebase.firestore().collection('adminUsers').doc('chatroom').collection('chats').doc(chatId).delete();
+    await firebase.firestore().collection('users').doc(chatId).collection('notifications').add({
+      message: 'Your issue has been resolved.',
+      timeStamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  } catch (err) {
+    console.error(err);
+    throw new Error('Failed to close the chat');
+  }
+};
+
+// Send Message
+export const sendMessage = async (chatId, message) => {
+  try {
+    const newMessage = {
+      user: 'admin',
+      chat: message,
+      timeStamp: firebase.firestore.FieldValue.serverTimestamp(),
+      read: false
+    };
+    const chatRef = firebase.firestore().collection('adminUsers').doc('chatroom').collection('chats').doc(chatId);
+    await chatRef.update({
+      messages: firebase.firestore.FieldValue.arrayUnion(newMessage)
+    });
+  } catch (err) {
+    console.error(err);
+    throw new Error('Failed to send message');
+  }
+};
+
+// Real-time Chat Updates
+export const subscribeToChatUpdates = (chatId, callback) => {
+  const unsubscribe = firebase.firestore().collection('adminUsers').doc('chatroom').collection('chats').doc(chatId)
+    .onSnapshot(snapshot => {
+      callback(snapshot.data().messages);
+    });
+
+  return unsubscribe;
+};
+
+// export { fetchChats, fetchChatMessages, closeChat, sendMessage, subscribeToChatUpdates };

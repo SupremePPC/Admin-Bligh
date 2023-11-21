@@ -52,19 +52,30 @@
   background: #abe2c1;
 }
 
-.userName p {
+.userName .name {
   font-size: var(--font-sixteen);
   font-weight: 500;
   color: var(--primary);
 }
 
-.msgAlert {
+.userName .newMsg_alert {
   color: green;
   background-color: #d5f4d5;
   text-align: center;
   border-radius: 5px;
-  padding: 3px 6px;
+  padding: 3px 4px;
   font-size: 10px;
+  font-weight: 700;
+  line-height: 1rem;
+}
+
+.userName .msgAlert {
+  color: blue;
+  background-color: #d7d5f4;
+  text-align: center;
+  border-radius: 5px;
+  padding: 3px;
+  font-size: 22px;
   font-weight: 700;
 }
 
@@ -141,10 +152,14 @@
 
 .chatPage_chats .user {
   text-align: right;
+  border-radius: 8px 0px 8px 8px;
+  border-right: blue 1.5px solid;
 }
 
 .chatPage_chats .admin {
   text-align: left;
+  border-left: 1.5px solid green;
+  border-radius: 0px 8px 8px 8px;
 }
 
 .chat .chatName {
