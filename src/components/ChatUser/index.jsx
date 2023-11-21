@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import chat_icon from "../../assets/live_chat.png";
 import Header from "./Header";
 import { BsCheckAll } from "react-icons/bs";
@@ -19,6 +19,7 @@ export default function ChatWithUser() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [newMessage, setNewMessage] = useState("");
+  const unsubscribeRef = useRef(null);
 
   //Fetch chats
   useEffect(() => {
@@ -38,18 +39,31 @@ export default function ChatWithUser() {
   }, []);
 
   //Handle chat selection
-  const handleChatSelection = async (chatId) => {
+  const handleChatSelection = (userUid, chatId) => {
+    if (!chatId) return;
+
     setLoading(true);
-    try {
-      const chatData = await fetchChatMessages(chatId);
-      setSelectedChat({ ...chatData, id: chatId });
-    } catch (err) {
-      console.error(err);
-      setError("Failed to load chat messages");
-    } finally {
-      setLoading(false);
+
+    // Unsubscribe from any previous chat updates
+    if (unsubscribeRef.current) {
+      unsubscribeRef.current();
     }
+
+    // Subscribe to the new chat's updates
+    unsubscribeRef.current = fetchChatMessages(userUid, chatId, (chatData) => {
+      setSelectedChat({ ...chatData, id: chatId });
+      setLoading(false);
+    });
   };
+
+  useEffect(() => {
+    return () => {
+      // Cleanup: unsubscribe from the current chat when the component unmounts
+      if (unsubscribeRef.current) {
+        unsubscribeRef.current();
+      }
+    };
+  }, []);
 
   // Close chat/ delete chat
   const closeChat = async (chatId) => {
@@ -103,17 +117,22 @@ export default function ChatWithUser() {
   // Real-time chat updates
   useEffect(() => {
     if (!selectedChat) return undefined;
-  
-    const unsubscribe = subscribeToChatUpdates(selectedChat.id, (updatedMessages) => {
-      setSelectedChat(currentSelectedChat => {
-        // Ensure we are updating the latest state
-        return { ...currentSelectedChat, messages: updatedMessages };
-      });
-    });
-  
+
+    const userUid = selectedChat.userId; // Replace with the correct way to get userUid
+    const chatId = selectedChat.chatId; // Replace with the correct way to get chatId
+
+    const unsubscribe = subscribeToChatUpdates(
+      userUid,
+      chatId,
+      (updatedMessages) => {
+        setSelectedChat((currentSelectedChat) => {
+          return { ...currentSelectedChat, messages: updatedMessages };
+        });
+      }
+    );
+
     return () => unsubscribe();
-  }, [selectedChat?.id]); // Depend on selectedChat.id instead of the entire selectedChat object
-  
+  }, [selectedChat?.userUid, selectedChat?.id]);
 
   return (
     <section className="container chatPage_wrapper">
@@ -138,12 +157,18 @@ export default function ChatWithUser() {
               className="userName"
               onClick={() => handleChatSelection(chat.id)}
             >
-              <p className="name">{chat.userName}</p>
-              {/* Display New or Message alert based on chat status */}
-              {chat.newMessage ? (
-                <p className="newMsg_alert">New</p>
+              {loading ? (
+                <></>
               ) : (
-                <BsCheckAll className="msgAlert" />
+                <>
+                  <p className="name">{chat.user}</p>
+                  {/* Display New or Message alert based on chat status */}
+                  {chat.newMessage ? (
+                    <p className="newMsg_alert">New</p>
+                  ) : (
+                    <BsCheckAll className="msgAlert" />
+                  )}
+                </>
               )}
             </div>
           ))}
@@ -155,6 +180,7 @@ export default function ChatWithUser() {
             setNewMessage={setNewMessage}
             handleSendMessage={handleSendMessage}
             user={selectedChat.userName}
+            isLoading={loading}
           />
         )}
       </div>

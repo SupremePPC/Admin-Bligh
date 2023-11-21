@@ -1553,9 +1553,27 @@ export const sendMessage = async (userUid, chatId, message) => {
 
 // Real-time Chat Updates
 export const subscribeToChatUpdates = (userUid, chatId, callback) => {
-  const unsubscribe = onSnapshot(doc(db, USERS_COLLECTION, userUid, 'chats', chatId), snapshot => {
+  // Ensure that userUid and chatId are just string IDs
+  console.log('USERS_COLLECTION:', USERS_COLLECTION);
+  console.log('userUid:', userUid);
+  console.log('chatId:', chatId);
+
+  if (!userUid || !chatId) {
+    console.error('Invalid userUid or chatId');
+    return () => {};
+  }
+
+  const docRef = doc(db, USERS_COLLECTION, userUid, 'chats', chatId);
+  console.log('Document Reference:', docRef);
+
+  const unsubscribe = onSnapshot(docRef, snapshot => {
+    console.log('Snapshot data:', snapshot.data());
+    if (snapshot.exists()) {
       callback(snapshot.data().messages);
-    });
+    } else {
+      console.log('No such document!');
+    }
+  });
 
   return unsubscribe;
 };

@@ -127,6 +127,11 @@
   font-size: var(--font-sixteen);
 }
 
+.view_btn a:hover {
+  text-decoration: none;
+  color: var(--white);
+}
+
 .chatPage_chats {
   display: flex;
   flex-direction: column;
@@ -174,6 +179,12 @@
   color: var(--grey);
 }
 
+.chat .timeStamp{
+  font-size: 8px;
+  color: var(--grey);
+  line-height: 0;
+}
+
 .chatPage_chatbox {
   display: flex;
   flex-direction: column;
@@ -210,10 +221,15 @@
   border: 1px solid #fff;
   color: var(--white);
   width: 150px;
-  padding: 10px 0rem;
+  padding: 12px 0rem;
   font-size: var(--font-sixteen);
   font-weight: 600;
   cursor: pointer;
+}
+
+.chatPage_chatbox .chatbox_button:hover {
+  background-color: #0250bc;
+  color: var(--white);
 }
 
 @media screen and (max-width: 768px) {
