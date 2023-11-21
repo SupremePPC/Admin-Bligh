@@ -23,17 +23,28 @@ export default function ChatWithUser() {
         <div className="usersChat">
           <div className="userName">
             <p>John Doe</p>
-            <div className="msgAlert">1</div>
+            <div className="msgAlert">New</div>
           </div>
         </div>
         <div className="chatUser">
+          <div className="chatUser_header">
+            <h4>You are now chatting with John Doe</h4>
+          </div>
+          <div className="chatUser_toolBox">
+            <button className="close_btn">
+              Close chat
+            </button>
+            <button className="view_btn">
+              View profile
+            </button>
+          </div>
           <div className="chatPage_chats">
             <p className="chat user">
-              <span className="chatName">John Doe :</span>
+              <span className="chatName">John Doe</span>
               <span className="chatMsg">Hello, I need help!</span>
             </p>
             <p className="chat admin">
-              <span className="chatName">Admin :</span>
+              <span className="chatName">Admin</span>
               <span className="chatMsg">Yes, how can we help you?</span>
             </p>
           </div>
