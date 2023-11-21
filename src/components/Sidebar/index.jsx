@@ -174,7 +174,7 @@ function Sidebar() {
             className={`menu_link ${
               isActive("/dashboard/chat-with-user") ? "active" : ""
             }`}
-            to="/dashboard/chat-with user"
+            to="/dashboard/chat-with-user"
           >
             <BsChatLeftText size={20} />
             {!collapsed && "Chat With User"}

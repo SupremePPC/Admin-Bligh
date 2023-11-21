@@ -8,7 +8,8 @@ import {
   BsFileEarmarkText,
   BsCashCoin,
   BsBriefcase,
-  BsBank
+  BsBank,
+  BsChatLeftText
 } from "react-icons/bs";
 import { PiMoneyLight } from "react-icons/pi";
 import { IoMdNotificationsOutline, IoIosLogOut } from "react-icons/io";
@@ -94,9 +95,14 @@ function HomePage() {
           label="Banking Details"
         />
         <DashboardCard
-          to="/dashboard/Documents"
+          to="/dashboard/documents"
           icon={<BsFileEarmarkText stroke="#fff" size={20} />}
           label="Documents"
+        />
+        <DashboardCard
+          to="/dashboard/chat-with-user"
+          icon={<BsChatLeftText stroke="#fff" size={20} />}
+          label="Chat With User"
         />
         <DashboardCard
           to="/dashboard/notifications"
