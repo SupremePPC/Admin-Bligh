@@ -10,7 +10,8 @@ import {
   BsCashCoin,
   BsBriefcase,
   BsCreditCard2Front,
-  BsBank
+  BsBank,
+  BsChatLeftText
 } from "react-icons/bs";
 import { PiMoneyLight } from "react-icons/pi";
 import { IoMdNotificationsOutline, IoIosLogOut } from "react-icons/io";
@@ -19,6 +20,7 @@ import { getAuth } from "firebase/auth";
 import Modal from "../CustomsModal";
 import { SumNotifications } from "../../firebaseConfig/firestore";
 import "./style.css";
+import { AiOutlineStock } from "react-icons/ai";
 
 function Sidebar() {
   const [collapsed, setCollapsed] = useState(true);
@@ -137,6 +139,17 @@ function Sidebar() {
         <li className="menu_list">
           <Link
             className={`menu_link ${
+              isActive("/dashboard/stock-trading") ? "active" : ""
+            }`}
+            to="/dashboard/stock-trading"
+          >
+            <AiOutlineStock size={20} />
+            {!collapsed && "Stock Trading"}
+          </Link>
+        </li>
+        <li className="menu_list">
+          <Link
+            className={`menu_link ${
               isActive("/dashboard/banking-details") ? "active" : ""
             }`}
             to="/dashboard/banking-details"
@@ -156,7 +169,17 @@ function Sidebar() {
             {!collapsed && "Docs Management"}
           </Link>
         </li>
-
+        <li className="menu_list">
+          <Link
+            className={`menu_link ${
+              isActive("/dashboard/chat-with-user") ? "active" : ""
+            }`}
+            to="/dashboard/chat-with user"
+          >
+            <BsChatLeftText size={20} />
+            {!collapsed && "Chat With User"}
+          </Link>
+        </li>
         <li className="menu_list">
           <Link
             className={`menu_link ${
@@ -203,7 +226,7 @@ function Sidebar() {
                     setIsLoading(false);
                     console.log("Successfully signed out!");
                     navigate("/");
-                  })
+                  }) 
                   .catch((error) => {
                     setIsLoading(false);
                     console.error("Error signing out:", error);
