@@ -37,39 +37,45 @@ export default function ChatWithUser() {
 
   //Fetch chats
   useEffect(() => {
-    const fetchAndSetChats = async () => {
+    setLoading(true);
+  
+    const loadChats = async () => {
       try {
-        const chatsData = await fetchChats();
-        setChats(chatsData);
-        console.log(chatsData);
-        setSelectedChat(chatsData[0] || null);
-      } catch (err) {
-        setError(err.message);
+        await fetchChats(setChats);
+      } catch (error) {
+        console.error(error);
+        setError("Failed to load chats");
       } finally {
         setLoading(false);
       }
     };
-
-    fetchAndSetChats();
+  
+    loadChats();
   }, []);
-
+  
   //Handle chat selection
-  const handleChatSelection = (userUid, chatId) => {
-    if (!chatId) return;
-
+  const handleChatSelection = (userUid, userName) => {
     setLoading(true);
-
+  
     // Unsubscribe from any previous chat updates
     if (unsubscribeRef.current) {
       unsubscribeRef.current();
     }
-
+  
     // Subscribe to the new chat's updates
-    unsubscribeRef.current = fetchChatMessages(userUid, chatId, (chatData) => {
-      setSelectedChat({ ...chatData, id: chatId });
+    unsubscribeRef.current = fetchChatMessages(userUid, (chats) => {
+      if (chats.length > 0) {
+        setSelectedChat({ userId: userUid, messages: chats, userName: userName });
+      } else {
+        setSelectedChat(null); // Handle case where there are no chats
+      }
+      setLoading(false);
+    }, (error) => {
+      console.error("Failed to fetch chat messages:", error);
+      setError(error.message);
       setLoading(false);
     });
-  };
+  };  
 
   useEffect(() => {
     return () => {
@@ -112,29 +118,36 @@ export default function ChatWithUser() {
   // Send message
   const handleSendMessage = async (event) => {
     event.preventDefault();
-    if (!newMessage.trim() || !selectedChat) return;
-
+  
     try {
-      await sendMessage(selectedChat.id, newMessage);
-      // Update the chat in state
-      const updatedMessages = [
-        ...selectedChat.messages,
-        { user: "admin", chat: newMessage },
-      ];
-      setSelectedChat({ ...selectedChat, messages: updatedMessages });
-      setNewMessage(""); // Clear the input field
+      setLoading(true);
+      // Sending message to the selected user's 'chats' subcollection
+      await sendMessage(selectedChat.userId, newMessage);
+  
+      // Update local state to reflect the new message
+      // const updatedMessages = [
+      //   ...selectedChat.messages,
+      //   { user: "admin", chat: newMessage, timeStamp: new Date() }  // Adding a new message to the local state
+      // ];
+      // setSelectedChat({ ...selectedChat, messages: updatedMessages });
+      console.log
+      setNewMessage("");  // Clear the input field after sending
+  
     } catch (err) {
-      console.error(err);
+      console.error("Error sending message:", err);
       setError("Failed to send message");
+    } finally {
+      setLoading(false);
     }
   };
-
+  
   // Real-time chat updates
   useEffect(() => {
     if (!selectedChat) return undefined;
 
-    const userUid = selectedChat.userId; // Replace with the correct way to get userUid
-    const chatId = selectedChat.chatId; // Replace with the correct way to get chatId
+    const userUid = selectedChat.userId; 
+    const chatId = selectedChat.chatId;
+    console.log(selectedChat)
 
     const unsubscribe = subscribeToChatUpdates(
       userUid,
@@ -165,19 +178,20 @@ export default function ChatWithUser() {
         </div>
       </div>
       <div className="chatBox">
-        {loading ? (
+        {/* {loading ? (
           <LoadingScreen />
         ) : (
-          <>
+          <> */}
             <div className="usersChat">
               <div className="usersChat_header">
                 <h4>All messages</h4>
               </div>
               {chats.map((user) => (
+                
                 <div
                   key={user.userId}
                   className="userName"
-                  onClick={() => handleChatSelection(user.userId)}
+                  onClick={() => handleChatSelection(user.userId, user.userName)}
                   title="Click to view chat"
                 >
                   <p className="name">{user.userName}</p>
@@ -192,15 +206,17 @@ export default function ChatWithUser() {
                 closeChat={() =>
                   closeChat(selectedChat.userId, selectedChat.id)
                 }
+                newMessage={newMessage}
+                setNewMessage={setNewMessage}
               />
             ) : (
               <div className="chatBox_banner">
-                <AiFillWechat size={50} />
+                <AiFillWechat size={80} />
                 <h4>Click on a chat to start responding.</h4>
               </div>
             )}
-          </>
-        )}
+          {/* </>
+        )} */}
       </div>
     </section>
   );

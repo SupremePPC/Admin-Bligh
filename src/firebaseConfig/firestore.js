@@ -19,9 +19,11 @@ import {
   doc,
   getDoc,
   getDocs,
+  limit,
   onSnapshot,
   orderBy,
   query,
+  serverTimestamp,
   setDoc,
   updateDoc,
   where,
@@ -1474,7 +1476,7 @@ export const updateTitleText = async (newTitle) => {
 
 //LIVE CHAT
 // Fetch all users with 'chats' in their doc
-export const fetchChats = async () => {
+export const fetchChats = async (setChats) => {
   try {
     const usersRef = collection(db, USERS_COLLECTION);
     const usersSnapshot = await getDocs(usersRef);
@@ -1483,20 +1485,20 @@ export const fetchChats = async () => {
     for (const userDoc of usersSnapshot.docs) {
       const userUid = userDoc.id;
       const chatsRef = collection(db, USERS_COLLECTION, userUid, 'chats');
-      const chatsSnapshot = await getDocs(chatsRef);
+      const q = query(chatsRef, orderBy('timeStamp', 'asc'));
+      const chatsSnapshot = await getDocs(q);
 
       if (!chatsSnapshot.empty) {
-        usersWithChats.push({ userId: userUid, userName: userDoc.data().fullName }); 
+        usersWithChats.push({ userId: userUid, userName: userDoc.data().fullName });
       }
     }
 
-    return usersWithChats;
+    setChats(usersWithChats);
   } catch (err) {
     console.error(err);
     throw new Error('Failed to load user chats');
   }
 };
-
 
 // Fetch all chats within the 'chats' subcollection for an individual user
 export const fetchChatMessages = (userUid, callback) => {
@@ -1516,7 +1518,6 @@ export const fetchChatMessages = (userUid, callback) => {
   }
 };
 
-
 // Close Chat
 export const closeChat = async (userUid, chatId) => {
   try {
@@ -1532,26 +1533,34 @@ export const closeChat = async (userUid, chatId) => {
 };
 
 // Send Message
-export const sendMessage = async (userUid, chatId, message) => {
+export const sendMessage = async (userUid, chatMessage) => {
   try {
-    const newMessage = {
-      user: 'admin',
-      chat: message,
+    // Create a new chat document reference
+    const newChatRef = doc(collection(db, 'users', userUid, 'chats'));
+    const chatId = newChatRef.id;
+    console.log(chatId);
+    // Initialize the new chat document with the chat message and other data
+    await setDoc(newChatRef, {
+      chat: chatMessage,
       timeStamp: serverTimestamp(),
-      read: false
-    };
-    const chatRef = doc(db, USERS_COLLECTION, userUid, 'chats', chatId);
-    await updateDoc(chatRef, {
-      messages: firebase.firestore.FieldValue.arrayUnion(newMessage)
+      read: false,
+      user: 'admin', // or the client's identifier
+      id: userUid,
+      chatId: chatId,
+      // userName: fullName,
     });
+    return chatId;
   } catch (err) {
     console.error(err);
-    throw new Error('Failed to send message');
+    throw new Error('Failed to send chat');
   }
 };
 
+
 // Real-time Chat Updates
 export const subscribeToChatUpdates = (userUid, chatId, callback) => {
+  console.log('userUid:', userUid, 'chatId:', chatId); // Add this line for debugging
+
   if (!userUid || !chatId) {
     console.error('Invalid userUid or chatId');
     return () => {};

@@ -9,10 +9,10 @@ export default function ChatBox({
   selectedChat,
   handleSendMessage,
   closeChat,
+  newMessage,
+  setNewMessage
 }) {
   const [chats, setChats] = useState([]);
-  const [error, setError] = useState("");
-  const [newMessage, setNewMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -22,7 +22,6 @@ export default function ChatBox({
         setChats(messages);
         setIsLoading(false);
       });
-
       return () => unsubscribe();
     }
   }, [selectedChat]);
@@ -47,13 +46,13 @@ export default function ChatBox({
   return (
     <div className="chatUser">
       <div className="chatUser_header">
-        <h4>You are now chatting with {selectedChat.user}</h4>
+        <h4>You are now chatting with {selectedChat.userName}</h4>
         <div className="chatUser_toolBox">
           <button className="close_btn" title="Delete Chat" onClick={closeChat}>
             <MdDelete size={20} />
           </button>
           <button className="view_btn" title="View Profile">
-            <Link to={`/dashboard/user-overview/${selectedChat.id}`}>
+            <Link to={`/dashboard/user-overview/${selectedChat.userId}`}>
               <IoPersonCircleOutline size={20} />
             </Link>
           </button>
@@ -69,7 +68,7 @@ export default function ChatBox({
               {formatTimestamp(message.timeStamp)}
             </span>
             <span className="chatName">
-              {message.user === "client" ? "You" : message.userName}:
+              {message.user === "client" ? message.userName : "You"}:
             </span>
             <span className="chatMsg">{message.chat}</span>
           </p>
