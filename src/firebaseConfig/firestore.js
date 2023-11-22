@@ -1473,50 +1473,49 @@ export const updateTitleText = async (newTitle) => {
 };
 
 //LIVE CHAT
-// Fetch Chats from all users
+// Fetch all users with 'chats' in their doc
 export const fetchChats = async () => {
   try {
     const usersRef = collection(db, USERS_COLLECTION);
     const usersSnapshot = await getDocs(usersRef);
-    const chats = [];
+    const usersWithChats = [];
 
     for (const userDoc of usersSnapshot.docs) {
       const userUid = userDoc.id;
-      const chatsQuery = query(collection(db, USERS_COLLECTION, userUid, 'chats'), orderBy('timeStamp', 'desc'));
-      const chatsSnapshot = await getDocs(chatsQuery);
-      chatsSnapshot.forEach(chatDoc => {
-        chats.push({ id: chatDoc.id, userId: userUid, ...chatDoc.data() });
-        console.log(chats);
-      });
+      const chatsRef = collection(db, USERS_COLLECTION, userUid, 'chats');
+      const chatsSnapshot = await getDocs(chatsRef);
+
+      if (!chatsSnapshot.empty) {
+        usersWithChats.push({ userId: userUid, userName: userDoc.data().fullName }); 
+      }
     }
 
-    return chats;
+    return usersWithChats;
   } catch (err) {
     console.error(err);
-    throw new Error('Failed to load chats');
+    throw new Error('Failed to load user chats');
   }
 };
 
-// Handle Chat Selection
-export const fetchChatMessages = (userUid, chatId, callback) => {
-  try {
-    const messagesRef = doc(db, USERS_COLLECTION, userUid, 'chats', chatId);
 
-    const unsubscribe = onSnapshot(messagesRef, (doc) => {
-      if (doc.exists()) {
-        console.log('Document data:', doc.data());
-        callback(doc.data());
-      } else {
-        console.log('No such document!');
-      }
+// Fetch all chats within the 'chats' subcollection for an individual user
+export const fetchChatMessages = (userUid, callback) => {
+  try {
+    const messagesRef = collection(db, USERS_COLLECTION, userUid, 'chats');
+    const q = query(messagesRef, orderBy('timeStamp', 'asc'));
+
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const chats = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      callback(chats);
     });
 
-    return unsubscribe; // This function should be called to stop listening to changes
+    return unsubscribe; // Function to stop listening to changes
   } catch (err) {
     console.error(err);
     throw new Error('Failed to load chat messages');
   }
 };
+
 
 // Close Chat
 export const closeChat = async (userUid, chatId) => {
@@ -1553,21 +1552,16 @@ export const sendMessage = async (userUid, chatId, message) => {
 
 // Real-time Chat Updates
 export const subscribeToChatUpdates = (userUid, chatId, callback) => {
-  // Ensure that userUid and chatId are just string IDs
-  console.log('USERS_COLLECTION:', USERS_COLLECTION);
-  console.log('userUid:', userUid);
-  console.log('chatId:', chatId);
-
   if (!userUid || !chatId) {
     console.error('Invalid userUid or chatId');
     return () => {};
   }
 
   const docRef = doc(db, USERS_COLLECTION, userUid, 'chats', chatId);
-  console.log('Document Reference:', docRef);
+  // console.log('Document Reference:', docRef);
 
   const unsubscribe = onSnapshot(docRef, snapshot => {
-    console.log('Snapshot data:', snapshot.data());
+    // console.log('Snapshot data:', snapshot.data());
     if (snapshot.exists()) {
       callback(snapshot.data().messages);
     } else {

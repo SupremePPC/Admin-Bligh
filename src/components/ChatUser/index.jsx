@@ -13,13 +13,13 @@ import {
 } from "../../firebaseConfig/firestore";
 import ChatBox from "./Chat";
 import LoadingScreen from "../LoadingScreen";
+import { format, isToday, isYesterday } from "date-fns";
 import "./styles.css";
 
 // TODO
 //click on chat isn't working
 // When a chat is closed, the user should be moved to the next chat in the list.
 // Handle send chat for admin
-// Handle send chat for user 
 // Handle new message alert for admin
 // Handle chat status for admin
 // Handle chat status for user
@@ -41,6 +41,7 @@ export default function ChatWithUser() {
       try {
         const chatsData = await fetchChats();
         setChats(chatsData);
+        console.log(chatsData);
         setSelectedChat(chatsData[0] || null);
       } catch (err) {
         setError(err.message);
@@ -172,41 +173,65 @@ export default function ChatWithUser() {
               <div className="usersChat_header">
                 <h4>All messages</h4>
               </div>
-              {chats.map((chat) => (
+              {chats.map((user) => (
                 <div
-                  key={chat.id}
+                  key={user.userId}
                   className="userName"
-                  onClick={() => handleChatSelection(chat.id)}
+                  onClick={() => handleChatSelection(user.userId)}
                   title="Click to view chat"
                 >
-                  <p className="name">{chat.user}</p>
-                  {/* Display New or Message alert based on chat status */}
-                  {chat.newMessage ? (
-                    <p className="newMsg_alert">New</p>
-                  ) : (
-                    <BsCheckAll className="msgAlert" />
-                  )}
+                  <p className="name">{user.userName}</p>
                 </div>
               ))}
             </div>
-            { selectedChat ? (
-            <ChatBox
-              selectedChat={selectedChat}
-              newMessage={newMessage}
-              setNewMessage={setNewMessage}
-              handleSendMessage={handleSendMessage}
-              user={selectedChat.userName}
-              isLoading={loading}
-            />
+            {selectedChat ? (
+              <ChatBox
+                selectedChat={selectedChat}
+                handleSendMessage={handleSendMessage}
+                isLoading={loading}
+                closeChat={() =>
+                  closeChat(selectedChat.userId, selectedChat.id)
+                }
+              />
             ) : (
-            <div className="chatBox_banner">
-              <AiFillWechat size={50} />
-              <h4>Click on a chat to start responding.</h4>
-            </div>
+              <div className="chatBox_banner">
+                <AiFillWechat size={50} />
+                <h4>Click on a chat to start responding.</h4>
+              </div>
             )}
           </>
         )}
       </div>
     </section>
   );
+}
+
+// const formatTimestamp = (timeStamp) => {
+//   console.log(timeStamp);
+//   if (!timeStamp) return "";
+
+//   const date = timeStamp.toDate(); // Convert Firestore timestamp to JavaScript Date object
+
+//   if (isToday(date)) {
+//     // If the message was sent today, return only the time
+//     return format(date, "p"); // 'p' is for the local time format
+//   } else if (isYesterday(date)) {
+//     // If the message was sent yesterday, return 'Yesterday'
+//     return "Yesterday";
+//   } else {
+//     // Otherwise, return the full date
+//     return format(date, "PPP"); // 'PPP' is for the longer date format, e.g., Jun 20, 2020
+//   }
+// };
+{
+  /* <p className="newMsg_alert">
+                    {formatTimestamp(user.timeStamp)}
+                  </p> */
+}
+{
+  /* {user.read ? (
+                    <p className="newMsg_alert">New</p>
+                  ) : (
+                    <BsCheckAll className="msgAlert" />
+                  )} */
 }
