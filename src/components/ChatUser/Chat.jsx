@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { MdDelete } from "react-icons/md";
 import { IoPersonCircleOutline } from "react-icons/io5";
+import { format, isToday, isYesterday } from 'date-fns';
 
 export default function ChatBox({
   selectedChat,
@@ -11,6 +12,24 @@ export default function ChatBox({
   isLoading,
   closeChat,
 }) {
+    const formatTimestamp = (timeStamp) => {
+        console.log(timeStamp)
+        if (!timeStamp) return '';
+      
+        const date = timeStamp.toDate(); // Convert Firestore timestamp to JavaScript Date object
+      
+        if (isToday(date)) {
+          // If the message was sent today, return only the time
+          return format(date, 'p'); // 'p' is for the local time format
+        } else if (isYesterday(date)) {
+          // If the message was sent yesterday, return 'Yesterday'
+          return 'Yesterday';
+        } else {
+          // Otherwise, return the full date
+          return format(date, 'PPP'); // 'PPP' is for the longer date format, e.g., Jun 20, 2020
+        }
+      };
+      
   return (
     <div className="chatUser">
       <div className="chatUser_header">
@@ -30,7 +49,7 @@ export default function ChatBox({
       </div>
       <div className="chatPage_chats">
         <p className="chat user">
-          <span className="timeStamp">{selectedChat.timeStamp}</span>
+          <span className="timeStamp">{formatTimestamp(selectedChat.timeStamp)}</span>
           <span className="chatName">{selectedChat.user}</span>
           <span className="chatMsg">{selectedChat.chat}</span>
         </p>

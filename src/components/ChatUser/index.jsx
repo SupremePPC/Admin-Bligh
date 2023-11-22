@@ -16,14 +16,14 @@ import LoadingScreen from "../LoadingScreen";
 import "./styles.css";
 
 // TODO
-// When data is loading (e.g., fetching chats), only the exact chat that is clicked on should be loading or the exact element that is loading should be loading, not the entire page.
+//click on chat isn't working
 // When a chat is closed, the user should be moved to the next chat in the list.
 // Handle send chat for admin
+// Handle send chat for user 
 // Handle new message alert for admin
 // Handle chat status for admin
 // Handle chat status for user
 // Handle new message alert for user
-// Handle send chat for user
 //Handle chat count for admin so that the admin can see how many chats are open
 //Handle new unread messages count for admin so that the admin can see how many messages are new from all chats combined
 
