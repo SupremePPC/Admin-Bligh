@@ -3,6 +3,7 @@ import chat_icon from "../../assets/live_chat.png";
 import Header from "./Header";
 import { BsCheckAll } from "react-icons/bs";
 import Swal from "sweetalert2";
+import { AiFillWechat } from "react-icons/ai";
 import {
   fetchChats,
   closeChat,
@@ -11,7 +12,20 @@ import {
   subscribeToChatUpdates,
 } from "../../firebaseConfig/firestore";
 import ChatBox from "./Chat";
+import LoadingScreen from "../LoadingScreen";
 import "./styles.css";
+
+// TODO
+// When data is loading (e.g., fetching chats), only the exact chat that is clicked on should be loading or the exact element that is loading should be loading, not the entire page.
+// When a chat is closed, the user should be moved to the next chat in the list.
+// Handle send chat for admin
+// Handle new message alert for admin
+// Handle chat status for admin
+// Handle chat status for user
+// Handle new message alert for user
+// Handle send chat for user
+//Handle chat count for admin so that the admin can see how many chats are open
+//Handle new unread messages count for admin so that the admin can see how many messages are new from all chats combined
 
 export default function ChatWithUser() {
   const [selectedChat, setSelectedChat] = useState(null);
@@ -150,17 +164,21 @@ export default function ChatWithUser() {
         </div>
       </div>
       <div className="chatBox">
-        <div className="usersChat">
-          {chats.map((chat) => (
-            <div
-              key={chat.id}
-              className="userName"
-              onClick={() => handleChatSelection(chat.id)}
-            >
-              {loading ? (
-                <></>
-              ) : (
-                <>
+        {loading ? (
+          <LoadingScreen />
+        ) : (
+          <>
+            <div className="usersChat">
+              <div className="usersChat_header">
+                <h4>All messages</h4>
+              </div>
+              {chats.map((chat) => (
+                <div
+                  key={chat.id}
+                  className="userName"
+                  onClick={() => handleChatSelection(chat.id)}
+                  title="Click to view chat"
+                >
                   <p className="name">{chat.user}</p>
                   {/* Display New or Message alert based on chat status */}
                   {chat.newMessage ? (
@@ -168,20 +186,25 @@ export default function ChatWithUser() {
                   ) : (
                     <BsCheckAll className="msgAlert" />
                   )}
-                </>
-              )}
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-        {selectedChat && (
-          <ChatBox
-            selectedChat={selectedChat}
-            newMessage={newMessage}
-            setNewMessage={setNewMessage}
-            handleSendMessage={handleSendMessage}
-            user={selectedChat.userName}
-            isLoading={loading}
-          />
+            { selectedChat ? (
+            <ChatBox
+              selectedChat={selectedChat}
+              newMessage={newMessage}
+              setNewMessage={setNewMessage}
+              handleSendMessage={handleSendMessage}
+              user={selectedChat.userName}
+              isLoading={loading}
+            />
+            ) : (
+            <div className="chatBox_banner">
+              <AiFillWechat size={50} />
+              <h4>Click on a chat to start responding.</h4>
+            </div>
+            )}
+          </>
         )}
       </div>
     </section>
