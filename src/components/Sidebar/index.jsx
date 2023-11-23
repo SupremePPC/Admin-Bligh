@@ -292,8 +292,8 @@ function Sidebar() {
                     console.error("Error signing out:", error);
                   });
               }}
-              positiveLabel="Cancel"
-              negativeLabel="Logout"
+              positiveLabel="Logout"
+              negativeLabel="Cancel"
               isLoading={isLoading}
             />
           </div>

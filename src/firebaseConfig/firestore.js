@@ -36,6 +36,7 @@ import {
   getDownloadURL,
   uploadBytesResumable,
 } from "firebase/storage";
+import { getAuth, signOut } from "firebase/auth";
 
 const ADMINUSER_COLLECTION = "admin_users";
 const ADMINDASH_COLLECTION = "admin_users";
@@ -67,6 +68,32 @@ export function addAdminUser(uid, fullName, email) {
     email,
   });
 }
+
+export const checkAdminRoleAndLogoutIfNot = async (db) => {
+  const auth = getAuth();
+  const user = auth.currentUser;
+
+  if (!user) {
+    return false;
+  }
+
+  try {
+    const adminUserRef = doc(db, "adminUsers", user.uid);
+    const adminUserDoc = await getDoc(adminUserRef);
+
+    if (adminUserDoc.exists() && adminUserDoc.data().role === "admin") {
+      return true;
+    } else {
+      await signOut(auth);
+      return false;
+    }
+  } catch (error) {
+    console.error("Error checking admin role:", error);
+    await signOut(auth);
+    return false;
+  }
+};
+
 
 //USER REQUESTS
 const USER_REQUESTS_COLLECTION = "userRequests";
@@ -1705,27 +1732,37 @@ export function fetchChats(db, setChats) {
 export function countUsersWithChats(db, setUsersWithChatsCount) {
   const usersRef = collection(db, "users");
 
-  onSnapshot(usersRef, async (usersSnapshot) => {
-    let usersWithChatsCount = 0;
+  let userChatListeners = new Map(); // To track listeners for each user
 
-    // Iterate through each user document
-    for (const userDoc of usersSnapshot.docs) {
+  onSnapshot(usersRef, (usersSnapshot) => {
+    // Unsubscribe from any previous chat listeners
+    userChatListeners.forEach(unsubscribe => unsubscribe());
+    userChatListeners.clear();
+
+    let currentUsersWithChatsCount = 0;
+
+    usersSnapshot.forEach((userDoc) => {
       const userUid = userDoc.id;
-      console.log(userUid);
       const chatsRef = collection(db, "users", userUid, 'chats');
 
-      // Check if the 'chats' subcollection has any documents
-      const chatsSnapshot = await getDocs(chatsRef);
-      if (!chatsSnapshot.empty) {
-        usersWithChatsCount += chatsSnapshot.size;
-      }
-    }
-
-    // Update the count
-    setUsersWithChatsCount(usersWithChatsCount);
+      // Set up a listener for each user's 'chats' subcollection
+      const unsubscribe = onSnapshot(chatsRef, (chatsSnapshot) => {
+        if (!chatsSnapshot.empty) {
+          // Only count if there are chat documents
+          if (!userChatListeners.has(userUid)) {
+            currentUsersWithChatsCount++;
+          }
+        } else {
+          if (userChatListeners.has(userUid)) {
+            currentUsersWithChatsCount--;
+          }
+        }
+        setUsersWithChatsCount(currentUsersWithChatsCount);
+        userChatListeners.set(userUid, unsubscribe);
+      });
+    });
   });
 }
-
 
 
 // Fetch all chats within the CHATS_SUBCOLLECTION subcollection for an individual user

@@ -1,5 +1,5 @@
 // App.js
-import React from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { useAuth } from "./authState";
 import { Provider } from "react-redux";
@@ -30,10 +30,17 @@ import UpdateHeaderData from "./metaData";
 import HomePage from "./components/HomePage";
 import ChatWithUser from "./components/ChatUser";
 import StockTrading from "./components/StockTrading";
+import { db } from "./firebaseConfig/firebase";
+import { checkAdminRoleAndLogoutIfNot } from "./firebaseConfig/firestore";
+  
 
 function App() {
   const { loadingAuthState } = useAuth();
-
+  
+  useEffect(() => {
+    checkAdminRoleAndLogoutIfNot(db);
+  }, []);
+  
   return (
     <Provider store={store}>
       <div className="App">
