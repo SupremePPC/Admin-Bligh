@@ -272,6 +272,10 @@ img {
   color: var(--white);
 }
 
+.swal2-actions{
+  gap: 1rem;
+}
+
 .spinner {
   width: 25px;
   height: 25px;

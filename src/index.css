@@ -828,7 +828,7 @@ button:hover,
 [type='submit']:hover,
 [type='reset']:hover,
 [type='button']:hover {
-  border: 1px solid #0250bc;
+  /* border: 1px solid #0250bc; */
   background: #0250bc;
   color: #ffffff;
   text-decoration: none;

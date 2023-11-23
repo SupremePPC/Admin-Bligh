@@ -1556,7 +1556,6 @@ export const sendMessage = async (userUid, chatMessage) => {
   }
 };
 
-
 // Real-time Chat Updates
 export const subscribeToChatUpdates = (userUid, chatId, callback) => {
   console.log('userUid:', userUid, 'chatId:', chatId); // Add this line for debugging

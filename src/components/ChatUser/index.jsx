@@ -17,9 +17,7 @@ import { format, isToday, isYesterday } from "date-fns";
 import "./styles.css";
 
 // TODO
-//click on chat isn't working
 // When a chat is closed, the user should be moved to the next chat in the list.
-// Handle send chat for admin
 // Handle new message alert for admin
 // Handle chat status for admin
 // Handle chat status for user
@@ -38,7 +36,7 @@ export default function ChatWithUser() {
   //Fetch chats
   useEffect(() => {
     setLoading(true);
-  
+
     const loadChats = async () => {
       try {
         await fetchChats(setChats);
@@ -49,33 +47,42 @@ export default function ChatWithUser() {
         setLoading(false);
       }
     };
-  
+
     loadChats();
   }, []);
-  
+
   //Handle chat selection
   const handleChatSelection = (userUid, userName) => {
     setLoading(true);
-  
+
     // Unsubscribe from any previous chat updates
     if (unsubscribeRef.current) {
       unsubscribeRef.current();
     }
-  
+
     // Subscribe to the new chat's updates
-    unsubscribeRef.current = fetchChatMessages(userUid, (chats) => {
-      if (chats.length > 0) {
-        setSelectedChat({ userId: userUid, messages: chats, userName: userName });
-      } else {
-        setSelectedChat(null); // Handle case where there are no chats
+    unsubscribeRef.current = fetchChatMessages(
+      userUid,
+      (chats) => {
+        if (chats.length > 0) {
+          setSelectedChat({
+            userId: userUid,
+            messages: chats,
+            userName: userName,
+            chatId: chats[0].chatId,
+          });
+        } else {
+          setSelectedChat(null); // Handle case where there are no chats
+        }
+        setLoading(false);
+      },
+      (error) => {
+        console.error("Failed to fetch chat messages:", error);
+        setError(error.message);
+        setLoading(false);
       }
-      setLoading(false);
-    }, (error) => {
-      console.error("Failed to fetch chat messages:", error);
-      setError(error.message);
-      setLoading(false);
-    });
-  };  
+    );
+  };
 
   useEffect(() => {
     return () => {
@@ -87,24 +94,25 @@ export default function ChatWithUser() {
   }, []);
 
   // Close chat/ delete chat
-  const closeChat = async (chatId) => {
+  const handleCloseChat = async (userId, chatId) => {
     Swal.fire({
       title: "Are you sure?",
       text: "Do you want to close this chat?",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: "#3085d6",
+      confirmButtonColor: "#008000",
       cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, close it!",
+      confirmButtonText: "Close it!",
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          // await closeChat(chatId);\
           setLoading(true);
-          await closeChat(chatId);
+          await closeChat(userId, chatId); // Assuming this is a function that handles closing the chat in Firestore
           Swal.fire("Closed!", "The chat has been closed.", "success");
-          // Update chats in state
-          setChats(chats.filter((chat) => chat.id !== chatId));
+
+          // Update chats in state and reset selected chat
+          // setChats(chats.filter((chat) => chat.id !== chatId));
+          setSelectedChat(null); // Reset selected chat to show default component
         } catch (err) {
           console.error(err);
           Swal.fire("Error", "Failed to close the chat", "error");
@@ -118,21 +126,11 @@ export default function ChatWithUser() {
   // Send message
   const handleSendMessage = async (event) => {
     event.preventDefault();
-  
+
     try {
       setLoading(true);
-      // Sending message to the selected user's 'chats' subcollection
       await sendMessage(selectedChat.userId, newMessage);
-  
-      // Update local state to reflect the new message
-      // const updatedMessages = [
-      //   ...selectedChat.messages,
-      //   { user: "admin", chat: newMessage, timeStamp: new Date() }  // Adding a new message to the local state
-      // ];
-      // setSelectedChat({ ...selectedChat, messages: updatedMessages });
-      console.log
-      setNewMessage("");  // Clear the input field after sending
-  
+      setNewMessage("");
     } catch (err) {
       console.error("Error sending message:", err);
       setError("Failed to send message");
@@ -140,14 +138,14 @@ export default function ChatWithUser() {
       setLoading(false);
     }
   };
-  
+
   // Real-time chat updates
   useEffect(() => {
     if (!selectedChat) return undefined;
 
-    const userUid = selectedChat.userId; 
+    const userUid = selectedChat.userId;
     const chatId = selectedChat.chatId;
-    console.log(selectedChat)
+    console.log(selectedChat);
 
     const unsubscribe = subscribeToChatUpdates(
       userUid,
@@ -178,45 +176,47 @@ export default function ChatWithUser() {
         </div>
       </div>
       <div className="chatBox">
-        {/* {loading ? (
-          <LoadingScreen />
-        ) : (
-          <> */}
-            <div className="usersChat">
-              <div className="usersChat_header">
-                <h4>All messages</h4>
-              </div>
+        <div className="usersChat">
+          <div className="usersChat_header">
+            <h4>All messages</h4>
+          </div>
+          {loading ? (
+              <div className="spinner"></div>
+          ) : (
+            <>
               {chats.map((user) => (
-                
                 <div
                   key={user.userId}
                   className="userName"
-                  onClick={() => handleChatSelection(user.userId, user.userName)}
+                  onClick={() =>
+                    handleChatSelection(user.userId, user.userName)
+                  }
                   title="Click to view chat"
                 >
                   <p className="name">{user.userName}</p>
                 </div>
               ))}
-            </div>
-            {selectedChat ? (
-              <ChatBox
-                selectedChat={selectedChat}
-                handleSendMessage={handleSendMessage}
-                isLoading={loading}
-                closeChat={() =>
-                  closeChat(selectedChat.userId, selectedChat.id)
-                }
-                newMessage={newMessage}
-                setNewMessage={setNewMessage}
-              />
-            ) : (
-              <div className="chatBox_banner">
-                <AiFillWechat size={80} />
-                <h4>Click on a chat to start responding.</h4>
-              </div>
-            )}
-          {/* </>
-        )} */}
+            </>
+          )}
+        </div>
+
+        {selectedChat ? (
+          <ChatBox
+            selectedChat={selectedChat}
+            handleSendMessage={handleSendMessage}
+            isLoading={loading}
+            closeChat={() =>
+              handleCloseChat(selectedChat.userId, selectedChat.id)
+            }
+            newMessage={newMessage}
+            setNewMessage={setNewMessage}
+          />
+        ) : (
+          <div className="chatBox_banner">
+            <AiFillWechat size={80} />
+            <h4>Click on a chat to start responding.</h4>
+          </div>
+        )}
       </div>
     </section>
   );
