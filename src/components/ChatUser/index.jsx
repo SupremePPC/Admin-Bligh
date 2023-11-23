@@ -113,7 +113,7 @@ export default function ChatWithUser() {
           Swal.fire("Closed!", "The chat has been closed.", "success");
 
           // Update chats in state and reset selected chat
-          // setChats(chats.filter((chat) => chat.id !== chatId));
+          setChats(chats.filter((chat) => chat.id !== chat.chatId));
           setSelectedChat(null); // Reset selected chat to show default component
         } catch (err) {
           console.error(err);
@@ -165,6 +165,20 @@ export default function ChatWithUser() {
   return (
     <section className="container chatPage_wrapper">
       <Header />
+      {
+        chats.length === 0 ? (
+          <div className="chatPage_header">
+          <div className="chatPage_icon">
+            <img src={chat_icon} alt="chat icon" />
+          </div>
+          <div className="chatPage_title">
+            <h4>
+              You have messages no messages!
+              
+            </h4>
+          </div>
+        </div>
+        ) : (
       <div className="chatPage_header">
         <div className="chatPage_icon">
           <img src={chat_icon} alt="chat icon" />
@@ -177,29 +191,32 @@ export default function ChatWithUser() {
           </h4>
         </div>
       </div>
+      )}
+
+      {
+        chats.length === 0 ? (
+          <div className="">
+            <div className="chatBox_banner">
+              <AiFillWechat size={80} />
+              <h4>No messages.</h4>
+            </div>
+          </div>
+        ) : (
       <div className="chatBox">
         <div className="usersChat">
           <div className="usersChat_header">
             <h4>All messages</h4>
           </div>
-          {loading ? (
-              <div className="spinner"></div>
-          ) : (
-            <>
-              {chats.map((user) => (
-                <div
-                  key={user.userId}
-                  className="userName"
-                  onClick={() =>
-                    handleChatSelection(user.userId, user.userName)
-                  }
-                  title="Click to view chat"
-                >
-                  <p className="name">{user.userName}</p>
-                </div>
-              ))}
-            </>
-          )}
+          {chats.map((user) => (
+            <div
+              key={user.userId}
+              className="userName"
+              onClick={() => handleChatSelection(user.userId, user.userName)}
+              title="Click to view chat"
+            >
+              <p className="name">{user.userName}</p>
+            </div>
+          ))}
         </div>
 
         {selectedChat ? (
@@ -207,9 +224,7 @@ export default function ChatWithUser() {
             selectedChat={selectedChat}
             handleSendMessage={handleSendMessage}
             isLoading={loading}
-            closeChat={() =>
-              handleCloseChat(selectedChat.userId)
-            }
+            closeChat={() => handleCloseChat(selectedChat.userId)}
             newMessage={newMessage}
             setNewMessage={setNewMessage}
           />
@@ -220,6 +235,10 @@ export default function ChatWithUser() {
           </div>
         )}
       </div>
+
+        )
+      }
+
     </section>
   );
 }

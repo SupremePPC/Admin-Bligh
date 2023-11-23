@@ -199,7 +199,7 @@ export function sumUserRequests(db, setRequests) {
     });
   });
 }
-g
+
 // get all users
 export async function getUser(uid) {
   const userRef = doc(db, USERS_COLLECTION, uid);
@@ -1726,7 +1726,6 @@ export function countUsersWithChats(db, setUsersWithChatsCount) {
     });
   });
 }
-
 
 // Fetch all chats within the CHATS_SUBCOLLECTION subcollection for an individual user
 export const fetchChatMessages = (userUid, callback) => {

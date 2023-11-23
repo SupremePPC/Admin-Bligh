@@ -1,13 +1,4 @@
 import React, { useEffect, useState } from "react";
-import {
-  getDocs,
-  collection,
-  doc,
-  addDoc,
-  deleteDoc,
-  getDoc,
-  setDoc,
-} from "firebase/firestore";
 import { auth, db } from "../../firebaseConfig/firebase";
 import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 import Header from "./Header";
@@ -28,23 +19,22 @@ export default function UserRequest() {
   const [pendingRequestData, setPendingRequestData] = useState(null); // Store data of the request being processed
 
   //FETCH USER REQUESTS
-  useEffect(() => {
+ 
+  const handleFetch = async (db) => {
     setIsLoading(true);
-    fetchUserRequests(db)
-      .then((requests) => {
-        setUserRequests(requests);
-      })
-      .catch((error) => {
-        console.error("Error fetching user requests:", error);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, []);
+    try {
+      const requests = await handleFetch(db)(db);  // Assuming getUserRequests is the function that fetches data
+      setUserRequests(requests);
+    } catch (error) {
+      console.error("Error fetching user requests:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
   
-
   useEffect(() => {
-  }, [userRequests]);
+    handleFetch(db);
+  }, [db]);
 
   //HANDLE APPROVAL
   const handleApproval = async (userId, requestData) => {
@@ -52,6 +42,7 @@ export default function UserRequest() {
     try {
       await handleUserApproval(db, auth, userId, requestData);
       // Update UI based on the response
+      fetchUserRequests();
       Swal.fire("Approved!", "User request approved successfully.", "success");
     } catch (error) {
       // Handle any errors
@@ -69,6 +60,7 @@ export default function UserRequest() {
       await handleUserRejection(db, userId, requestData);
       // Update UI based on the response
       Swal.fire("Removed!", "User request rejected and removed successfully.", "success");
+
     } catch (error) {
       // Handle any errors
       console.error("Error rejecting user:", error);
