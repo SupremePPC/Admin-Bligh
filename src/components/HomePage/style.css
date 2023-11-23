@@ -45,6 +45,10 @@
   cursor: pointer;
 }
 
+.homePage_link:hover {
+  text-decoration: none;
+}
+
 .homePage_icon svg {
   margin-bottom: 5px;
   color: var(--primary);
@@ -52,22 +56,23 @@
   height: 50px;
 }
 
-.homePage_label {
+.homePage_link .homePage_label {
   font-size: var(--font-eighteen);
   font-weight: bold;
   margin: 0;
-  text-decoration: none;
   text-transform: uppercase;
 }
 
-.notification_badge {
+.badge {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
 }
 
-.notification_count {
+.badge_count {
   margin-left: 5px;
-  font-size: 14px;
+  font-size: var(--font-twelve);
+  font-weight: 700;
+  color: var(--red);
 }
 
 @media screen and (min-width: 768px) {

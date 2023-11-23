@@ -1681,51 +1681,52 @@ export const updateTitleText = async (newTitle) => {
 const CHATS_SUBCOLLECTION = 'chats';
 
 // Fetch all users with CHATS_SUBCOLLECTION in their doc
-export const fetchChats = async (setChats) => {
-  try {
-    const usersRef = collection(db, USERS_COLLECTION);
-    const usersSnapshot = await getDocs(usersRef);
-    const usersWithChats = [];
+export function fetchChats(db, setChats) {
+  const usersRef = collection(db, "users");
 
-    for (const userDoc of usersSnapshot.docs) {
-      const userUid = userDoc.id;
-      const chatsRef = collection(db, USERS_COLLECTION, userUid, CHATS_SUBCOLLECTION);
-      const q = query(chatsRef, orderBy('timeStamp', 'asc'));
-      const chatsSnapshot = await getDocs(q);
+  onSnapshot(usersRef, (usersSnapshot) => {
+    let usersWithChats = [];
 
-      if (!chatsSnapshot.empty) {
-        usersWithChats.push({ userId: userUid, userName: userDoc.data().fullName });
-      }
-    }
+    usersSnapshot.forEach((userDoc) => {
+      const chatsRef = collection(db, "users", userDoc.id, 'chats');
 
-    setChats(usersWithChats);
-  } catch (err) {
-    console.error(err);
-    throw new Error('Failed to load user chats');
-  }
-};
+      onSnapshot(chatsRef, (chatsSnapshot) => {
+        if (!chatsSnapshot.empty) {
+          usersWithChats.push({ userId: userDoc.id, userName: userDoc.data().fullName });
+          setChats([...usersWithChats]); // Update state each time a new chat is found
+        }
+      });
+    });
+  });
+}
+
 
 //Sum of live chats
 export function countUsersWithChats(db, setUsersWithChatsCount) {
   const usersRef = collection(db, "users");
 
-  onSnapshot(usersRef, (usersSnapshot) => {
-    let countPromises = [];
+  onSnapshot(usersRef, async (usersSnapshot) => {
+    let usersWithChatsCount = 0;
 
-    usersSnapshot.forEach((userDoc) => {
-      const chatsRef = collection(db, "users", userDoc.id, 'chats');
-      const countPromise = getDocs(chatsRef).then((chatsSnapshot) => {
-        return chatsSnapshot.empty ? 0 : 1;
-      });
-      countPromises.push(countPromise);
-    });
+    // Iterate through each user document
+    for (const userDoc of usersSnapshot.docs) {
+      const userUid = userDoc.id;
+      console.log(userUid);
+      const chatsRef = collection(db, "users", userUid, 'chats');
 
-    Promise.all(countPromises).then(counts => {
-      const total = counts.reduce((acc, curr) => acc + curr, 0);
-      setUsersWithChatsCount(total);
-    });
+      // Check if the 'chats' subcollection has any documents
+      const chatsSnapshot = await getDocs(chatsRef);
+      if (!chatsSnapshot.empty) {
+        usersWithChatsCount += chatsSnapshot.size;
+      }
+    }
+
+    // Update the count
+    setUsersWithChatsCount(usersWithChatsCount);
   });
 }
+
+
 
 // Fetch all chats within the CHATS_SUBCOLLECTION subcollection for an individual user
 export const fetchChatMessages = (userUid, callback) => {

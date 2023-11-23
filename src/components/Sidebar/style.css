@@ -83,14 +83,12 @@
 .notification_badge{
   display: flex;
   align-items: flex-start;
-  position: relative;
 }
 
 .notification_badge .notification_count{
   font-size: var(--font-twelve);
   font-weight: 700;
   color: var(--red);
-  position: absolute;
-  left: 80%;
-  top: 20%;
+  line-height: 0;
+  margin-left: 1px;
 }

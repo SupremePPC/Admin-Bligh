@@ -11,8 +11,6 @@ import { fetchUserRequests, handleUserApproval, handleUserRejection } from "../.
 
 export default function UserRequest() {
   const [userRequests, setUserRequests] = useState([]);
-  const [error, setError] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isApproved, setIsApproved] = useState(false);
   const [isRejected, setIsRejected] = useState(false);
@@ -23,7 +21,7 @@ export default function UserRequest() {
   const handleFetch = async (db) => {
     setIsLoading(true);
     try {
-      const requests = await handleFetch(db)(db);  // Assuming getUserRequests is the function that fetches data
+      const requests = await fetchUserRequests(db);
       setUserRequests(requests);
     } catch (error) {
       console.error("Error fetching user requests:", error);
@@ -42,7 +40,7 @@ export default function UserRequest() {
     try {
       await handleUserApproval(db, auth, userId, requestData);
       // Update UI based on the response
-      fetchUserRequests();
+      handleFetch();
       Swal.fire("Approved!", "User request approved successfully.", "success");
     } catch (error) {
       // Handle any errors

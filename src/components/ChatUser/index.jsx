@@ -40,7 +40,7 @@ export default function ChatWithUser() {
 
     const loadChats = async () => {
       try {
-        await fetchChats(setChats);
+         fetchChats(db, setChats);
       } catch (error) {
         console.error(error);
         setError("Failed to load chats");
@@ -195,12 +195,10 @@ export default function ChatWithUser() {
 
       {
         chats.length === 0 ? (
-          <div className="">
-            <div className="chatBox_banner">
+            <div className="chatBox_banner" style={{height: '72%'}}>
               <AiFillWechat size={80} />
               <h4>No messages.</h4>
             </div>
-          </div>
         ) : (
       <div className="chatBox">
         <div className="usersChat">
@@ -214,7 +212,7 @@ export default function ChatWithUser() {
               onClick={() => handleChatSelection(user.userId, user.userName)}
               title="Click to view chat"
             >
-              <p className="name">{user.userName}</p>
+              <p className="name">{user.userName} </p>
             </div>
           ))}
         </div>
