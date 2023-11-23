@@ -480,6 +480,26 @@ export async function getBondRequests(userId) {
   }
 }
 
+// Sum of bond requests
+export async function sumBondRequests(db) {
+  try {
+    const adminDashRef = collection(db, ADMINDASH_COLLECTION); // Replace with your collection name
+    const adminDocs = await getDocs(adminDashRef);
+    let bondRequestsCount = 0;
+
+    for (const doc of adminDocs.docs) {
+      const bondRequestsRef = collection(db, ADMINDASH_COLLECTION, doc.id, BONDS_REQUEST_SUB_COLLECTION);
+      const bondRequestsSnapshot = await getDocs(bondRequestsRef);
+      bondRequestsCount += bondRequestsSnapshot.size;
+    }
+
+    return bondRequestsCount;
+  } catch (error) {
+    console.error("Error in sumBondRequests: ", error);
+    return 0;
+  }
+}
+
 // Function to handle selling bonds
 export async function handleSellApproval(uid, bondData) {
   const userBondsPath = `users/${uid}/bondsHoldings`;
@@ -818,6 +838,7 @@ export async function getAllTerms() {
   return allTerms;
 }
 
+
 //add new terms
 export async function addNewTerm(termData) {
   try {
@@ -934,6 +955,26 @@ export async function getTermRequests() {
   } catch (error) {
     console.error("Error in getTermRequests: ", error);
     return [];
+  }
+}
+
+//Sum of fixed term requests
+export async function sumTermRequests(db) {
+  try {
+    const adminDashRef = collection(db, ADMINDASH_COLLECTION);
+    const adminDocs = await getDocs(adminDashRef);
+    let termRequestsCount = 0;
+
+    for (const doc of adminDocs.docs) {
+      const termRequestsRef = collection(db, ADMINDASH_COLLECTION, doc.id, TERMS_REQUEST_SUB_COLLECTION); // Adjust sub-collection name
+      const termRequestsSnapshot = await getDocs(termRequestsRef);
+      termRequestsCount += termRequestsSnapshot.size;
+    }
+
+    return termRequestsCount;
+  } catch (error) {
+    console.error("Error in sumTermRequests: ", error);
+    return 0;
   }
 }
 
@@ -1194,6 +1235,26 @@ export async function getIposRequests() {
   } catch (error) {
     console.error("Error in getIposRequests: ", error);
     return [];
+  }
+}
+
+//Sum of ipos requests
+export async function sumIposRequests(db) {
+  try {
+    const adminDashRef = collection(db, ADMINDASH_COLLECTION);
+    const adminDocs = await getDocs(adminDashRef);
+    let iposRequestsCount = 0;
+
+    for (const doc of adminDocs.docs) {
+      const iposRequestsRef = collection(db, ADMINDASH_COLLECTION, doc.id, IPOS_REQUESTS_COLLECTION); // Adjust sub-collection name
+      const iposRequestsSnapshot = await getDocs(iposRequestsRef);
+      iposRequestsCount += iposRequestsSnapshot.size;
+    }
+
+    return iposRequestsCount;
+  } catch (error) {
+    console.error("Error in sumIposRequests: ", error);
+    return 0;
   }
 }
 
@@ -1602,7 +1663,9 @@ export const updateTitleText = async (newTitle) => {
 };
 
 //LIVE CHAT
-// Fetch all users with 'chats' in their doc
+const CHATS_SUBCOLLECTION = 'chats';
+
+// Fetch all users with CHATS_SUBCOLLECTION in their doc
 export const fetchChats = async (setChats) => {
   try {
     const usersRef = collection(db, USERS_COLLECTION);
@@ -1611,7 +1674,7 @@ export const fetchChats = async (setChats) => {
 
     for (const userDoc of usersSnapshot.docs) {
       const userUid = userDoc.id;
-      const chatsRef = collection(db, USERS_COLLECTION, userUid, 'chats');
+      const chatsRef = collection(db, USERS_COLLECTION, userUid, CHATS_SUBCOLLECTION);
       const q = query(chatsRef, orderBy('timeStamp', 'asc'));
       const chatsSnapshot = await getDocs(q);
 
@@ -1627,10 +1690,33 @@ export const fetchChats = async (setChats) => {
   }
 };
 
-// Fetch all chats within the 'chats' subcollection for an individual user
+//Sum of live chats
+export async function countUsersWithChats(db) {
+  try {
+    const usersRef = collection(db, USERS_COLLECTION); 
+    const usersSnapshot = await getDocs(usersRef);
+    let usersWithChatsCount = 0;
+
+    for (const userDoc of usersSnapshot.docs) {
+      const chatsRef = collection(db, USERS_COLLECTION, userDoc.id, CHATS_SUBCOLLECTION);
+      const chatsSnapshot = await getDocs(chatsRef);
+
+      if (!chatsSnapshot.empty) {
+        usersWithChatsCount++;
+      }
+    }
+
+    return usersWithChatsCount;
+  } catch (err) {
+    console.error("Error in countUsersWithChats: ", err);
+    return 0;
+  }
+}
+
+// Fetch all chats within the CHATS_SUBCOLLECTION subcollection for an individual user
 export const fetchChatMessages = (userUid, callback) => {
   try {
-    const messagesRef = collection(db, USERS_COLLECTION, userUid, 'chats');
+    const messagesRef = collection(db, USERS_COLLECTION, userUid, CHATS_SUBCOLLECTION);
     const q = query(messagesRef, orderBy('timeStamp', 'asc'));
 
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
@@ -1648,7 +1734,7 @@ export const fetchChatMessages = (userUid, callback) => {
 // Close Chat
 export const closeChat = async (userUid) => {
   try {
-    const chatRef = doc(db, USERS_COLLECTION, userUid, 'chats');
+    const chatRef = doc(db, USERS_COLLECTION, userUid, CHATS_SUBCOLLECTION);
     await deleteC(chatRef );
     await addDoc(collection(db, USERS_COLLECTION, userUid, 'notifications'), {
       message: 'Your issue has been resolved.',
@@ -1664,7 +1750,7 @@ export const closeChat = async (userUid) => {
 export const sendMessage = async (userUid, chatMessage) => {
   try {
     // Create a new chat document reference
-    const newChatRef = doc(collection(db, 'users', userUid, 'chats'));
+    const newChatRef = doc(collection(db, 'users', userUid, CHATS_SUBCOLLECTION));
     const chatId = newChatRef.id;
     console.log(chatId);
     // Initialize the new chat document with the chat message and other data
@@ -1692,7 +1778,7 @@ export const subscribeToChatUpdates = (userUid, chatId, callback) => {
     return () => {};
   }
 
-  const docRef = doc(db, USERS_COLLECTION, userUid, 'chats', chatId);
+  const docRef = doc(db, USERS_COLLECTION, userUid, CHATS_SUBCOLLECTION, chatId);
 
   const unsubscribe = onSnapshot(docRef, snapshot => {
     // console.log('Snapshot data:', snapshot.data());

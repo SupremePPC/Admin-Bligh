@@ -136,7 +136,7 @@ function Sidebar() {
             to="/dashboard/fixed-term-deposits"
             title="Fixed Term Deposits"
           >
-            <PiMoneyLight size={24} />
+            <PiMoneyLight size={22} />
             {!collapsed && "Fixed Term Deposits"}
           </Link>
         </li>
@@ -160,7 +160,7 @@ function Sidebar() {
             to="/dashboard/stock-trading"
             title="Stock Trading"
           >
-            <AiOutlineStock size={20} />
+            <AiOutlineStock size={22} />
             {!collapsed && "Stock Trading"}
           </Link>
         </li>
@@ -172,7 +172,7 @@ function Sidebar() {
             to="/dashboard/banking-details"
             title="Banking Details"
           >
-            <BsBank size={20} />
+            <BsBank size={16} />
             {!collapsed && "Banking Details"}
           </Link>
         </li>
