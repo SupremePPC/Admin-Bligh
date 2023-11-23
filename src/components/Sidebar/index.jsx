@@ -21,6 +21,7 @@ import { getAuth } from "firebase/auth";
 import Modal from "../CustomsModal";
 import { SumNotifications, countUsersWithChats, sumBondRequests, sumIposRequests, sumTermRequests, sumUserRequests } from "../../firebaseConfig/firestore";
 import "./style.css";
+import { db } from "../../firebaseConfig/firebase";
 
 function Sidebar() {
   const location = useLocation();
@@ -40,11 +41,11 @@ function Sidebar() {
 
   useEffect(() => {
     SumNotifications(setNotifications);
-    sumUserRequests(setUserRequests);
-    sumBondRequests(setBondsRequests);
-    sumIposRequests(setIposRequests);
-    sumTermRequests(setTermsRequests);
-    countUsersWithChats(setLiveChatSum);
+    sumUserRequests(db, setUserRequests);
+    sumBondRequests(db, setBondsRequests);
+    sumIposRequests(db, setIposRequests);
+    sumTermRequests(db, setTermsRequests);
+    countUsersWithChats(db, setLiveChatSum);
   }, []);
 
   const notificationBadge = (

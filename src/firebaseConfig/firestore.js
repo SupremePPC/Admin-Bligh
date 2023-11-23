@@ -172,25 +172,34 @@ export const handleUserRejection = async (db, userId, requestData) => {
 };
 
 // Sum userRequests
-export async function sumUserRequests(setRequests) {
-  try {
-    const adminDashRef = collection(db, "admin_users");
-    const adminDocs = await getDocs(adminDashRef);
-    let totalRequestsCount = 0;
+export function sumUserRequests(db, setRequests) {
+  const adminDashRef = collection(db, ADMINDASH_COLLECTION);
+  let userRequestsCount = 0;
+  let activeListeners = 0;
 
-    for (const doc of adminDocs.docs) {
-      const userRequestsRef = collection(db, "admin_users", doc.id, "userRequests");
-      const userRequestsSnapshot = await getDocs(userRequestsRef);
-      totalRequestsCount += userRequestsSnapshot.size; // Sum the number of requests for each user
+  onSnapshot(adminDashRef, (adminDocs) => {
+    userRequestsCount = 0; // Reset the count for each update
+    activeListeners = adminDocs.size; // Reset the number of active listeners
+
+    if (activeListeners === 0) {
+      setRequests(0); // If no admin docs, set count to 0
     }
 
-    setRequests(totalRequestsCount);
-  } catch (error) {
-    console.error("Error summing user requests:", error);
-    // Handle the error appropriately
-  }
-}
+    adminDocs.forEach((doc) => {
+      const usersRequestsRef = collection(db, ADMINDASH_COLLECTION, doc.id, USER_REQUESTS_COLLECTION);
 
+      onSnapshot(usersRequestsRef, (usersRequestsSnapshot) => {
+        userRequestsCount += usersRequestsSnapshot.size;
+
+        activeListeners -= 1;
+        if (activeListeners === 0) {
+          setRequests(userRequestsCount); // Update the count when all listeners have reported
+        }
+      });
+    });
+  });
+}
+g
 // get all users
 export async function getUser(uid) {
   const userRef = doc(db, USERS_COLLECTION, uid);
@@ -481,23 +490,22 @@ export async function getBondRequests(userId) {
 }
 
 // Sum of bond requests
-export async function sumBondRequests(db) {
-  try {
-    const adminDashRef = collection(db, ADMINDASH_COLLECTION); // Replace with your collection name
-    const adminDocs = await getDocs(adminDashRef);
-    let bondRequestsCount = 0;
+export function sumBondRequests(db, setBondRequestsCount) {
+  const adminDashRef = collection(db, ADMINDASH_COLLECTION);
+  let totalBondRequestsCount = 0;
 
-    for (const doc of adminDocs.docs) {
+  onSnapshot(adminDashRef, (adminDocs) => {
+    totalBondRequestsCount = 0; // Reset count for each update
+
+    adminDocs.forEach((doc) => {
       const bondRequestsRef = collection(db, ADMINDASH_COLLECTION, doc.id, BONDS_REQUEST_SUB_COLLECTION);
-      const bondRequestsSnapshot = await getDocs(bondRequestsRef);
-      bondRequestsCount += bondRequestsSnapshot.size;
-    }
 
-    return bondRequestsCount;
-  } catch (error) {
-    console.error("Error in sumBondRequests: ", error);
-    return 0;
-  }
+      onSnapshot(bondRequestsRef, (bondRequestsSnapshot) => {
+        totalBondRequestsCount += bondRequestsSnapshot.size;
+        setBondRequestsCount(totalBondRequestsCount);
+      });
+    });
+  });
 }
 
 // Function to handle selling bonds
@@ -838,7 +846,6 @@ export async function getAllTerms() {
   return allTerms;
 }
 
-
 //add new terms
 export async function addNewTerm(termData) {
   try {
@@ -914,6 +921,133 @@ export async function addNotification(userId, message, type = "info") {
   }
 }
 
+// Function to fetch all the notifications
+export async function getLoginNotifications() {
+  try {
+    const adminDashRef = collection(db, "admin_users");
+    const notificationDashRef = doc(adminDashRef, "notifications");
+
+    const loginNotificationsRef = collection(
+      notificationDashRef,
+      "loginNotifications"
+    );
+    const logoutNotificationsRef = collection(
+      notificationDashRef,
+      "logoutNotifications"
+    );
+
+    const loginNotificationsSnapshot = await getDocs(
+      query(loginNotificationsRef, orderBy("timeStamp", "desc"))
+    );
+    const logoutNotificationsSnapshot = await getDocs(
+      query(logoutNotificationsRef, orderBy("timeStamp", "desc"))
+    );
+
+    const loginNotifications = loginNotificationsSnapshot.docs.map((doc) => ({
+      ...doc.data(),
+      id: doc.id,
+    }));
+
+    const logoutNotifications = logoutNotificationsSnapshot.docs.map((doc) => ({
+      ...doc.data(),
+      id: doc.id,
+    }));
+
+    const allNotifications = [...loginNotifications, ...logoutNotifications];
+
+    // Sort notifications based on timestamp (assuming there's a timestamp field)
+    const sortedNotifications = allNotifications.sort(
+      (a, b) => b.timeStamp - a.timeStamp
+      );
+    return sortedNotifications;
+  } catch (error) {
+    console.error("Error in getLoginNotifications: ", error);
+    return [];
+  }
+}
+
+//sum up all notfications
+export async function SumNotifications(setNotifications) {
+  const adminDashRef = collection(db,ADMINDASH_COLLECTION);
+  const notificationDashRef = doc(adminDashRef, "notifications");
+
+  const loginNotificationsRef = collection(
+    notificationDashRef,
+    "loginNotifications"
+  );
+  const logoutNotificationsRef = collection(
+    notificationDashRef,
+    "logoutNotifications"
+  );
+
+  let loginNotificationsCount = 0;
+  let logoutNotificationsCount = 0;
+
+  // Listen to changes in the loginNotifications collection
+  onSnapshot(loginNotificationsRef, (querySnapshot) => {
+    loginNotificationsCount = querySnapshot.size;
+    // Update your state here
+    setNotifications(loginNotificationsCount + logoutNotificationsCount);
+  });
+
+  // Listen to changes in the logoutNotifications collection
+  onSnapshot(logoutNotificationsRef, (querySnapshot) => {
+    logoutNotificationsCount = querySnapshot.size;
+    // Update your state here
+    setNotifications(loginNotificationsCount + logoutNotificationsCount);
+  });
+}
+
+// Function to delete all notifications
+export async function deleteAllNotifications() {
+  const adminDashRef = collection(db, "admin_users");
+  const notificationDashRef = doc(adminDashRef, "notifications");
+
+  const loginNotificationsRef = collection(
+    notificationDashRef,
+    "loginNotifications"
+  );
+  const logoutNotificationsRef = collection(
+    notificationDashRef,
+    "logoutNotifications"
+  );
+
+  try {
+    // Delete all documents in the 'loginNotifications' sub-collection
+    const loginQuerySnapshot = await getDocs(loginNotificationsRef);
+    loginQuerySnapshot.forEach(async (doc) => {
+      await deleteDoc(doc.ref);
+    });
+
+    // Delete all documents in the 'logoutNotifications' sub-collection
+    const logoutQuerySnapshot = await getDocs(logoutNotificationsRef);
+    logoutQuerySnapshot.forEach(async (doc) => {
+      await deleteDoc(doc.ref);
+    });
+
+  } catch (error) {
+    console.error("Error deleting all notifications:", error);
+  }
+}
+
+export async function deleteNotification(notificationId, isLoggedIn) {
+  const adminDashRef = collection(db, "admin_users");
+  const notificationDashRef = doc(adminDashRef, "notifications");
+  const subCollectionName = isLoggedIn
+    ? "loginNotifications"
+    : "logoutNotifications";
+
+  const notificationsRef = collection(notificationDashRef, subCollectionName);
+
+  try {
+    // Delete the notification document by its ID
+    await deleteDoc(doc(notificationsRef, notificationId));
+  } catch (error) {
+    console.error("Error deleting the notification:", error);
+  }
+}
+
+
 //TERMS REQUEST
 const TERMS_REQUEST_SUB_COLLECTION = "termDepositRequest";
 
@@ -959,19 +1093,25 @@ export async function getTermRequests() {
 }
 
 //Sum of fixed term requests
-export async function sumTermRequests(db) {
+export async function sumTermRequests(db, setTermsRequests) {
   try {
     const adminDashRef = collection(db, ADMINDASH_COLLECTION);
-    const adminDocs = await getDocs(adminDashRef);
-    let termRequestsCount = 0;
-
-    for (const doc of adminDocs.docs) {
-      const termRequestsRef = collection(db, ADMINDASH_COLLECTION, doc.id, TERMS_REQUEST_SUB_COLLECTION); // Adjust sub-collection name
-      const termRequestsSnapshot = await getDocs(termRequestsRef);
-      termRequestsCount += termRequestsSnapshot.size;
-    }
-
-    return termRequestsCount;
+    onSnapshot(adminDashRef, (adminDocs) => {
+      let termRequestsCount = 0;
+  
+      adminDocs.forEach((doc) => {
+        // Correctly reference the subcollection for each document
+        const termsRequestsRef = collection(db, ADMINDASH_COLLECTION, doc.id, TERMS_REQUEST_SUB_COLLECTION);
+  
+        onSnapshot(termsRequestsRef, (termsRequestsSnapshot) => {
+          termRequestsCount += termsRequestsSnapshot.size;
+          // Update the count outside the inner onSnapshot
+        });
+      });
+  
+      // Set the total count outside the loop
+      setTermsRequests(termRequestsCount);
+    });
   } catch (error) {
     console.error("Error in sumTermRequests: ", error);
     return 0;
@@ -1239,23 +1379,25 @@ export async function getIposRequests() {
 }
 
 //Sum of ipos requests
-export async function sumIposRequests(db) {
-  try {
-    const adminDashRef = collection(db, ADMINDASH_COLLECTION);
-    const adminDocs = await getDocs(adminDashRef);
-    let iposRequestsCount = 0;
+export function sumIposRequests(db, setIposRequestsCount) {
+  const adminDashRef = collection(db, ADMINDASH_COLLECTION);
 
-    for (const doc of adminDocs.docs) {
-      const iposRequestsRef = collection(db, ADMINDASH_COLLECTION, doc.id, IPOS_REQUESTS_COLLECTION); // Adjust sub-collection name
-      const iposRequestsSnapshot = await getDocs(iposRequestsRef);
-      iposRequestsCount += iposRequestsSnapshot.size;
-    }
+  onSnapshot(adminDashRef, (adminDocs) => {
+    let totalIposRequestsCount = 0;
 
-    return iposRequestsCount;
-  } catch (error) {
-    console.error("Error in sumIposRequests: ", error);
-    return 0;
-  }
+    adminDocs.forEach((doc) => {
+      // Correctly reference the subcollection for each document
+      const iposRequestsRef = collection(db, ADMINDASH_COLLECTION, doc.id, IPOS_REQUESTS_COLLECTION);
+
+      onSnapshot(iposRequestsRef, (iposRequestsSnapshot) => {
+        totalIposRequestsCount += iposRequestsSnapshot.size;
+        // Update the count outside the inner onSnapshot
+      });
+    });
+
+    // Set the total count outside the loop
+    setIposRequestsCount(totalIposRequestsCount);
+  });
 }
 
 // 5. Handle the IPO approval logic
@@ -1446,133 +1588,6 @@ export const deleteCashDeposit = async (uid, depositId) => {
   }
 };
 
-// Function to fetch all the notifications
-export async function getLoginNotifications() {
-  try {
-    const adminDashRef = collection(db, "admin_users");
-    const notificationDashRef = doc(adminDashRef, "notifications");
-
-    const loginNotificationsRef = collection(
-      notificationDashRef,
-      "loginNotifications"
-    );
-    const logoutNotificationsRef = collection(
-      notificationDashRef,
-      "logoutNotifications"
-    );
-
-    const loginNotificationsSnapshot = await getDocs(
-      query(loginNotificationsRef, orderBy("timeStamp", "desc"))
-    );
-    const logoutNotificationsSnapshot = await getDocs(
-      query(logoutNotificationsRef, orderBy("timeStamp", "desc"))
-    );
-
-    const loginNotifications = loginNotificationsSnapshot.docs.map((doc) => ({
-      ...doc.data(),
-      id: doc.id,
-    }));
-
-    const logoutNotifications = logoutNotificationsSnapshot.docs.map((doc) => ({
-      ...doc.data(),
-      id: doc.id,
-    }));
-
-    const allNotifications = [...loginNotifications, ...logoutNotifications];
-
-    // Sort notifications based on timestamp (assuming there's a timestamp field)
-    const sortedNotifications = allNotifications.sort(
-      (a, b) => b.timeStamp - a.timeStamp
-      );
-    return sortedNotifications;
-  } catch (error) {
-    console.error("Error in getLoginNotifications: ", error);
-    return [];
-  }
-}
-
-//sum up all notfications
-export async function SumNotifications(setNotifications) {
-  const adminDashRef = collection(db, "admin_users");
-  const notificationDashRef = doc(adminDashRef, "notifications");
-
-  const loginNotificationsRef = collection(
-    notificationDashRef,
-    "loginNotifications"
-  );
-  const logoutNotificationsRef = collection(
-    notificationDashRef,
-    "logoutNotifications"
-  );
-
-  let loginNotificationsCount = 0;
-  let logoutNotificationsCount = 0;
-
-  // Listen to changes in the loginNotifications collection
-  onSnapshot(loginNotificationsRef, (querySnapshot) => {
-    loginNotificationsCount = querySnapshot.size;
-    // Update your state here
-    setNotifications(loginNotificationsCount + logoutNotificationsCount);
-  });
-
-  // Listen to changes in the logoutNotifications collection
-  onSnapshot(logoutNotificationsRef, (querySnapshot) => {
-    logoutNotificationsCount = querySnapshot.size;
-    // Update your state here
-    setNotifications(loginNotificationsCount + logoutNotificationsCount);
-  });
-}
-
-// Function to delete all notifications
-export async function deleteAllNotifications() {
-  const adminDashRef = collection(db, "admin_users");
-  const notificationDashRef = doc(adminDashRef, "notifications");
-
-  const loginNotificationsRef = collection(
-    notificationDashRef,
-    "loginNotifications"
-  );
-  const logoutNotificationsRef = collection(
-    notificationDashRef,
-    "logoutNotifications"
-  );
-
-  try {
-    // Delete all documents in the 'loginNotifications' sub-collection
-    const loginQuerySnapshot = await getDocs(loginNotificationsRef);
-    loginQuerySnapshot.forEach(async (doc) => {
-      await deleteDoc(doc.ref);
-    });
-
-    // Delete all documents in the 'logoutNotifications' sub-collection
-    const logoutQuerySnapshot = await getDocs(logoutNotificationsRef);
-    logoutQuerySnapshot.forEach(async (doc) => {
-      await deleteDoc(doc.ref);
-    });
-
-  } catch (error) {
-    console.error("Error deleting all notifications:", error);
-  }
-}
-
-export async function deleteNotification(notificationId, isLoggedIn) {
-  const adminDashRef = collection(db, "admin_users");
-  const notificationDashRef = doc(adminDashRef, "notifications");
-  const subCollectionName = isLoggedIn
-    ? "loginNotifications"
-    : "logoutNotifications";
-
-  const notificationsRef = collection(notificationDashRef, subCollectionName);
-
-  try {
-    // Delete the notification document by its ID
-    await deleteDoc(doc(notificationsRef, notificationId));
-  } catch (error) {
-    console.error("Error deleting the notification:", error);
-  }
-}
-
-
 // Function to fetch the password policy setting from Firestore
 export const fetchPasswordPolicySetting = async () => {
   try {
@@ -1691,27 +1706,27 @@ export const fetchChats = async (setChats) => {
 };
 
 //Sum of live chats
-export async function countUsersWithChats(db) {
-  try {
-    const usersRef = collection(db, USERS_COLLECTION); 
-    const usersSnapshot = await getDocs(usersRef);
-    let usersWithChatsCount = 0;
+export function countUsersWithChats(db, setUsersWithChatsCount) {
+  const usersRef = collection(db, "users");
 
-    for (const userDoc of usersSnapshot.docs) {
-      const chatsRef = collection(db, USERS_COLLECTION, userDoc.id, CHATS_SUBCOLLECTION);
-      const chatsSnapshot = await getDocs(chatsRef);
+  onSnapshot(usersRef, (usersSnapshot) => {
+    let countPromises = [];
 
-      if (!chatsSnapshot.empty) {
-        usersWithChatsCount++;
-      }
-    }
+    usersSnapshot.forEach((userDoc) => {
+      const chatsRef = collection(db, "users", userDoc.id, 'chats');
+      const countPromise = getDocs(chatsRef).then((chatsSnapshot) => {
+        return chatsSnapshot.empty ? 0 : 1;
+      });
+      countPromises.push(countPromise);
+    });
 
-    return usersWithChatsCount;
-  } catch (err) {
-    console.error("Error in countUsersWithChats: ", err);
-    return 0;
-  }
+    Promise.all(countPromises).then(counts => {
+      const total = counts.reduce((acc, curr) => acc + curr, 0);
+      setUsersWithChatsCount(total);
+    });
+  });
 }
+
 
 // Fetch all chats within the CHATS_SUBCOLLECTION subcollection for an individual user
 export const fetchChatMessages = (userUid, callback) => {
@@ -1732,16 +1747,24 @@ export const fetchChatMessages = (userUid, callback) => {
 };
 
 // Close Chat
-export const closeChat = async (userUid) => {
+export const closeChat = async (db, userUid) => {
   try {
-    const chatRef = doc(db, USERS_COLLECTION, userUid, CHATS_SUBCOLLECTION);
-    await deleteC(chatRef );
+    const chatsRef = collection(db, USERS_COLLECTION, userUid, CHATS_SUBCOLLECTION);
+    const querySnapshot = await getDocs(query(chatsRef));
+
+    // Delete each chat document
+    for (const doc of querySnapshot.docs) {
+      await deleteDoc(doc.ref);
+    }
+
+    // Add a notification to the user's notifications subcollection
     await addDoc(collection(db, USERS_COLLECTION, userUid, 'notifications'), {
       message: 'Your issue has been resolved.',
       timeStamp: serverTimestamp()
     });
+
   } catch (err) {
-    console.error(err);
+    console.error("Failed to close the chat:", err);
     throw new Error('Failed to close the chat');
   }
 };

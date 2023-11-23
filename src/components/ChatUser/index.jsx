@@ -15,6 +15,7 @@ import ChatBox from "./Chat";
 import LoadingScreen from "../LoadingScreen";
 import { format, isToday, isYesterday } from "date-fns";
 import "./styles.css";
+import { db } from "../../firebaseConfig/firebase";
 
 // TODO
 // When a chat is closed, the user should be moved to the next chat in the list.
@@ -107,7 +108,7 @@ export default function ChatWithUser() {
       if (result.isConfirmed) {
         try {
           setLoading(true);
-          await closeChat(userId);
+          await closeChat(db, userId);
 
           Swal.fire("Closed!", "The chat has been closed.", "success");
 
