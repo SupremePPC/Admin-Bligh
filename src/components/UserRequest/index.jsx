@@ -9,7 +9,7 @@ import {
   setDoc,
 } from "firebase/firestore";
 import { auth, db } from "../../firebaseConfig/firebase";
-import { createUserWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail } from "firebase/auth";
+import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 import Header from "./Header";
 import Table from "./Table";
 import "./style.css";

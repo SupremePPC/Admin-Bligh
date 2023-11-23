@@ -67,7 +67,7 @@ export default function ChatWithUser() {
         if (chats.length > 0) {
           setSelectedChat({
             userId: userUid,
-            messages: chats,
+            messages: newMessage,
             userName: userName,
             chatId: chats[0].chatId,
           });
@@ -94,7 +94,7 @@ export default function ChatWithUser() {
   }, []);
 
   // Close chat/ delete chat
-  const handleCloseChat = async (userId, chatId) => {
+  const handleCloseChat = async (userId) => {
     Swal.fire({
       title: "Are you sure?",
       text: "Do you want to close this chat?",
@@ -107,7 +107,8 @@ export default function ChatWithUser() {
       if (result.isConfirmed) {
         try {
           setLoading(true);
-          await closeChat(userId, chatId); // Assuming this is a function that handles closing the chat in Firestore
+          await closeChat(userId);
+
           Swal.fire("Closed!", "The chat has been closed.", "success");
 
           // Update chats in state and reset selected chat
@@ -206,7 +207,7 @@ export default function ChatWithUser() {
             handleSendMessage={handleSendMessage}
             isLoading={loading}
             closeChat={() =>
-              handleCloseChat(selectedChat.userId, selectedChat.id)
+              handleCloseChat(selectedChat.userId)
             }
             newMessage={newMessage}
             setNewMessage={setNewMessage}

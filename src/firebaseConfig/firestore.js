@@ -59,6 +59,7 @@ export function formatNumber(number) {
   }).format(number);
 }
 
+//Admin Users
 export function addAdminUser(uid, fullName, email) {
   // Use the uid directly as the document ID
   return setDoc(doc(db, ADMINUSER_COLLECTION, uid), {
@@ -67,6 +68,26 @@ export function addAdminUser(uid, fullName, email) {
   });
 }
 
+//USER REQUESTS
+const USER_REQUESTS_COLLECTION = "userRequests";
+
+//Get all user requests
+
+// Sum userRequests
+export async function sumUserRequests(setRequests) {
+  const adminDashRef = collection(db, "admin_users");
+  const userRequestsRef = doc(adminDashRef, "userRequests");
+
+  let userRequestsCount = 0;
+
+  onSnapshot(userRequestsRef, (querySnapshot) => {
+    userRequestsCount = querySnapshot.size;
+    setRequests(userRequestsCount);
+  });
+}
+
+
+// get all users
 export async function getUser(uid) {
   const userRef = doc(db, USERS_COLLECTION, uid);
   const userSnap = await getDoc(userRef);
@@ -78,11 +99,13 @@ export async function getUser(uid) {
   }
 }
 
+// update user data
 export function updateUser(uid, userData) {
   const userDoc = doc(db, USERS_COLLECTION, uid);
   return updateDoc(userDoc, userData);
 }
 
+//delete user
 export function deleteuser(uid) {
   const userDoc = doc(db, USERS_COLLECTION, uid);
   return deleteDoc(userDoc);
@@ -1519,10 +1542,11 @@ export const fetchChatMessages = (userUid, callback) => {
 };
 
 // Close Chat
-export const closeChat = async (userUid, chatId) => {
+export const closeChat = async (userUid) => {
   try {
-    await deleteDoc(doc(db, USERS_COLLECTION, userUid, 'chats', chatId));
-    await addDoc(collection(db, USERS_COLLECTION, chatId, 'notifications'), {
+    const chatRef = doc(db, USERS_COLLECTION, userUid, 'chats');
+    await deleteC(chatRef );
+    await addDoc(collection(db, USERS_COLLECTION, userUid, 'notifications'), {
       message: 'Your issue has been resolved.',
       timeStamp: serverTimestamp()
     });
@@ -1558,7 +1582,6 @@ export const sendMessage = async (userUid, chatMessage) => {
 
 // Real-time Chat Updates
 export const subscribeToChatUpdates = (userUid, chatId, callback) => {
-  console.log('userUid:', userUid, 'chatId:', chatId); // Add this line for debugging
 
   if (!userUid || !chatId) {
     console.error('Invalid userUid or chatId');
@@ -1566,7 +1589,6 @@ export const subscribeToChatUpdates = (userUid, chatId, callback) => {
   }
 
   const docRef = doc(db, USERS_COLLECTION, userUid, 'chats', chatId);
-  // console.log('Document Reference:', docRef);
 
   const unsubscribe = onSnapshot(docRef, snapshot => {
     // console.log('Snapshot data:', snapshot.data());

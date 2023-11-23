@@ -49,7 +49,7 @@ export default function ChatBox({
         <h4>You are now chatting with {selectedChat.userName}</h4>
         <div className="chatUser_toolBox">
           <button className="close_btn" title="Delete Chat" onClick={() =>
-              closeChat(selectedChat.userId, selectedChat.id)
+              closeChat(selectedChat.userId)
             }>
             <MdDelete size={20} />
           </button>

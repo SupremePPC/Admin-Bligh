@@ -18,7 +18,7 @@ import { IoMdNotificationsOutline, IoIosLogOut } from "react-icons/io";
 import { TbUsersGroup } from "react-icons/tb";
 import { getAuth } from "firebase/auth";
 import Modal from "../CustomsModal";
-import { SumNotifications } from "../../firebaseConfig/firestore";
+import { SumNotifications, sumUserRequests } from "../../firebaseConfig/firestore";
 import "./style.css";
 import { AiOutlineStock } from "react-icons/ai";
 
@@ -29,18 +29,26 @@ function Sidebar() {
   const [isLoading, setIsLoading] = useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [notifications, setNotifications] = useState(0);
+  const [userRequests, setUserRequests] = useState(0);
   const navigate = useNavigate();
   const auth = getAuth();
 
   useEffect(() => {
     // Call SumNotifications and pass the setter function for notifications
     SumNotifications(setNotifications);
+    sumUserRequests(setUserRequests);
   }, []);
 
   const notificationBadge = (
     <span className="notification_badge">
       <IoMdNotificationsOutline size={20} />
       <p className="notification_count">{notifications}</p>
+    </span>
+  );
+  const userRequestsBadge = (
+    <span className="notification_badge">
+      <BsPerson size={18} />
+      <p className="notification_count">{userRequests}</p>
     </span>
   );
 
@@ -77,7 +85,7 @@ function Sidebar() {
             }`}
             to="/dashboard/user-requests"
           >
-            <BsPerson size={18} />
+            {userRequestsBadge}
             {!collapsed && "User Requests"}
           </Link>
         </li>
