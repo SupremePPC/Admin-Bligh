@@ -62,6 +62,7 @@ function Sidebar() {
           <Link
             className={`menu_link ${isActive("/dashboard/") ? "active" : ""}`}
             to="/dashboard/"
+            title="Dashboard"
           >
             <IoHomeOutline size={18} />
             {!collapsed && "Dashboard"}
@@ -73,6 +74,7 @@ function Sidebar() {
               isActive("/dashboard/registered-users/") ? "active" : ""
             }`}
             to="/dashboard/registered-users/"
+            title="Registered Users"
           >
             <TbUsersGroup size={18} />
             {!collapsed && "Registered Users"}
@@ -84,6 +86,7 @@ function Sidebar() {
               isActive("/dashboard/user-requests") ? "active" : ""
             }`}
             to="/dashboard/user-requests"
+            title="User Requests"
           >
             {userRequestsBadge}
             {!collapsed && "User Requests"}
@@ -95,6 +98,7 @@ function Sidebar() {
               isActive("/dashboard/transactions") ? "active" : ""
             }`}
             to="/dashboard/transactions"
+            title="Transactions"
           >
             <BiTransfer fill="#fff" stroke="#fff" size={20} />
             {!collapsed && "Transactions Request"}
@@ -106,6 +110,7 @@ function Sidebar() {
               isActive("/dashboard/cash-deposits") ? "active" : ""
             }`}
             to="/dashboard/cash-deposits"
+            title="Cash Deposits"
           >
             <BsCashCoin stroke="#fff" size={20} />
             {!collapsed && "Cash Deposits"}
@@ -117,6 +122,7 @@ function Sidebar() {
               isActive("/dashboard/bonds") ? "active" : ""
             }`}
             to="/dashboard/bonds"
+            title="Bonds"
           >
             <BsCreditCard2Front size={18} />
             {!collapsed && "Bonds"}
@@ -128,8 +134,9 @@ function Sidebar() {
               isActive("/dashboard/fixed-term-deposits") ? "active" : ""
             }`}
             to="/dashboard/fixed-term-deposits"
+            title="Fixed Term Deposits"
           >
-            <PiMoneyLight size={22} />
+            <PiMoneyLight size={24} />
             {!collapsed && "Fixed Term Deposits"}
           </Link>
         </li>
@@ -139,6 +146,7 @@ function Sidebar() {
               isActive("/dashboard/ipos") ? "active" : ""
             }`}
             to="/dashboard/ipos"
+            title="IPOs"
           >
             <BsBriefcase size={20} />
             {!collapsed && "IPOs"}
@@ -150,6 +158,7 @@ function Sidebar() {
               isActive("/dashboard/stock-trading") ? "active" : ""
             }`}
             to="/dashboard/stock-trading"
+            title="Stock Trading"
           >
             <AiOutlineStock size={20} />
             {!collapsed && "Stock Trading"}
@@ -161,6 +170,7 @@ function Sidebar() {
               isActive("/dashboard/banking-details") ? "active" : ""
             }`}
             to="/dashboard/banking-details"
+            title="Banking Details"
           >
             <BsBank size={20} />
             {!collapsed && "Banking Details"}
@@ -172,8 +182,9 @@ function Sidebar() {
               isActive("/dashboard/documents") ? "active" : ""
             }`}
             to="/dashboard/documents"
+            title="Docs Management"
           >
-            <BsFileEarmarkText />
+            <BsFileEarmarkText size={20} />
             {!collapsed && "Docs Management"}
           </Link>
         </li>
@@ -183,8 +194,9 @@ function Sidebar() {
               isActive("/dashboard/chat-with-user") ? "active" : ""
             }`}
             to="/dashboard/chat-with-user"
+            title="Chat With User"
           >
-            <BsChatLeftText size={20} />
+            <BsChatLeftText size={18} />
             {!collapsed && "Chat With User"}
           </Link>
         </li>
@@ -194,6 +206,7 @@ function Sidebar() {
               isActive("/dashboard/notifications") ? "active" : ""
             }`}
             to="/dashboard/notifications"
+            title="Notifications"
           >
             {notificationBadge}
             {!collapsed && "Notifications"}
@@ -206,13 +219,14 @@ function Sidebar() {
               isActive("/dashboard/settings") ? "active" : ""
             }`}
             to="/dashboard/settings"
+            title="Settings"
           >
             <IoSettingsOutline size={20} />
             {!collapsed && "Settings"}
           </Link>
         </li>
 
-        <li className="menu_list">
+        <li className="menu_list" title="Logout">
           <div
             className="menu_link"
             onClick={() => {
