@@ -240,8 +240,8 @@ function Sidebar() {
                     console.error("Error signing out:", error);
                   });
               }}
-              positiveLabel="Logout"
-              negativeLabel="Cancel"
+              positiveLabel="Cancel"
+              negativeLabel="Logout"
               isLoading={isLoading}
             />
           </div>

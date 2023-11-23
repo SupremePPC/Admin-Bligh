@@ -72,20 +72,124 @@ export function addAdminUser(uid, fullName, email) {
 const USER_REQUESTS_COLLECTION = "userRequests";
 
 //Get all user requests
+export const fetchUserRequests = async (db) => {
+  const adminDashRef = collection(db, ADMINDASH_COLLECTION);
+  const adminDocs = await getDocs(adminDashRef);
+  let allUserRequests = [];
+
+  for (const doc of adminDocs.docs) {
+    const userRequestsRef = collection(db, ADMINDASH_COLLECTION, doc.id, USER_REQUESTS_COLLECTION);
+    const userRequestsSnapshot = await getDocs(userRequestsRef);
+    const requests = userRequestsSnapshot.docs.map((userDoc) => ({
+      ...userDoc.data(),
+      id: userDoc.id,
+      uid: doc.id,
+    }));
+    allUserRequests = allUserRequests.concat(requests);
+  }
+
+  return allUserRequests;
+};
+
+//handle user approval
+export const handleUserApproval = async (db, auth, userId, requestData) => {
+  try {
+    // Step 1: Create the user with Firebase Authentication
+    const userCredential = await createUserWithEmailAndPassword(
+      auth,
+      requestData.email,
+      requestData.password
+    );
+
+    const user = userCredential.user;
+    // Send email verification
+    await sendEmailVerification(user);
+
+    // Step 2: Use the User ID as the document ID in the 'users' collection
+    const newUserId = userCredential.user.uid;
+    await setDoc(doc(db, "users", newUserId), {
+      fullName: requestData.fullName,
+      email: requestData.email,
+      address: requestData.address,
+      mobilePhone: requestData.mobilePhone,
+      country: requestData.country,
+      jointAccount: requestData.jointAccount,
+      secondaryAccountHolder: requestData.secondaryAccountHolder,
+    });
+
+    // Step 3: Delete the admin request
+    await deleteDoc(
+      doc(db, ADMINDASH_COLLECTION, requestData.uid, USER_REQUESTS_COLLECTION, userId)
+    );
+
+    // Step 4: Send a confirmation email
+    const mailRef = collection(db, "mail");
+    await addDoc(mailRef, {
+      to: requestData.email,
+      message: {
+        subject: "Signup Request Approved",
+        html: `<p>Hello ${requestData.fullName},</p>
+          <p>Your signup request has been approved! You can now log in using your credentials.</p>
+          <p>Thank you for joining us!</p>`,
+      },
+    });
+
+    return "User request approved successfully.";
+
+  } catch (error) {
+    console.error("Error approving user:", error);
+    throw new Error(`Error approving user: ${error.message}`);
+  }
+};
+
+//handle user rejection
+export const handleUserRejection = async (db, userId, requestData) => {
+  try {
+    // Step 1: Delete the specific user request
+    await deleteDoc(
+      doc(db, ADMINDASH_COLLECTION, requestData.uid, USER_REQUESTS_COLLECTION, userId)
+    );
+
+    // Step 2: Send a rejection email
+    const mailRef = collection(db, "mail");
+    await addDoc(mailRef, {
+      to: requestData.email,
+      message: {
+        subject: "Signup Request Rejected",
+        html: `<p>Hello ${requestData.fullName},</p>
+          <p>We regret to inform you that your signup request has been rejected. 
+          If you believe this is an error or want to inquire further, please contact our support team.</p>
+          <p>Thank you for your understanding!</p>`,
+      },
+    });
+
+    return "User request rejected and removed successfully.";
+
+  } catch (error) {
+    console.error("Error rejecting and removing user:", error);
+    throw new Error(`Error rejecting and removing user: ${error.message}`);
+  }
+};
 
 // Sum userRequests
 export async function sumUserRequests(setRequests) {
-  const adminDashRef = collection(db, "admin_users");
-  const userRequestsRef = doc(adminDashRef, "userRequests");
+  try {
+    const adminDashRef = collection(db, "admin_users");
+    const adminDocs = await getDocs(adminDashRef);
+    let totalRequestsCount = 0;
 
-  let userRequestsCount = 0;
+    for (const doc of adminDocs.docs) {
+      const userRequestsRef = collection(db, "admin_users", doc.id, "userRequests");
+      const userRequestsSnapshot = await getDocs(userRequestsRef);
+      totalRequestsCount += userRequestsSnapshot.size; // Sum the number of requests for each user
+    }
 
-  onSnapshot(userRequestsRef, (querySnapshot) => {
-    userRequestsCount = querySnapshot.size;
-    setRequests(userRequestsCount);
-  });
+    setRequests(totalRequestsCount);
+  } catch (error) {
+    console.error("Error summing user requests:", error);
+    // Handle the error appropriately
+  }
 }
-
 
 // get all users
 export async function getUser(uid) {
