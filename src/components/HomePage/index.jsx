@@ -16,7 +16,7 @@ import { IoMdNotificationsOutline, IoIosLogOut } from "react-icons/io";
 import { TbUsersGroup } from "react-icons/tb";
 import { getAuth } from "firebase/auth";
 import Modal from "../CustomsModal";
-import { SumNotifications, sumUserRequests } from "../../firebaseConfig/firestore";
+import { SumNotifications, countUsersWithChats, sumBondRequests, sumIposRequests, sumTermRequests, sumUserRequests } from "../../firebaseConfig/firestore";
 import "./style.css";
 
 const DashboardCard = ({ to, icon, label }) => {
@@ -35,14 +35,23 @@ const DashboardCard = ({ to, icon, label }) => {
 function HomePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
-  const [notifications, setNotifications] = useState(0);
-  const [userRequests, setUserRequests] = useState(0); 
   const navigate = useNavigate();
   const auth = getAuth();
+  const [notifications, setNotifications] = useState(0);
+  const [userRequests, setUserRequests] = useState(0);
+  const [iposRequests, setIposRequests] = useState(0);
+  const [termsRequests, setTermsRequests] = useState(0);
+  const [liveChatSum, setLiveChatSum] = useState(0);
+  const [bondsRequests, setBondsRequests] = useState(0);
+
 
   useEffect(() => {
     SumNotifications(setNotifications);
     sumUserRequests(setUserRequests);
+    sumBondRequests(setBondsRequests);
+    sumIposRequests(setIposRequests);
+    sumTermRequests(setTermsRequests);
+    countUsersWithChats(setLiveChatSum);
   }, []);
 
   const notificationBadge = (
@@ -51,10 +60,39 @@ function HomePage() {
       <p className="notification_count">{notifications}</p>
     </span>
   );
+
   const userRequestsBadge = (
     <span className="notification_badge">
       <BsPerson size={18} />
       <p className="notification_count">{userRequests}</p>
+    </span>
+  );
+
+  const iposRequestsBadge = (
+    <span className="notification_badge">
+      <BsBriefcase size={18} />
+      <p className="notification_count">{iposRequests}</p>
+    </span>
+  );
+
+  const termsRequestsBadge = (
+    <span className="notification_badge">
+      <PiMoneyLight size={22} />
+      <p className="notification_count">{termsRequests}</p>
+    </span>
+  );
+
+  const bondsRequestsBadge = (
+    <span className="notification_badge">
+      <BsCreditCard2Front size={18} />
+      <p className="notification_count">{bondsRequests}</p>
+    </span>
+  );
+
+  const liveChatBadge = (
+    <span className="notification_badge">
+      <BsChatLeftText size={16} />
+      <p className="notification_count">{liveChatSum}</p>
     </span>
   );
 
@@ -84,12 +122,12 @@ function HomePage() {
         />
         <DashboardCard
           to="/dashboard/bonds"
-          icon={<BsCreditCard2Front stroke="#fff" size={18} />}
+          icon={bondsRequestsBadge}
           label="Bonds"
         />
         <DashboardCard
           to="/dashboard/fixed-term-deposits"
-          icon={<PiMoneyLight stroke="#fff" size={22} />}
+          icon={termsRequestsBadge}
           label="Fixed Term Deposits"
         />
         <DashboardCard
@@ -109,7 +147,7 @@ function HomePage() {
         />
         <DashboardCard
           to="/dashboard/chat-with-user"
-          icon={<BsChatLeftText stroke="#fff" size={20} />}
+          icon={liveChatBadge}
           label="Chat With User"
         />
         <DashboardCard

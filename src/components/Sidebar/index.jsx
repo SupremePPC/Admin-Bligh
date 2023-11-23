@@ -16,27 +16,35 @@ import {
 import { PiMoneyLight } from "react-icons/pi";
 import { IoMdNotificationsOutline, IoIosLogOut } from "react-icons/io";
 import { TbUsersGroup } from "react-icons/tb";
+import { AiOutlineStock } from "react-icons/ai";
 import { getAuth } from "firebase/auth";
 import Modal from "../CustomsModal";
-import { SumNotifications, sumUserRequests } from "../../firebaseConfig/firestore";
+import { SumNotifications, countUsersWithChats, sumBondRequests, sumIposRequests, sumTermRequests, sumUserRequests } from "../../firebaseConfig/firestore";
 import "./style.css";
-import { AiOutlineStock } from "react-icons/ai";
 
 function Sidebar() {
-  const [collapsed, setCollapsed] = useState(true);
   const location = useLocation();
+  const navigate = useNavigate();
+  const auth = getAuth();
   const isActive = (path) => location.pathname === path;
+  const [collapsed, setCollapsed] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [notifications, setNotifications] = useState(0);
   const [userRequests, setUserRequests] = useState(0);
-  const navigate = useNavigate();
-  const auth = getAuth();
+  const [iposRequests, setIposRequests] = useState(0);
+  const [termsRequests, setTermsRequests] = useState(0);
+  const [liveChatSum, setLiveChatSum] = useState(0);
+  const [bondsRequests, setBondsRequests] = useState(0);
+
 
   useEffect(() => {
-    // Call SumNotifications and pass the setter function for notifications
     SumNotifications(setNotifications);
     sumUserRequests(setUserRequests);
+    sumBondRequests(setBondsRequests);
+    sumIposRequests(setIposRequests);
+    sumTermRequests(setTermsRequests);
+    countUsersWithChats(setLiveChatSum);
   }, []);
 
   const notificationBadge = (
@@ -45,10 +53,39 @@ function Sidebar() {
       <p className="notification_count">{notifications}</p>
     </span>
   );
+
   const userRequestsBadge = (
     <span className="notification_badge">
       <BsPerson size={18} />
       <p className="notification_count">{userRequests}</p>
+    </span>
+  );
+
+  const iposRequestsBadge = (
+    <span className="notification_badge">
+      <BsBriefcase size={18} />
+      <p className="notification_count">{iposRequests}</p>
+    </span>
+  );
+
+  const termsRequestsBadge = (
+    <span className="notification_badge">
+      <PiMoneyLight size={22} />
+      <p className="notification_count">{termsRequests}</p>
+    </span>
+  );
+
+  const bondsRequestsBadge = (
+    <span className="notification_badge">
+      <BsCreditCard2Front size={18} />
+      <p className="notification_count">{bondsRequests}</p>
+    </span>
+  );
+
+  const liveChatBadge = (
+    <span className="notification_badge">
+      <BsChatLeftText size={16} />
+      <p className="notification_count">{liveChatSum}</p>
     </span>
   );
 
@@ -124,7 +161,7 @@ function Sidebar() {
             to="/dashboard/bonds"
             title="Bonds"
           >
-            <BsCreditCard2Front size={18} />
+            {bondsRequestsBadge}
             {!collapsed && "Bonds"}
           </Link>
         </li>
@@ -136,7 +173,7 @@ function Sidebar() {
             to="/dashboard/fixed-term-deposits"
             title="Fixed Term Deposits"
           >
-            <PiMoneyLight size={22} />
+            {termsRequestsBadge}
             {!collapsed && "Fixed Term Deposits"}
           </Link>
         </li>
@@ -148,7 +185,7 @@ function Sidebar() {
             to="/dashboard/ipos"
             title="IPOs"
           >
-            <BsBriefcase size={20} />
+            {iposRequestsBadge}
             {!collapsed && "IPOs"}
           </Link>
         </li>
@@ -196,7 +233,7 @@ function Sidebar() {
             to="/dashboard/chat-with-user"
             title="Chat With User"
           >
-            <BsChatLeftText size={18} />
+            {liveChatBadge}
             {!collapsed && "Chat With User"}
           </Link>
         </li>
