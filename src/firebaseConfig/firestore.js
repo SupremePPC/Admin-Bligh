@@ -1742,30 +1742,17 @@ export function fetchChats(db, setChats) {
 
 //Sum of live chats
 export function countUsersWithChats(db, setUsersWithChatsCount) {
-  const usersRef = collection(db, "users");
+  // Reference to the 'activeChats' subcollection within 'chatRoom'
+  const activeChatsRef = collection(db, ADMINUSERS_COLLECTION, "chatRoom", "activeChats");
 
-  onSnapshot(usersRef, (usersSnapshot) => {
-    let currentUsersWithChatsCount = 0;
-    let processedUsers = 0; // Track the number of processed users
-
-    usersSnapshot.forEach((userDoc) => {
-      const userUid = userDoc.id;
-      const chatsRef = collection(db, "users", userUid, 'chats');
-
-      // Check the 'chats' subcollection for each user
-      getDocs(chatsRef).then((chatsSnapshot) => {
-        if (!chatsSnapshot.empty) {
-          currentUsersWithChatsCount++; // Increment if 'chats' is not empty
-        }
-        processedUsers++;
-        if (processedUsers === usersSnapshot.size) {
-          // Update the count only after processing all users
-          setUsersWithChatsCount(currentUsersWithChatsCount);
-        }
-      });
-    });
+  // Listen for real-time updates in the 'activeChats' subcollection
+  onSnapshot(activeChatsRef, (activeChatsSnapshot) => {
+    // Count is simply the number of documents in the 'activeChats' subcollection
+    const activeChatsCount = activeChatsSnapshot.size;
+    setUsersWithChatsCount(activeChatsCount);
   });
 }
+
 
 // Fetch all chats within the CHATS_SUBCOLLECTION subcollection for an individual user
 export const fetchChatMessages = (userUid, callback) => {
@@ -1801,6 +1788,9 @@ export const closeChat = async (db, userUid) => {
       message: 'Your issue has been resolved.',
       timeStamp: serverTimestamp()
     });
+    // Remove user from 'chatRoom'
+    const chatRoomRef = doc(db, ADMINUSERS_COLLECTION, "chatRoom", "activeChats", userUid);
+    await deleteDoc(chatRoomRef);
 
   } catch (err) {
     console.error("Failed to close the chat:", err);
