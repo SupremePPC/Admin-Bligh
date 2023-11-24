@@ -1,16 +1,10 @@
 import React, { useState } from "react";
-import Modal from "../CustomsModal";
 
 const Table = ({
   userRequests,
   handleApproval,
   handleRejection,
 }) => {
-  const firestoreTimestampToDate = (timestamp) => {
-    return timestamp
-      ? new Date(timestamp.seconds * 1000).toLocaleDateString()
-      : "";
-  };
   
   return (
     <div className="contain-table">
@@ -56,7 +50,7 @@ const Table = ({
             ))
           ) : (
             <tr>
-              <td colSpan={7}>No User Found.</td>
+              <td colSpan={7}>No Request Found.</td>
             </tr>
           )}
         </tbody>

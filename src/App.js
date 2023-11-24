@@ -1,5 +1,5 @@
 // App.js
-import React from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { useAuth } from "./authState";
 import { Provider } from "react-redux";
@@ -28,10 +28,19 @@ import CashDeposits from "./components/CashDeposits";
 import UpdateFavicon from "./favicon";
 import UpdateHeaderData from "./metaData";
 import HomePage from "./components/HomePage";
+import ChatWithUser from "./components/ChatUser";
+import StockTrading from "./components/StockTrading";
+import { db } from "./firebaseConfig/firebase";
+import { checkAdminRoleAndLogoutIfNot } from "./firebaseConfig/firestore";
+  
 
 function App() {
   const { loadingAuthState } = useAuth();
-
+  
+  useEffect(() => {
+    checkAdminRoleAndLogoutIfNot(db);
+  }, []);
+  
   return (
     <Provider store={store}>
       <div className="App">
@@ -141,6 +150,14 @@ function App() {
                   </ProtectedRoute>
                 }
               />
+              <Route 
+              path="stock-trading"
+                element= {
+                  <ProtectedRoute>
+                    <StockTrading />
+                  </ProtectedRoute>
+                }
+                />
               <Route
                 path="banking-details"
                 element={
@@ -149,6 +166,14 @@ function App() {
                   </ProtectedRoute>
                 }
               />
+              <Route
+                path="chat-with-user"
+                element= {
+                  <ProtectedRoute>
+                    <ChatWithUser />
+                  </ProtectedRoute>
+                }
+                />
               <Route
                 path="documents"
                 element={

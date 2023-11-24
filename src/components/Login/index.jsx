@@ -7,7 +7,8 @@ import {
 } from "firebase/auth";
 import { getDownloadURL, ref } from "firebase/storage";
 import { onAuthStateChanged } from "firebase/auth";
-import { auth, storage } from "../../firebaseConfig/firebase";
+import { auth, db, storage } from "../../firebaseConfig/firebase";
+import { checkAdminRoleAndLogoutIfNot } from "../../firebaseConfig/firestore";
 import "./style.css";
 
 const Login = () => {
@@ -45,34 +46,44 @@ const Login = () => {
       if (user) {
         navigate("/dashboard");
       } else {
-        // User is not authenticated
-        console.error("No user logged in");
+        return;
       }
     });
 
     return () => unsubscribe(); // Cleanup listener on component unmount
   }, [auth]);
 
+  useEffect(() => {
+    checkAdminRoleAndLogoutIfNot(db);
+  }, []);
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    
+  
     try {
       await setPersistence(auth, browserSessionPersistence);
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-      setIsLoading(false);
-      navigate("/dashboard");
+      await signInWithEmailAndPassword(auth, email, password);
+      navigate("/");
       
+      const isAdmin = await checkAdminRoleAndLogoutIfNot(db);
+      if (isAdmin) {
+        navigate("/dashboard");
+        setIsLoading(false);
+      } else {
+        setError("Access denied. You are not authorized as an admin.");
+        setTimeout(() => setError(""), 4000);
+        setIsLoading(false);
+      }
+  
     } catch (error) {
       console.error("Error during login:", error);
       setError(error.message);
       setIsLoading(false);
-      setTimeout(() => {
-        setError("");
-      }, 4000);
+      setTimeout(() => setError(""), 4000);
     }
   };
+  
 
   return (
     <section className="login_container">

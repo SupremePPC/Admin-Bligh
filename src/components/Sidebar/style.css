@@ -52,7 +52,10 @@
 
 .sidebar .menu_link.active {
   color: var(--secondary);
-  font-size: 20px;
+}
+
+.sidebar .menu_link.active:hover {
+  color: var(--white);
 }
 
 .sidebar .menu_link:hover {
@@ -83,14 +86,12 @@
 .notification_badge{
   display: flex;
   align-items: flex-start;
-  position: relative;
 }
 
 .notification_badge .notification_count{
   font-size: var(--font-twelve);
   font-weight: 700;
   color: var(--red);
-  position: absolute;
-  left: 54%;
-  top: -50%;
+  line-height: 0;
+  margin-left: 1px;
 }

@@ -19,9 +19,11 @@ import {
   doc,
   getDoc,
   getDocs,
+  limit,
   onSnapshot,
   orderBy,
   query,
+  serverTimestamp,
   setDoc,
   updateDoc,
   where,
@@ -34,8 +36,9 @@ import {
   getDownloadURL,
   uploadBytesResumable,
 } from "firebase/storage";
+import { getAuth, signOut } from "firebase/auth";
 
-const ADMINUSER_COLLECTION = "admin_users";
+const ADMINUSERS_COLLECTION = "adminUsers";
 const ADMINDASH_COLLECTION = "admin_users";
 const USERS_COLLECTION = "users";
 
@@ -57,14 +60,173 @@ export function formatNumber(number) {
   }).format(number);
 }
 
+//Admin Users
 export function addAdminUser(uid, fullName, email) {
   // Use the uid directly as the document ID
-  return setDoc(doc(db, ADMINUSER_COLLECTION, uid), {
+  return setDoc(doc(db, ADMINUSERS_COLLECTION, uid), {
     fullName,
     email,
   });
 }
 
+export const checkAdminRoleAndLogoutIfNot = async (db) => {
+  const auth = getAuth();
+  const user = auth.currentUser;
+
+  if (!user) {
+    return false;
+  }
+
+  try {
+    const adminUserRef = doc(db, ADMINUSERS_COLLECTION, user.uid);
+    const adminUserDoc = await getDoc(adminUserRef);
+
+    if (adminUserDoc.exists() && adminUserDoc.data().role === "admin") {
+      return true;
+    } else {
+      await signOut(auth);
+      return false;
+    }
+  } catch (error) {
+    console.error("Error checking admin role:", error);
+    await signOut(auth);
+    return false;
+  }
+};
+
+//USER REQUESTS
+const USER_REQUESTS_COLLECTION = "userRequests";
+
+//Get all user requests
+export const fetchUserRequests = async (db) => {
+  const adminDashRef = collection(db, ADMINDASH_COLLECTION);
+  const adminDocs = await getDocs(adminDashRef);
+  let allUserRequests = [];
+
+  for (const doc of adminDocs.docs) {
+    const userRequestsRef = collection(db, ADMINDASH_COLLECTION, doc.id, USER_REQUESTS_COLLECTION);
+    const userRequestsSnapshot = await getDocs(userRequestsRef);
+    const requests = userRequestsSnapshot.docs.map((userDoc) => ({
+      ...userDoc.data(),
+      id: userDoc.id,
+      uid: doc.id,
+    }));
+    allUserRequests = allUserRequests.concat(requests);
+  }
+
+  return allUserRequests;
+};
+
+//handle user approval
+export const handleUserApproval = async (db, auth, userId, requestData) => {
+  try {
+    // Step 1: Create the user with Firebase Authentication
+    const userCredential = await createUserWithEmailAndPassword(
+      auth,
+      requestData.email,
+      requestData.password
+    );
+
+    const user = userCredential.user;
+    // Send email verification
+    await sendEmailVerification(user);
+
+    // Step 2: Use the User ID as the document ID in the 'users' collection
+    const newUserId = userCredential.user.uid;
+    await setDoc(doc(db, "users", newUserId), {
+      fullName: requestData.fullName,
+      email: requestData.email,
+      address: requestData.address,
+      mobilePhone: requestData.mobilePhone,
+      country: requestData.country,
+      jointAccount: requestData.jointAccount,
+      secondaryAccountHolder: requestData.secondaryAccountHolder,
+    });
+
+    // Step 3: Delete the admin request
+    await deleteDoc(
+      doc(db, ADMINDASH_COLLECTION, requestData.uid, USER_REQUESTS_COLLECTION, userId)
+    );
+
+    // Step 4: Send a confirmation email
+    const mailRef = collection(db, "mail");
+    await addDoc(mailRef, {
+      to: requestData.email,
+      message: {
+        subject: "Signup Request Approved",
+        html: `<p>Hello ${requestData.fullName},</p>
+          <p>Your signup request has been approved! You can now log in using your credentials.</p>
+          <p>Thank you for joining us!</p>`,
+      },
+    });
+
+    return "User request approved successfully.";
+
+  } catch (error) {
+    console.error("Error approving user:", error);
+    throw new Error(`Error approving user: ${error.message}`);
+  }
+};
+
+//handle user rejection
+export const handleUserRejection = async (db, userId, requestData) => {
+  try {
+    // Step 1: Delete the specific user request
+    await deleteDoc(
+      doc(db, ADMINDASH_COLLECTION, requestData.uid, USER_REQUESTS_COLLECTION, userId)
+    );
+
+    // Step 2: Send a rejection email
+    const mailRef = collection(db, "mail");
+    await addDoc(mailRef, {
+      to: requestData.email,
+      message: {
+        subject: "Signup Request Rejected",
+        html: `<p>Hello ${requestData.fullName},</p>
+          <p>We regret to inform you that your signup request has been rejected. 
+          If you believe this is an error or want to inquire further, please contact our support team.</p>
+          <p>Thank you for your understanding!</p>`,
+      },
+    });
+
+    return "User request rejected and removed successfully.";
+
+  } catch (error) {
+    console.error("Error rejecting and removing user:", error);
+    throw new Error(`Error rejecting and removing user: ${error.message}`);
+  }
+};
+
+// Sum userRequests
+export function sumUserRequests(db, setRequests) {
+  const adminDashRef = collection(db, ADMINDASH_COLLECTION);
+  let userRequestsCount = 0;
+  let activeListeners = 0;
+
+  onSnapshot(adminDashRef, (adminDocs) => {
+    userRequestsCount = 0; // Reset the count for each update
+    activeListeners = adminDocs.size; // Reset the number of active listeners
+
+    if (activeListeners === 0) {
+      setRequests(0); // If no admin docs, set count to 0
+    }
+
+    adminDocs.forEach((doc) => {
+      const usersRequestsRef = collection(db, ADMINDASH_COLLECTION, doc.id, USER_REQUESTS_COLLECTION);
+
+      onSnapshot(usersRequestsRef, (usersRequestsSnapshot) => {
+        userRequestsCount += usersRequestsSnapshot.size;
+
+        activeListeners -= 1;
+        if (activeListeners === 0) {
+          setRequests(userRequestsCount); // Update the count when all listeners have reported
+        }
+      });
+    });
+  });
+}
+
+// get all users
 export async function getUser(uid) {
   const userRef = doc(db, USERS_COLLECTION, uid);
   const userSnap = await getDoc(userRef);
@@ -76,11 +238,13 @@ export async function getUser(uid) {
   }
 }
 
+// update user data
 export function updateUser(uid, userData) {
   const userDoc = doc(db, USERS_COLLECTION, uid);
   return updateDoc(userDoc, userData);
 }
 
+//delete user
 export function deleteuser(uid) {
   const userDoc = doc(db, USERS_COLLECTION, uid);
   return deleteDoc(userDoc);
@@ -349,6 +513,25 @@ export async function getBondRequests(userId) {
     console.error("Error in getBondRequests: ", error);
     return [];
   }
+}
+
+// Sum of bond requests
+export function sumBondRequests(db, setBondRequestsCount) {
+  const adminDashRef = collection(db, ADMINDASH_COLLECTION);
+  let totalBondRequestsCount = 0;
+
+  onSnapshot(adminDashRef, (adminDocs) => {
+    totalBondRequestsCount = 0; // Reset count for each update
+
+    adminDocs.forEach((doc) => {
+      const bondRequestsRef = collection(db, ADMINDASH_COLLECTION, doc.id, BONDS_REQUEST_SUB_COLLECTION);
+
+      onSnapshot(bondRequestsRef, (bondRequestsSnapshot) => {
+        totalBondRequestsCount += bondRequestsSnapshot.size;
+        setBondRequestsCount(totalBondRequestsCount);
+      });
+    });
+  });
 }
 
 // Function to handle selling bonds
@@ -764,6 +947,167 @@ export async function addNotification(userId, message, type = "info") {
   }
 }
 
+// Function to fetch all the notifications
+export async function getLoginNotifications() {
+  try {
+    const adminDashRef = collection(db, ADMINUSERS_COLLECTION);
+    const notificationDashRef = doc(adminDashRef, "notifications");
+
+    const loginNotificationsRef = collection(
+      notificationDashRef,
+      "loginNotifications"
+    );
+    const logoutNotificationsRef = collection(
+      notificationDashRef,
+      "logoutNotifications"
+    );
+
+    const closeChatNotificationsRef = collection(
+      notificationDashRef,
+      "chatNotifications"
+    );
+
+    const loginNotificationsSnapshot = await getDocs(
+      query(loginNotificationsRef, orderBy("timeStamp", "desc"))
+    );
+    const logoutNotificationsSnapshot = await getDocs(
+      query(logoutNotificationsRef, orderBy("timeStamp", "desc"))
+    );
+
+    const closeChatNotificationsSnapshot = await getDocs(
+      query(closeChatNotificationsRef, orderBy("timeStamp", "desc"))
+    );
+
+    const loginNotifications = loginNotificationsSnapshot.docs.map((doc) => ({
+      ...doc.data(),
+      id: doc.id,
+    }));
+
+    const logoutNotifications = logoutNotificationsSnapshot.docs.map((doc) => ({
+      ...doc.data(),
+      id: doc.id,
+    }));
+
+    const closeChatNotifications = closeChatNotificationsSnapshot.docs.map((doc) => ({
+      ...doc.data(),
+      id: doc.id,
+    }));
+
+    const allNotifications = [...loginNotifications, ...logoutNotifications, ...closeChatNotifications];
+
+    // Sort notifications based on timestamp (assuming there's a timestamp field)
+    const sortedNotifications = allNotifications.sort(
+      (a, b) => b.timeStamp - a.timeStamp
+      );
+    return sortedNotifications;
+  } catch (error) {
+    console.error("Error in getLoginNotifications: ", error);
+    return [];
+  }
+}
+
+//sum up all notfications
+export function sumNotifications(setNotifications) {
+  const adminDashRef = collection(db, ADMINUSERS_COLLECTION);
+  const notificationDashRef = doc(adminDashRef, "notifications");
+
+  const loginNotificationsRef = collection(notificationDashRef, "loginNotifications");
+  const logoutNotificationsRef = collection(notificationDashRef, "logoutNotifications");
+  const closeChatNotificationsRef = collection(notificationDashRef, "chatNotifications");
+
+  let loginNotificationsCount = 0;
+  let logoutNotificationsCount = 0;
+  let closeChatNotificationsCount = 0;
+
+  const updateTotalNotifications = () => {
+   let totalNotifications = 0; // Reset the count for each update
+    // Sum all types of notifications and update the state
+   totalNotifications = loginNotificationsCount + logoutNotificationsCount + closeChatNotificationsCount;
+   console.log(totalNotifications);
+    setNotifications(totalNotifications);
+  };
+
+  // Listen to changes in the loginNotifications collection
+  onSnapshot(loginNotificationsRef, (querySnapshot) => {
+    loginNotificationsCount = querySnapshot.size;
+    updateTotalNotifications();
+  });
+
+  // Listen to changes in the logoutNotifications collection
+  onSnapshot(logoutNotificationsRef, (querySnapshot) => {
+    logoutNotificationsCount = querySnapshot.size;
+    updateTotalNotifications();
+  });
+
+  // Listen to changes in the closeChatNotifications collection
+  onSnapshot(closeChatNotificationsRef, (querySnapshot) => {
+    closeChatNotificationsCount = querySnapshot.size;
+    updateTotalNotifications();
+  });
+}
+
+
+// Function to delete all notifications
+export async function deleteAllNotifications() {
+  const adminDashRef = collection(db, ADMINUSERS_COLLECTION);
+  const notificationDashRef = doc(adminDashRef, "notifications");
+
+  const loginNotificationsRef = collection(
+    notificationDashRef,
+    "loginNotifications"
+  );
+  const logoutNotificationsRef = collection(
+    notificationDashRef,
+    "logoutNotifications"
+  );
+
+  const closeChatNotificationsRef = collection(
+    notificationDashRef,
+    "chatNotifications"
+  ); 
+
+  try {
+    // Delete all documents in the 'loginNotifications' sub-collection
+    const loginQuerySnapshot = await getDocs(loginNotificationsRef);
+    loginQuerySnapshot.forEach(async (doc) => {
+      await deleteDoc(doc.ref);
+    });
+
+    // Delete all documents in the 'logoutNotifications' sub-collection
+    const logoutQuerySnapshot = await getDocs(logoutNotificationsRef);
+    logoutQuerySnapshot.forEach(async (doc) => {
+      await deleteDoc(doc.ref);
+    });
+
+    // Delete all documents in the 'closeChatNotifications' sub-collection
+    const closeChatQuerySnapshot = await getDocs(closeChatNotificationsRef);
+    closeChatQuerySnapshot.forEach(async (doc) => {
+      await deleteDoc(doc.ref);
+    });
+
+  } catch (error) {
+    console.error("Error deleting all notifications:", error);
+  }
+}
+
+export async function deleteNotification(notificationId, isLoggedIn) {
+  const adminDashRef = collection(db, ADMINUSERS_COLLECTION);
+  const notificationDashRef = doc(adminDashRef, "notifications");
+  const subCollectionName = isLoggedIn
+    ? "loginNotifications"
+    : "logoutNotifications";
+
+  const notificationsRef = collection(notificationDashRef, subCollectionName);
+
+  try {
+    // Delete the notification document by its ID
+    await deleteDoc(doc(notificationsRef, notificationId));
+  } catch (error) {
+    console.error("Error deleting the notification:", error);
+  }
+}
+
+
 //TERMS REQUEST
 const TERMS_REQUEST_SUB_COLLECTION = "termDepositRequest";
 
@@ -805,6 +1149,32 @@ export async function getTermRequests() {
   } catch (error) {
     console.error("Error in getTermRequests: ", error);
     return [];
+  }
+}
+
+//Sum of fixed term requests
+export async function sumTermRequests(db, setTermsRequests) {
+  try {
+    const adminDashRef = collection(db, ADMINDASH_COLLECTION);
+    onSnapshot(adminDashRef, (adminDocs) => {
+      let termRequestsCount = 0;
+  
+      adminDocs.forEach((doc) => {
+        // Correctly reference the subcollection for each document
+        const termsRequestsRef = collection(db, ADMINDASH_COLLECTION, doc.id, TERMS_REQUEST_SUB_COLLECTION);
+  
+        onSnapshot(termsRequestsRef, (termsRequestsSnapshot) => {
+          termRequestsCount += termsRequestsSnapshot.size;
+          // Update the count outside the inner onSnapshot
+        });
+      });
+  
+      // Set the total count outside the loop
+      setTermsRequests(termRequestsCount);
+    });
+  } catch (error) {
+    console.error("Error in sumTermRequests: ", error);
+    return 0;
   }
 }
 
@@ -1068,6 +1438,28 @@ export async function getIposRequests() {
   }
 }
 
+//Sum of ipos requests
+export function sumIposRequests(db, setIposRequestsCount) {
+  const adminDashRef = collection(db, ADMINDASH_COLLECTION);
+
+  onSnapshot(adminDashRef, (adminDocs) => {
+    let totalIposRequestsCount = 0;
+
+    adminDocs.forEach((doc) => {
+      // Correctly reference the subcollection for each document
+      const iposRequestsRef = collection(db, ADMINDASH_COLLECTION, doc.id, IPOS_REQUESTS_COLLECTION);
+
+      onSnapshot(iposRequestsRef, (iposRequestsSnapshot) => {
+        totalIposRequestsCount += iposRequestsSnapshot.size;
+        // Update the count outside the inner onSnapshot
+      });
+    });
+
+    // Set the total count outside the loop
+    setIposRequestsCount(totalIposRequestsCount);
+  });
+}
+
 // 5. Handle the IPO approval logic
 export const handleIpoApproval = async (uid, requestId, requestData) => {
   try {
@@ -1256,137 +1648,10 @@ export const deleteCashDeposit = async (uid, depositId) => {
   }
 };
 
-// Function to fetch all the notifications
-export async function getLoginNotifications() {
-  try {
-    const adminDashRef = collection(db, "admin_users");
-    const notificationDashRef = doc(adminDashRef, "notifications");
-
-    const loginNotificationsRef = collection(
-      notificationDashRef,
-      "loginNotifications"
-    );
-    const logoutNotificationsRef = collection(
-      notificationDashRef,
-      "logoutNotifications"
-    );
-
-    const loginNotificationsSnapshot = await getDocs(
-      query(loginNotificationsRef, orderBy("timeStamp", "desc"))
-    );
-    const logoutNotificationsSnapshot = await getDocs(
-      query(logoutNotificationsRef, orderBy("timeStamp", "desc"))
-    );
-
-    const loginNotifications = loginNotificationsSnapshot.docs.map((doc) => ({
-      ...doc.data(),
-      id: doc.id,
-    }));
-
-    const logoutNotifications = logoutNotificationsSnapshot.docs.map((doc) => ({
-      ...doc.data(),
-      id: doc.id,
-    }));
-
-    const allNotifications = [...loginNotifications, ...logoutNotifications];
-
-    // Sort notifications based on timestamp (assuming there's a timestamp field)
-    const sortedNotifications = allNotifications.sort(
-      (a, b) => b.timeStamp - a.timeStamp
-      );
-    return sortedNotifications;
-  } catch (error) {
-    console.error("Error in getLoginNotifications: ", error);
-    return [];
-  }
-}
-
-//sum up all notfications
-export async function SumNotifications(setNotifications) {
-  const adminDashRef = collection(db, "admin_users");
-  const notificationDashRef = doc(adminDashRef, "notifications");
-
-  const loginNotificationsRef = collection(
-    notificationDashRef,
-    "loginNotifications"
-  );
-  const logoutNotificationsRef = collection(
-    notificationDashRef,
-    "logoutNotifications"
-  );
-
-  let loginNotificationsCount = 0;
-  let logoutNotificationsCount = 0;
-
-  // Listen to changes in the loginNotifications collection
-  onSnapshot(loginNotificationsRef, (querySnapshot) => {
-    loginNotificationsCount = querySnapshot.size;
-    // Update your state here
-    setNotifications(loginNotificationsCount + logoutNotificationsCount);
-  });
-
-  // Listen to changes in the logoutNotifications collection
-  onSnapshot(logoutNotificationsRef, (querySnapshot) => {
-    logoutNotificationsCount = querySnapshot.size;
-    // Update your state here
-    setNotifications(loginNotificationsCount + logoutNotificationsCount);
-  });
-}
-
-// Function to delete all notifications
-export async function deleteAllNotifications() {
-  const adminDashRef = collection(db, "admin_users");
-  const notificationDashRef = doc(adminDashRef, "notifications");
-
-  const loginNotificationsRef = collection(
-    notificationDashRef,
-    "loginNotifications"
-  );
-  const logoutNotificationsRef = collection(
-    notificationDashRef,
-    "logoutNotifications"
-  );
-
-  try {
-    // Delete all documents in the 'loginNotifications' sub-collection
-    const loginQuerySnapshot = await getDocs(loginNotificationsRef);
-    loginQuerySnapshot.forEach(async (doc) => {
-      await deleteDoc(doc.ref);
-    });
-
-    // Delete all documents in the 'logoutNotifications' sub-collection
-    const logoutQuerySnapshot = await getDocs(logoutNotificationsRef);
-    logoutQuerySnapshot.forEach(async (doc) => {
-      await deleteDoc(doc.ref);
-    });
-
-  } catch (error) {
-    console.error("Error deleting all notifications:", error);
-  }
-}
-
-export async function deleteNotification(notificationId, isLoggedIn) {
-  const adminDashRef = collection(db, "admin_users");
-  const notificationDashRef = doc(adminDashRef, "notifications");
-  const subCollectionName = isLoggedIn
-    ? "loginNotifications"
-    : "logoutNotifications";
-
-  const notificationsRef = collection(notificationDashRef, subCollectionName);
-
-  try {
-    // Delete the notification document by its ID
-    await deleteDoc(doc(notificationsRef, notificationId));
-  } catch (error) {
-    console.error("Error deleting the notification:", error);
-  }
-}
-
-
 // Function to fetch the password policy setting from Firestore
 export const fetchPasswordPolicySetting = async () => {
   try {
-    const docRef = doc(db, 'adminUsers', 'strongPasswordPolicy');
+    const docRef = doc(db, ADMINUSERS_COLLECTION, 'strongPasswordPolicy');
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
@@ -1404,7 +1669,7 @@ export const fetchPasswordPolicySetting = async () => {
 // Function to update the password policy setting in Firestore
 export const updatePasswordPolicySetting = async (newValue) => {
   try {
-    const docRef = doc(db, 'adminUsers', 'strongPasswordPolicy');
+    const docRef = doc(db, ADMINUSERS_COLLECTION, 'strongPasswordPolicy');
     await updateDoc(docRef, {
       isTrue: newValue,
     });
@@ -1417,7 +1682,7 @@ export const updatePasswordPolicySetting = async (newValue) => {
 //Fetch meta data from adminUsers collection
 export const fetchMetaData = async () => {
   try {
-    const docRef = doc(db, 'adminUsers', 'metaData');
+    const docRef = doc(db, ADMINUSERS_COLLECTION, 'metaData');
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists) {
@@ -1434,7 +1699,7 @@ export const fetchMetaData = async () => {
 //Fetch title data from adminUsers collection
 export const fetchTitleData = async () => {
   try {
-    const docRef = doc(db, 'adminUsers', 'title');
+    const docRef = doc(db, ADMINUSERS_COLLECTION, 'title');
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists) {
@@ -1451,7 +1716,7 @@ export const fetchTitleData = async () => {
 // handle update meta data
 export const updateMetaData = async (newMeta) => {
   try {
-    const docRef = doc(db, 'adminUsers', 'metaData');
+    const docRef = doc(db, ADMINUSERS_COLLECTION, 'metaData');
     await updateDoc(docRef, { data: newMeta });
     return 'Meta data updated successfully.';
   } catch (error) {
@@ -1463,11 +1728,145 @@ export const updateMetaData = async (newMeta) => {
 // handle update title data
 export const updateTitleText = async (newTitle) => {
   try {
-    const docRef = doc(db, 'adminUsers', 'title');
+    const docRef = doc(db, ADMINUSERS_COLLECTION, 'title');
     await updateDoc(docRef, { text: newTitle });
     return 'Title text updated successfully.';
   } catch (error) {
     console.error('Error updating meta data:', error);
     throw error;
   }
+};
+
+//LIVE CHAT
+const CHATS_SUBCOLLECTION = 'chats';
+
+// Fetch all users with CHATS_SUBCOLLECTION in their doc
+export function fetchChats(db, setChats) {
+  // Reference to the 'activeChats' subcollection within 'chatRoom'
+  const activeChatsRef = collection(db, ADMINUSERS_COLLECTION, "chatRoom", "activeChats");
+
+  // Listen for real-time updates in the 'activeChats' subcollection
+  onSnapshot(activeChatsRef, async (activeChatsSnapshot) => {
+    let usersWithChats = [];
+
+    // Iterate over each active chat document
+    for (const activeChatDoc of activeChatsSnapshot.docs) {
+      const userUid = activeChatDoc.id;
+      const userRef = doc(db, "users", userUid);
+      
+      // Fetch user details
+      const userDoc = await getDoc(userRef);
+      if (userDoc.exists()) {
+        usersWithChats.push({ userId: userUid, userName: userDoc.data().fullName });
+      }
+    }
+
+    // Update the state with the list of users who have active chats
+    setChats(usersWithChats);
+  });
+}
+
+
+//Sum of live chats
+export function countUsersWithChats(db, setUsersWithChatsCount) {
+  // Reference to the 'activeChats' subcollection within 'chatRoom'
+  const activeChatsRef = collection(db, ADMINUSERS_COLLECTION, "chatRoom", "activeChats");
+
+  // Listen for real-time updates in the 'activeChats' subcollection
+  onSnapshot(activeChatsRef, (activeChatsSnapshot) => {
+    // Count is simply the number of documents in the 'activeChats' subcollection
+    const activeChatsCount = activeChatsSnapshot.size;
+    setUsersWithChatsCount(activeChatsCount);
+  });
+}
+
+
+// Fetch all chats within the CHATS_SUBCOLLECTION subcollection for an individual user
+export const fetchChatMessages = (userUid, callback) => {
+  try {
+    const messagesRef = collection(db, USERS_COLLECTION, userUid, CHATS_SUBCOLLECTION);
+    const q = query(messagesRef, orderBy('timeStamp', 'asc'));
+
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const chats = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      callback(chats);
+    });
+
+    return unsubscribe; // Function to stop listening to changes
+  } catch (err) {
+    console.error(err);
+    throw new Error('Failed to load chat messages');
+  }
+};
+
+// Close Chat
+export const closeChat = async (db, userUid) => {
+  try {
+    const chatsRef = collection(db, USERS_COLLECTION, userUid, CHATS_SUBCOLLECTION);
+    const querySnapshot = await getDocs(query(chatsRef));
+
+    // Delete each chat document
+    for (const doc of querySnapshot.docs) {
+      await deleteDoc(doc.ref);
+    }
+
+    // Add a notification to the user's notifications subcollection
+    await addDoc(collection(db, USERS_COLLECTION, userUid, 'notifications'), {
+      message: 'Your issue has been resolved.',
+      timeStamp: serverTimestamp()
+    });
+    // Remove user from 'chatRoom'
+    const chatRoomRef = doc(db, ADMINUSERS_COLLECTION, "chatRoom", "activeChats", userUid);
+    await deleteDoc(chatRoomRef);
+
+  } catch (err) {
+    console.error("Failed to close the chat:", err);
+    throw new Error('Failed to close the chat');
+  }
+};
+
+// Send Message
+export const sendMessage = async (userUid, chatMessage) => {
+  try {
+    // Create a new chat document reference
+    const newChatRef = doc(collection(db, 'users', userUid, CHATS_SUBCOLLECTION));
+    const chatId = newChatRef.id;
+    console.log(chatId);
+    // Initialize the new chat document with the chat message and other data
+    await setDoc(newChatRef, {
+      chat: chatMessage,
+      timeStamp: serverTimestamp(),
+      read: false,
+      user: 'admin', // or the client's identifier
+      id: userUid,
+      chatId: chatId,
+      // userName: fullName,
+    });
+    return chatId;
+  } catch (err) {
+    console.error(err);
+    throw new Error('Failed to send chat');
+  }
+};
+
+// Real-time Chat Updates
+export const subscribeToChatUpdates = (userUid, chatId, callback) => {
+
+  if (!userUid || !chatId) {
+    console.error('Invalid userUid or chatId');
+    return () => {};
+  }
+
+  const docRef = doc(db, USERS_COLLECTION, userUid, CHATS_SUBCOLLECTION, chatId);
+
+  const unsubscribe = onSnapshot(docRef, snapshot => {
+    // console.log('Snapshot data:', snapshot.data());
+    if (snapshot.exists()) {
+      callback(snapshot.data().messages);
+    } else {
+      console.log('No such document!');
+    }
+  });
+
+  return unsubscribe;
 };
