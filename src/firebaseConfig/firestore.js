@@ -1742,23 +1742,30 @@ const CHATS_SUBCOLLECTION = 'chats';
 
 // Fetch all users with CHATS_SUBCOLLECTION in their doc
 export function fetchChats(db, setChats) {
-  const usersRef = collection(db, "users");
+  // Reference to the 'activeChats' subcollection within 'chatRoom'
+  const activeChatsRef = collection(db, ADMINUSERS_COLLECTION, "chatRoom", "activeChats");
 
-  onSnapshot(usersRef, (usersSnapshot) => {
+  // Listen for real-time updates in the 'activeChats' subcollection
+  onSnapshot(activeChatsRef, async (activeChatsSnapshot) => {
     let usersWithChats = [];
 
-    usersSnapshot.forEach((userDoc) => {
-      const chatsRef = collection(db, "users", userDoc.id, 'chats');
+    // Iterate over each active chat document
+    for (const activeChatDoc of activeChatsSnapshot.docs) {
+      const userUid = activeChatDoc.id;
+      const userRef = doc(db, "users", userUid);
+      
+      // Fetch user details
+      const userDoc = await getDoc(userRef);
+      if (userDoc.exists()) {
+        usersWithChats.push({ userId: userUid, userName: userDoc.data().fullName });
+      }
+    }
 
-      onSnapshot(chatsRef, (chatsSnapshot) => {
-        if (!chatsSnapshot.empty) {
-          usersWithChats.push({ userId: userDoc.id, userName: userDoc.data().fullName });
-          setChats([...usersWithChats]); // Update state each time a new chat is found
-        }
-      });
-    });
+    // Update the state with the list of users who have active chats
+    setChats(usersWithChats);
   });
 }
+
 
 //Sum of live chats
 export function countUsersWithChats(db, setUsersWithChatsCount) {
