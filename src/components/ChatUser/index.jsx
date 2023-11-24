@@ -147,7 +147,6 @@ export default function ChatWithUser() {
 
     const userUid = selectedChat.userId;
     const chatId = selectedChat.chatId;
-    console.log(selectedChat);
 
     const unsubscribe = subscribeToChatUpdates(
       userUid,

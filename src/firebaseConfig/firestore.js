@@ -1007,40 +1007,49 @@ export async function getLoginNotifications() {
 }
 
 //sum up all notfications
-export async function SumNotifications(setNotifications) {
-  const adminDashRef = collection(db,ADMINDASH_COLLECTION);
+export function sumNotifications(setNotifications) {
+  const adminDashRef = collection(db, ADMINUSERS_COLLECTION);
   const notificationDashRef = doc(adminDashRef, "notifications");
 
-  const loginNotificationsRef = collection(
-    notificationDashRef,
-    "loginNotifications"
-  );
-  const logoutNotificationsRef = collection(
-    notificationDashRef,
-    "logoutNotifications"
-  );
+  const loginNotificationsRef = collection(notificationDashRef, "loginNotifications");
+  const logoutNotificationsRef = collection(notificationDashRef, "logoutNotifications");
+  const closeChatNotificationsRef = collection(notificationDashRef, "chatNotifications");
 
   let loginNotificationsCount = 0;
   let logoutNotificationsCount = 0;
+  let closeChatNotificationsCount = 0;
+
+  const updateTotalNotifications = () => {
+   let totalNotifications = 0; // Reset the count for each update
+    // Sum all types of notifications and update the state
+   totalNotifications = loginNotificationsCount + logoutNotificationsCount + closeChatNotificationsCount;
+   console.log(totalNotifications);
+    setNotifications(totalNotifications);
+  };
 
   // Listen to changes in the loginNotifications collection
   onSnapshot(loginNotificationsRef, (querySnapshot) => {
     loginNotificationsCount = querySnapshot.size;
-    // Update your state here
-    setNotifications(loginNotificationsCount + logoutNotificationsCount);
+    updateTotalNotifications();
   });
 
   // Listen to changes in the logoutNotifications collection
   onSnapshot(logoutNotificationsRef, (querySnapshot) => {
     logoutNotificationsCount = querySnapshot.size;
-    // Update your state here
-    setNotifications(loginNotificationsCount + logoutNotificationsCount);
+    updateTotalNotifications();
+  });
+
+  // Listen to changes in the closeChatNotifications collection
+  onSnapshot(closeChatNotificationsRef, (querySnapshot) => {
+    closeChatNotificationsCount = querySnapshot.size;
+    updateTotalNotifications();
   });
 }
 
+
 // Function to delete all notifications
 export async function deleteAllNotifications() {
-  const adminDashRef = collection(db, "admin_users");
+  const adminDashRef = collection(db, ADMINUSERS_COLLECTION);
   const notificationDashRef = doc(adminDashRef, "notifications");
 
   const loginNotificationsRef = collection(
@@ -1051,6 +1060,11 @@ export async function deleteAllNotifications() {
     notificationDashRef,
     "logoutNotifications"
   );
+
+  const closeChatNotificationsRef = collection(
+    notificationDashRef,
+    "chatNotifications"
+  ); 
 
   try {
     // Delete all documents in the 'loginNotifications' sub-collection
@@ -1065,13 +1079,19 @@ export async function deleteAllNotifications() {
       await deleteDoc(doc.ref);
     });
 
+    // Delete all documents in the 'closeChatNotifications' sub-collection
+    const closeChatQuerySnapshot = await getDocs(closeChatNotificationsRef);
+    closeChatQuerySnapshot.forEach(async (doc) => {
+      await deleteDoc(doc.ref);
+    });
+
   } catch (error) {
     console.error("Error deleting all notifications:", error);
   }
 }
 
 export async function deleteNotification(notificationId, isLoggedIn) {
-  const adminDashRef = collection(db, "admin_users");
+  const adminDashRef = collection(db, ADMINUSERS_COLLECTION);
   const notificationDashRef = doc(adminDashRef, "notifications");
   const subCollectionName = isLoggedIn
     ? "loginNotifications"

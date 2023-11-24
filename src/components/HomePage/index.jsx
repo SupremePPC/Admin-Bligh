@@ -9,7 +9,6 @@ import {
   BsCashCoin,
   BsBriefcase,
   BsBank,
-  BsChatLeftText,
   BsChatDots,
 } from "react-icons/bs";
 import { PiMoneyLight } from "react-icons/pi";
@@ -18,7 +17,7 @@ import { TbUsersGroup } from "react-icons/tb";
 import { getAuth } from "firebase/auth";
 import Modal from "../CustomsModal";
 import {
-  SumNotifications,
+  sumNotifications,
   countUsersWithChats,
   sumBondRequests,
   sumIposRequests,
@@ -27,7 +26,6 @@ import {
 } from "../../firebaseConfig/firestore";
 import { db } from "../../firebaseConfig/firebase";
 import "./style.css";
-import { AiFillWechat } from "react-icons/ai";
 
 const DashboardCard = ({ to, icon, label }) => {
   return (
@@ -55,7 +53,7 @@ function HomePage() {
   const [bondsRequests, setBondsRequests] = useState(0);
 
   useEffect(() => {
-    SumNotifications(setNotifications);
+    sumNotifications(setNotifications);
     sumUserRequests(db, setUserRequests);
     sumBondRequests(db, setBondsRequests);
     sumIposRequests(db, setIposRequests);

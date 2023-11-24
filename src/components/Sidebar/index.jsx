@@ -11,18 +11,17 @@ import {
   BsBriefcase,
   BsCreditCard2Front,
   BsBank,
-  BsChatLeftText,
   BsChatDots
 } from "react-icons/bs";
 import { PiMoneyLight } from "react-icons/pi";
 import { IoMdNotificationsOutline, IoIosLogOut } from "react-icons/io";
 import { TbUsersGroup } from "react-icons/tb";
-import { AiFillWechat, AiOutlineStock } from "react-icons/ai";
+import {AiOutlineStock } from "react-icons/ai";
 import { getAuth } from "firebase/auth";
 import Modal from "../CustomsModal";
-import { SumNotifications, countUsersWithChats, sumBondRequests, sumIposRequests, sumTermRequests, sumUserRequests } from "../../firebaseConfig/firestore";
-import "./style.css";
+import { sumNotifications, countUsersWithChats, sumBondRequests, sumIposRequests, sumTermRequests, sumUserRequests } from "../../firebaseConfig/firestore";
 import { db } from "../../firebaseConfig/firebase";
+import "./style.css";
 
 function Sidebar() {
   const location = useLocation();
@@ -41,7 +40,7 @@ function Sidebar() {
 
 
   useEffect(() => {
-    SumNotifications(setNotifications);
+    sumNotifications(setNotifications);
     sumUserRequests(db, setUserRequests);
     sumBondRequests(db, setBondsRequests);
     sumIposRequests(db, setIposRequests);
