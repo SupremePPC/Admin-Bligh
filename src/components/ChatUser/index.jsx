@@ -35,20 +35,19 @@ export default function ChatWithUser() {
   const unsubscribeRef = useRef(null);
 
   //Fetch chats
+  const loadChats = async () => {
+    try {
+      fetchChats(db, setChats);
+    } catch (error) {
+      console.error(error);
+      setError("Failed to load chats");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     setLoading(true);
-
-    const loadChats = async () => {
-      try {
-         fetchChats(db, setChats);
-      } catch (error) {
-        console.error(error);
-        setError("Failed to load chats");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     loadChats();
   }, []);
 
@@ -114,7 +113,8 @@ export default function ChatWithUser() {
 
           // Update chats in state and reset selected chat
           setChats(chats.filter((chat) => chat.id !== chat.chatId));
-          setSelectedChat(null); // Reset selected chat to show default component
+          setSelectedChat(null);
+          loadChats();
         } catch (err) {
           console.error(err);
           Swal.fire("Error", "Failed to close the chat", "error");
@@ -165,78 +165,90 @@ export default function ChatWithUser() {
   return (
     <section className="container chatPage_wrapper">
       <Header />
-      {
-        chats.length === 0 ? (
-          <div className="chatPage_header">
+      {chats.length === 0 ? (
+        <div className="chatPage_header">
+          <div className="chatPage_icon">
+            <img src={chat_icon} alt="chat icon" />
+          </div>
+          <div className="chatPage_title">
+            <h4>You have messages no messages!</h4>
+          </div>
+        </div>
+      ) : (
+        <div className="chatPage_header">
           <div className="chatPage_icon">
             <img src={chat_icon} alt="chat icon" />
           </div>
           <div className="chatPage_title">
             <h4>
-              You have messages no messages!
-              
+              You have messages from the following users!
+              <br />
+              Click on a chat to start responding.
             </h4>
           </div>
         </div>
-        ) : (
-      <div className="chatPage_header">
-        <div className="chatPage_icon">
-          <img src={chat_icon} alt="chat icon" />
-        </div>
-        <div className="chatPage_title">
-          <h4>
-            You have messages from the following users!
-            <br />
-            Click on a chat to start responding.
-          </h4>
-        </div>
-      </div>
       )}
 
-      {
-        chats.length === 0 ? (
-            <div className="chatBox_banner" style={{height: '72%'}}>
-              <AiFillWechat size={80} />
-              <h4>No messages.</h4>
-            </div>
-        ) : (
-      <div className="chatBox">
-        <div className="usersChat">
-          <div className="usersChat_header">
-            <h4>All messages</h4>
-          </div>
-          {chats.map((user) => (
-            <div
-              key={user.userId}
-              className="userName"
-              onClick={() => handleChatSelection(user.userId, user.userName)}
-              title="Click to view chat"
-            >
-              <p className="name">{user.userName} </p>
-            </div>
-          ))}
+      {chats.length === 0 ? (
+        <div className="chatBox_banner" style={{ height: "72%" }}>
+          <AiFillWechat size={80} />
+          <h4>No messages.</h4>
         </div>
-
-        {selectedChat ? (
-          <ChatBox
-            selectedChat={selectedChat}
-            handleSendMessage={handleSendMessage}
-            isLoading={loading}
-            closeChat={() => handleCloseChat(selectedChat.userId)}
-            newMessage={newMessage}
-            setNewMessage={setNewMessage}
-          />
-        ) : (
-          <div className="chatBox_banner">
-            <AiFillWechat size={80} />
-            <h4>Click on a chat to start responding.</h4>
+      ) : (
+        <div className="chatBox">
+          <div className="usersChat">
+            <div className="usersChat_header">
+              <h4>All messages</h4>
+            </div>
+            {chats.map((user) => (
+              <div
+                key={user.userId}
+                className="userName"
+                onClick={() => handleChatSelection(user.userId, user.userName)}
+                title="Click to view chat"
+              >
+                <p className="name">{user.userName} </p>
+              </div>
+            ))}
           </div>
-        )}
-      </div>
 
-        )
-      }
+          {loading ? (
+            <LoadingScreen />
+          ) : (
+            selectedChat ? (
+              <ChatBox
+                selectedChat={selectedChat}
+                handleSendMessage={handleSendMessage}
+                loading={loading}
+                closeChat={() => handleCloseChat(selectedChat.userId)}
+                newMessage={newMessage}
+                setNewMessage={setNewMessage}
+              />
+            ) : (
+              <div className="chatBox_banner">
+                <AiFillWechat size={80} />
+                <h4>Click on a chat to start responding.</h4>
+              </div>
+            )
+          )}
 
+          {/* {selectedChat ? (
+            <ChatBox
+              selectedChat={selectedChat}
+              handleSendMessage={handleSendMessage}
+              loading={loading}
+              closeChat={() => handleCloseChat(selectedChat.userId)}
+              newMessage={newMessage}
+              setNewMessage={setNewMessage}
+            />
+          ) : (
+            <div className="chatBox_banner">
+              <AiFillWechat size={80} />
+              <h4>Click on a chat to start responding.</h4>
+            </div>
+          )} */}
+        </div>
+      )}
     </section>
   );
 }

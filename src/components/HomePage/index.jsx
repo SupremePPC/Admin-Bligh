@@ -10,6 +10,7 @@ import {
   BsBriefcase,
   BsBank,
   BsChatLeftText,
+  BsChatDots,
 } from "react-icons/bs";
 import { PiMoneyLight } from "react-icons/pi";
 import { IoMdNotificationsOutline, IoIosLogOut } from "react-icons/io";
@@ -26,6 +27,7 @@ import {
 } from "../../firebaseConfig/firestore";
 import { db } from "../../firebaseConfig/firebase";
 import "./style.css";
+import { AiFillWechat } from "react-icons/ai";
 
 const DashboardCard = ({ to, icon, label }) => {
   return (
@@ -78,27 +80,27 @@ function HomePage() {
   const iposRequestsBadge = (
     <span className="badge">
       <BsBriefcase size={18} />
-      <p className="badge_count">{iposRequests}</p>
+      {/* <p className="badge_count">{iposRequests}</p> */}
     </span>
   );
 
   const termsRequestsBadge = (
     <span className="badge">
       <PiMoneyLight size={22} />
-      <p className="badge_count">{termsRequests}</p>
+      {/* <p className="badge_count">{termsRequests}</p> */}
     </span>
   );
 
   const bondsRequestsBadge = (
     <span className="badge">
       <BsCreditCard2Front size={18} />
-      <p className="badge_count">{bondsRequests}</p>
+      {/* <p className="badge_count">{bondsRequests}</p> */}
     </span>
   );
 
   const liveChatBadge = (
     <span className="badge">
-      <BsChatLeftText size={16} />
+      <BsChatDots size={16} />
       <p className="badge_count">{liveChatSum}</p>
     </span>
   );

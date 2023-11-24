@@ -52,7 +52,10 @@
 
 .sidebar .menu_link.active {
   color: var(--secondary);
-  font-size: 20px;
+}
+
+.sidebar .menu_link.active:hover {
+  color: var(--white);
 }
 
 .sidebar .menu_link:hover {

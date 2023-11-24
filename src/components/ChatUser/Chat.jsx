@@ -10,7 +10,8 @@ export default function ChatBox({
   handleSendMessage,
   closeChat,
   newMessage,
-  setNewMessage
+  setNewMessage,
+  loading,
 }) {
   const [chats, setChats] = useState([]);
   const [isLoading, setIsLoading] = useState(false);

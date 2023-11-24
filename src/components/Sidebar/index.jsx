@@ -11,12 +11,13 @@ import {
   BsBriefcase,
   BsCreditCard2Front,
   BsBank,
-  BsChatLeftText
+  BsChatLeftText,
+  BsChatDots
 } from "react-icons/bs";
 import { PiMoneyLight } from "react-icons/pi";
 import { IoMdNotificationsOutline, IoIosLogOut } from "react-icons/io";
 import { TbUsersGroup } from "react-icons/tb";
-import { AiOutlineStock } from "react-icons/ai";
+import { AiFillWechat, AiOutlineStock } from "react-icons/ai";
 import { getAuth } from "firebase/auth";
 import Modal from "../CustomsModal";
 import { SumNotifications, countUsersWithChats, sumBondRequests, sumIposRequests, sumTermRequests, sumUserRequests } from "../../firebaseConfig/firestore";
@@ -65,27 +66,27 @@ function Sidebar() {
   const iposRequestsBadge = (
     <span className="notification_badge">
       <BsBriefcase size={18} />
-      <p className="notification_count">{iposRequests}</p>
+      {/* <p className="notification_count">{iposRequests}</p> */}
     </span>
   );
 
   const termsRequestsBadge = (
     <span className="notification_badge">
       <PiMoneyLight size={22} />
-      <p className="notification_count">{termsRequests}</p>
+      {/* <p className="notification_count">{termsRequests}</p> */}
     </span>
   );
 
   const bondsRequestsBadge = (
     <span className="notification_badge">
       <BsCreditCard2Front size={18} />
-      <p className="notification_count">{bondsRequests}</p>
+      {/* <p className="notification_count">{bondsRequests}</p> */}
     </span>
   );
 
   const liveChatBadge = (
     <span className="notification_badge">
-      <BsChatLeftText size={16} />
+      <BsChatDots size={18} />
       <p className="notification_count">{liveChatSum}</p>
     </span>
   );

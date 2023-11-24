@@ -38,7 +38,7 @@ import {
 } from "firebase/storage";
 import { getAuth, signOut } from "firebase/auth";
 
-const ADMINUSER_COLLECTION = "admin_users";
+const ADMINUSERS_COLLECTION = "adminUsers";
 const ADMINDASH_COLLECTION = "admin_users";
 const USERS_COLLECTION = "users";
 
@@ -63,7 +63,7 @@ export function formatNumber(number) {
 //Admin Users
 export function addAdminUser(uid, fullName, email) {
   // Use the uid directly as the document ID
-  return setDoc(doc(db, ADMINUSER_COLLECTION, uid), {
+  return setDoc(doc(db, ADMINUSERS_COLLECTION, uid), {
     fullName,
     email,
   });
@@ -78,7 +78,7 @@ export const checkAdminRoleAndLogoutIfNot = async (db) => {
   }
 
   try {
-    const adminUserRef = doc(db, "adminUsers", user.uid);
+    const adminUserRef = doc(db, ADMINUSERS_COLLECTION, user.uid);
     const adminUserDoc = await getDoc(adminUserRef);
 
     if (adminUserDoc.exists() && adminUserDoc.data().role === "admin") {
@@ -93,7 +93,6 @@ export const checkAdminRoleAndLogoutIfNot = async (db) => {
     return false;
   }
 };
-
 
 //USER REQUESTS
 const USER_REQUESTS_COLLECTION = "userRequests";
@@ -951,7 +950,7 @@ export async function addNotification(userId, message, type = "info") {
 // Function to fetch all the notifications
 export async function getLoginNotifications() {
   try {
-    const adminDashRef = collection(db, "admin_users");
+    const adminDashRef = collection(db, ADMINUSERS_COLLECTION);
     const notificationDashRef = doc(adminDashRef, "notifications");
 
     const loginNotificationsRef = collection(
@@ -963,11 +962,20 @@ export async function getLoginNotifications() {
       "logoutNotifications"
     );
 
+    const closeChatNotificationsRef = collection(
+      notificationDashRef,
+      "chatNotifications"
+    );
+
     const loginNotificationsSnapshot = await getDocs(
       query(loginNotificationsRef, orderBy("timeStamp", "desc"))
     );
     const logoutNotificationsSnapshot = await getDocs(
       query(logoutNotificationsRef, orderBy("timeStamp", "desc"))
+    );
+
+    const closeChatNotificationsSnapshot = await getDocs(
+      query(closeChatNotificationsRef, orderBy("timeStamp", "desc"))
     );
 
     const loginNotifications = loginNotificationsSnapshot.docs.map((doc) => ({
@@ -980,7 +988,12 @@ export async function getLoginNotifications() {
       id: doc.id,
     }));
 
-    const allNotifications = [...loginNotifications, ...logoutNotifications];
+    const closeChatNotifications = closeChatNotificationsSnapshot.docs.map((doc) => ({
+      ...doc.data(),
+      id: doc.id,
+    }));
+
+    const allNotifications = [...loginNotifications, ...logoutNotifications, ...closeChatNotifications];
 
     // Sort notifications based on timestamp (assuming there's a timestamp field)
     const sortedNotifications = allNotifications.sort(
@@ -1618,7 +1631,7 @@ export const deleteCashDeposit = async (uid, depositId) => {
 // Function to fetch the password policy setting from Firestore
 export const fetchPasswordPolicySetting = async () => {
   try {
-    const docRef = doc(db, 'adminUsers', 'strongPasswordPolicy');
+    const docRef = doc(db, ADMINUSERS_COLLECTION, 'strongPasswordPolicy');
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
@@ -1636,7 +1649,7 @@ export const fetchPasswordPolicySetting = async () => {
 // Function to update the password policy setting in Firestore
 export const updatePasswordPolicySetting = async (newValue) => {
   try {
-    const docRef = doc(db, 'adminUsers', 'strongPasswordPolicy');
+    const docRef = doc(db, ADMINUSERS_COLLECTION, 'strongPasswordPolicy');
     await updateDoc(docRef, {
       isTrue: newValue,
     });
@@ -1649,7 +1662,7 @@ export const updatePasswordPolicySetting = async (newValue) => {
 //Fetch meta data from adminUsers collection
 export const fetchMetaData = async () => {
   try {
-    const docRef = doc(db, 'adminUsers', 'metaData');
+    const docRef = doc(db, ADMINUSERS_COLLECTION, 'metaData');
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists) {
@@ -1666,7 +1679,7 @@ export const fetchMetaData = async () => {
 //Fetch title data from adminUsers collection
 export const fetchTitleData = async () => {
   try {
-    const docRef = doc(db, 'adminUsers', 'title');
+    const docRef = doc(db, ADMINUSERS_COLLECTION, 'title');
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists) {
@@ -1683,7 +1696,7 @@ export const fetchTitleData = async () => {
 // handle update meta data
 export const updateMetaData = async (newMeta) => {
   try {
-    const docRef = doc(db, 'adminUsers', 'metaData');
+    const docRef = doc(db, ADMINUSERS_COLLECTION, 'metaData');
     await updateDoc(docRef, { data: newMeta });
     return 'Meta data updated successfully.';
   } catch (error) {
@@ -1695,7 +1708,7 @@ export const updateMetaData = async (newMeta) => {
 // handle update title data
 export const updateTitleText = async (newTitle) => {
   try {
-    const docRef = doc(db, 'adminUsers', 'title');
+    const docRef = doc(db, ADMINUSERS_COLLECTION, 'title');
     await updateDoc(docRef, { text: newTitle });
     return 'Title text updated successfully.';
   } catch (error) {
@@ -1727,43 +1740,32 @@ export function fetchChats(db, setChats) {
   });
 }
 
-
 //Sum of live chats
 export function countUsersWithChats(db, setUsersWithChatsCount) {
   const usersRef = collection(db, "users");
 
-  let userChatListeners = new Map(); // To track listeners for each user
-
   onSnapshot(usersRef, (usersSnapshot) => {
-    // Unsubscribe from any previous chat listeners
-    userChatListeners.forEach(unsubscribe => unsubscribe());
-    userChatListeners.clear();
-
     let currentUsersWithChatsCount = 0;
+    let processedUsers = 0; // Track the number of processed users
 
     usersSnapshot.forEach((userDoc) => {
       const userUid = userDoc.id;
       const chatsRef = collection(db, "users", userUid, 'chats');
 
-      // Set up a listener for each user's 'chats' subcollection
-      const unsubscribe = onSnapshot(chatsRef, (chatsSnapshot) => {
+      // Check the 'chats' subcollection for each user
+      getDocs(chatsRef).then((chatsSnapshot) => {
         if (!chatsSnapshot.empty) {
-          // Only count if there are chat documents
-          if (!userChatListeners.has(userUid)) {
-            currentUsersWithChatsCount++;
-          }
-        } else {
-          if (userChatListeners.has(userUid)) {
-            currentUsersWithChatsCount--;
-          }
+          currentUsersWithChatsCount++; // Increment if 'chats' is not empty
         }
-        setUsersWithChatsCount(currentUsersWithChatsCount);
-        userChatListeners.set(userUid, unsubscribe);
+        processedUsers++;
+        if (processedUsers === usersSnapshot.size) {
+          // Update the count only after processing all users
+          setUsersWithChatsCount(currentUsersWithChatsCount);
+        }
       });
     });
   });
 }
-
 
 // Fetch all chats within the CHATS_SUBCOLLECTION subcollection for an individual user
 export const fetchChatMessages = (userUid, callback) => {
