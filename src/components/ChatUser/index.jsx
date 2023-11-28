@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import chat_icon from "../../assets/live_chat.png";
 import Header from "./Header";
-import { BsCheckAll } from "react-icons/bs";
 import Swal from "sweetalert2";
 import { AiFillWechat } from "react-icons/ai";
 import {
@@ -13,18 +12,8 @@ import {
 } from "../../firebaseConfig/firestore";
 import ChatBox from "./Chat";
 import LoadingScreen from "../LoadingScreen";
-import { format, isToday, isYesterday } from "date-fns";
-import "./styles.css";
 import { db } from "../../firebaseConfig/firebase";
-
-// TODO
-// When a chat is closed, the user should be moved to the next chat in the list.
-// Handle new message alert for admin
-// Handle chat status for admin
-// Handle chat status for user
-// Handle new message alert for user
-//Handle chat count for admin so that the admin can see how many chats are open
-//Handle new unread messages count for admin so that the admin can see how many messages are new from all chats combined
+import "./styles.css";
 
 export default function ChatWithUser() {
   const [selectedChat, setSelectedChat] = useState(null);
