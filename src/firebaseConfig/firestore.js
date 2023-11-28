@@ -1670,7 +1670,7 @@ export const fetchPasswordPolicySetting = async () => {
 export const updatePasswordPolicySetting = async (newValue) => {
   try {
     const docRef = doc(db, ADMINUSERS_COLLECTION, 'strongPasswordPolicy');
-    await updateDoc(docRef, {
+    await setDoc(docRef, {
       isTrue: newValue,
     });
   } catch (error) {
