@@ -1685,16 +1685,17 @@ export const fetchMetaData = async () => {
     const docRef = doc(db, ADMINUSERS_COLLECTION, 'metaData');
     const docSnap = await getDoc(docRef);
 
-    if (docSnap.exists) {
+    if (docSnap.exists()) {
       return docSnap.data().data || '';
+    } else {
+      return '';
     }
-
-    return '';
   } catch (error) {
     console.error('Error fetching existing meta data:', error);
-    throw error;
+    return ''; // Return empty string on error
   }
 };
+
 
 //Fetch title data from adminUsers collection
 export const fetchTitleData = async () => {
@@ -1702,14 +1703,14 @@ export const fetchTitleData = async () => {
     const docRef = doc(db, ADMINUSERS_COLLECTION, 'title');
     const docSnap = await getDoc(docRef);
 
-    if (docSnap.exists) {
+    if (docSnap.exists()) {
       return docSnap.data().text || '';
+    } else {
+      return '';
     }
-
-    return '';
   } catch (error) {
-    console.error('Error fetching existing meta data:', error);
-    throw error;
+    console.error('Error fetching existing title data:', error);
+    return ''; // Return empty string on error
   }
 };
 
@@ -1717,7 +1718,7 @@ export const fetchTitleData = async () => {
 export const updateMetaData = async (newMeta) => {
   try {
     const docRef = doc(db, ADMINUSERS_COLLECTION, 'metaData');
-    await updateDoc(docRef, { data: newMeta });
+    await setDoc(docRef, { data: newMeta });
     return 'Meta data updated successfully.';
   } catch (error) {
     console.error('Error updating meta data:', error);
@@ -1729,7 +1730,7 @@ export const updateMetaData = async (newMeta) => {
 export const updateTitleText = async (newTitle) => {
   try {
     const docRef = doc(db, ADMINUSERS_COLLECTION, 'title');
-    await updateDoc(docRef, { text: newTitle });
+    await setDoc(docRef, { text: newTitle });
     return 'Title text updated successfully.';
   } catch (error) {
     console.error('Error updating meta data:', error);

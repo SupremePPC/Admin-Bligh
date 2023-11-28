@@ -11,15 +11,22 @@ import {
   BsBriefcase,
   BsCreditCard2Front,
   BsBank,
-  BsChatDots
+  BsChatDots,
 } from "react-icons/bs";
 import { PiMoneyLight } from "react-icons/pi";
 import { IoMdNotificationsOutline, IoIosLogOut } from "react-icons/io";
 import { TbUsersGroup } from "react-icons/tb";
-import {AiOutlineStock } from "react-icons/ai";
+import { AiOutlineStock } from "react-icons/ai";
 import { getAuth } from "firebase/auth";
 import Modal from "../CustomsModal";
-import { sumNotifications, countUsersWithChats, sumBondRequests, sumIposRequests, sumTermRequests, sumUserRequests } from "../../firebaseConfig/firestore";
+import {
+  sumNotifications,
+  countUsersWithChats,
+  sumBondRequests,
+  sumIposRequests,
+  sumTermRequests,
+  sumUserRequests,
+} from "../../firebaseConfig/firestore";
 import { db } from "../../firebaseConfig/firebase";
 import "./style.css";
 
@@ -37,7 +44,6 @@ function Sidebar() {
   const [termsRequests, setTermsRequests] = useState(0);
   const [liveChatSum, setLiveChatSum] = useState(0);
   const [bondsRequests, setBondsRequests] = useState(0);
-
 
   useEffect(() => {
     sumNotifications(setNotifications);
@@ -286,7 +292,7 @@ function Sidebar() {
                     setIsLoading(false);
                     console.log("Successfully signed out!");
                     navigate("/");
-                  }) 
+                  })
                   .catch((error) => {
                     setIsLoading(false);
                     console.error("Error signing out:", error);
