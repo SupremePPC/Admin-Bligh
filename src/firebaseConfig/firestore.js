@@ -104,7 +104,12 @@ export const fetchUserRequests = async (db) => {
   let allUserRequests = [];
 
   for (const doc of adminDocs.docs) {
-    const userRequestsRef = collection(db, ADMINDASH_COLLECTION, doc.id, USER_REQUESTS_COLLECTION);
+    const userRequestsRef = collection(
+      db,
+      ADMINDASH_COLLECTION,
+      doc.id,
+      USER_REQUESTS_COLLECTION
+    );
     const userRequestsSnapshot = await getDocs(userRequestsRef);
     const requests = userRequestsSnapshot.docs.map((userDoc) => ({
       ...userDoc.data(),
@@ -145,7 +150,13 @@ export const handleUserApproval = async (db, auth, userId, requestData) => {
 
     // Step 3: Delete the admin request
     await deleteDoc(
-      doc(db, ADMINDASH_COLLECTION, requestData.uid, USER_REQUESTS_COLLECTION, userId)
+      doc(
+        db,
+        ADMINDASH_COLLECTION,
+        requestData.uid,
+        USER_REQUESTS_COLLECTION,
+        userId
+      )
     );
 
     // Step 4: Send a confirmation email
@@ -161,7 +172,6 @@ export const handleUserApproval = async (db, auth, userId, requestData) => {
     });
 
     return "User request approved successfully.";
-
   } catch (error) {
     console.error("Error approving user:", error);
     throw new Error(`Error approving user: ${error.message}`);
@@ -173,7 +183,13 @@ export const handleUserRejection = async (db, userId, requestData) => {
   try {
     // Step 1: Delete the specific user request
     await deleteDoc(
-      doc(db, ADMINDASH_COLLECTION, requestData.uid, USER_REQUESTS_COLLECTION, userId)
+      doc(
+        db,
+        ADMINDASH_COLLECTION,
+        requestData.uid,
+        USER_REQUESTS_COLLECTION,
+        userId
+      )
     );
 
     // Step 2: Send a rejection email
@@ -190,7 +206,6 @@ export const handleUserRejection = async (db, userId, requestData) => {
     });
 
     return "User request rejected and removed successfully.";
-
   } catch (error) {
     console.error("Error rejecting and removing user:", error);
     throw new Error(`Error rejecting and removing user: ${error.message}`);
@@ -212,7 +227,12 @@ export function sumUserRequests(db, setRequests) {
     }
 
     adminDocs.forEach((doc) => {
-      const usersRequestsRef = collection(db, ADMINDASH_COLLECTION, doc.id, USER_REQUESTS_COLLECTION);
+      const usersRequestsRef = collection(
+        db,
+        ADMINDASH_COLLECTION,
+        doc.id,
+        USER_REQUESTS_COLLECTION
+      );
 
       onSnapshot(usersRequestsRef, (usersRequestsSnapshot) => {
         userRequestsCount += usersRequestsSnapshot.size;
@@ -524,7 +544,12 @@ export function sumBondRequests(db, setBondRequestsCount) {
     totalBondRequestsCount = 0; // Reset count for each update
 
     adminDocs.forEach((doc) => {
-      const bondRequestsRef = collection(db, ADMINDASH_COLLECTION, doc.id, BONDS_REQUEST_SUB_COLLECTION);
+      const bondRequestsRef = collection(
+        db,
+        ADMINDASH_COLLECTION,
+        doc.id,
+        BONDS_REQUEST_SUB_COLLECTION
+      );
 
       onSnapshot(bondRequestsRef, (bondRequestsSnapshot) => {
         totalBondRequestsCount += bondRequestsSnapshot.size;
@@ -988,17 +1013,23 @@ export async function getLoginNotifications() {
       id: doc.id,
     }));
 
-    const closeChatNotifications = closeChatNotificationsSnapshot.docs.map((doc) => ({
-      ...doc.data(),
-      id: doc.id,
-    }));
+    const closeChatNotifications = closeChatNotificationsSnapshot.docs.map(
+      (doc) => ({
+        ...doc.data(),
+        id: doc.id,
+      })
+    );
 
-    const allNotifications = [...loginNotifications, ...logoutNotifications, ...closeChatNotifications];
+    const allNotifications = [
+      ...loginNotifications,
+      ...logoutNotifications,
+      ...closeChatNotifications,
+    ];
 
     // Sort notifications based on timestamp (assuming there's a timestamp field)
     const sortedNotifications = allNotifications.sort(
       (a, b) => b.timeStamp - a.timeStamp
-      );
+    );
     return sortedNotifications;
   } catch (error) {
     console.error("Error in getLoginNotifications: ", error);
@@ -1011,19 +1042,31 @@ export function sumNotifications(setNotifications) {
   const adminDashRef = collection(db, ADMINUSERS_COLLECTION);
   const notificationDashRef = doc(adminDashRef, "notifications");
 
-  const loginNotificationsRef = collection(notificationDashRef, "loginNotifications");
-  const logoutNotificationsRef = collection(notificationDashRef, "logoutNotifications");
-  const closeChatNotificationsRef = collection(notificationDashRef, "chatNotifications");
+  const loginNotificationsRef = collection(
+    notificationDashRef,
+    "loginNotifications"
+  );
+  const logoutNotificationsRef = collection(
+    notificationDashRef,
+    "logoutNotifications"
+  );
+  const closeChatNotificationsRef = collection(
+    notificationDashRef,
+    "chatNotifications"
+  );
 
   let loginNotificationsCount = 0;
   let logoutNotificationsCount = 0;
   let closeChatNotificationsCount = 0;
 
   const updateTotalNotifications = () => {
-   let totalNotifications = 0; // Reset the count for each update
+    let totalNotifications = 0; // Reset the count for each update
     // Sum all types of notifications and update the state
-   totalNotifications = loginNotificationsCount + logoutNotificationsCount + closeChatNotificationsCount;
-   console.log(totalNotifications);
+    totalNotifications =
+      loginNotificationsCount +
+      logoutNotificationsCount +
+      closeChatNotificationsCount;
+    console.log(totalNotifications);
     setNotifications(totalNotifications);
   };
 
@@ -1046,7 +1089,6 @@ export function sumNotifications(setNotifications) {
   });
 }
 
-
 // Function to delete all notifications
 export async function deleteAllNotifications() {
   const adminDashRef = collection(db, ADMINUSERS_COLLECTION);
@@ -1064,7 +1106,7 @@ export async function deleteAllNotifications() {
   const closeChatNotificationsRef = collection(
     notificationDashRef,
     "chatNotifications"
-  ); 
+  );
 
   try {
     // Delete all documents in the 'loginNotifications' sub-collection
@@ -1084,7 +1126,6 @@ export async function deleteAllNotifications() {
     closeChatQuerySnapshot.forEach(async (doc) => {
       await deleteDoc(doc.ref);
     });
-
   } catch (error) {
     console.error("Error deleting all notifications:", error);
   }
@@ -1106,7 +1147,6 @@ export async function deleteNotification(notificationId, isLoggedIn) {
     console.error("Error deleting the notification:", error);
   }
 }
-
 
 //TERMS REQUEST
 const TERMS_REQUEST_SUB_COLLECTION = "termDepositRequest";
@@ -1158,17 +1198,22 @@ export async function sumTermRequests(db, setTermsRequests) {
     const adminDashRef = collection(db, ADMINDASH_COLLECTION);
     onSnapshot(adminDashRef, (adminDocs) => {
       let termRequestsCount = 0;
-  
+
       adminDocs.forEach((doc) => {
         // Correctly reference the subcollection for each document
-        const termsRequestsRef = collection(db, ADMINDASH_COLLECTION, doc.id, TERMS_REQUEST_SUB_COLLECTION);
-  
+        const termsRequestsRef = collection(
+          db,
+          ADMINDASH_COLLECTION,
+          doc.id,
+          TERMS_REQUEST_SUB_COLLECTION
+        );
+
         onSnapshot(termsRequestsRef, (termsRequestsSnapshot) => {
           termRequestsCount += termsRequestsSnapshot.size;
           // Update the count outside the inner onSnapshot
         });
       });
-  
+
       // Set the total count outside the loop
       setTermsRequests(termRequestsCount);
     });
@@ -1447,7 +1492,12 @@ export function sumIposRequests(db, setIposRequestsCount) {
 
     adminDocs.forEach((doc) => {
       // Correctly reference the subcollection for each document
-      const iposRequestsRef = collection(db, ADMINDASH_COLLECTION, doc.id, IPOS_REQUESTS_COLLECTION);
+      const iposRequestsRef = collection(
+        db,
+        ADMINDASH_COLLECTION,
+        doc.id,
+        IPOS_REQUESTS_COLLECTION
+      );
 
       onSnapshot(iposRequestsRef, (iposRequestsSnapshot) => {
         totalIposRequestsCount += iposRequestsSnapshot.size;
@@ -1651,17 +1701,53 @@ export const deleteCashDeposit = async (uid, depositId) => {
 // Function to fetch the password policy setting from Firestore
 export const fetchPasswordPolicySetting = async () => {
   try {
-    const docRef = doc(db, ADMINUSERS_COLLECTION, 'strongPasswordPolicy');
+    const docRef = doc(db, ADMINUSERS_COLLECTION, "strongPasswordPolicy");
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
       const isStrong = docSnap.data().isTrue;
       return isStrong;
-    } else {;
-      return true; 
+    } else {
+      return true;
     }
   } catch (error) {
-    console.error('Error fetching password policy: ', error);
+    console.error("Error fetching password policy: ", error);
+    throw error;
+  }
+};
+
+// Function to fetch the chat setting from Firestore
+export const fetchChatFeature = async () => {
+  try {
+    const docRef = doc(db, ADMINUSERS_COLLECTION, "chatFeature");
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const isDisplayed = docSnap.data().isDisplayed;
+      return isDisplayed;
+    } else {
+      return true;
+    }
+  } catch (error) {
+    console.error("Error fetching chat feature: ", error);
+    throw error;
+  }
+};
+
+// Function to fetch the tools setting from Firestore
+export const fetchToolsFeature = async () => {
+  try {
+    const docRef = doc(db, ADMINUSERS_COLLECTION, "toolFeature");
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const isDisplayed = docSnap.data().isDisplayed;
+      return isDisplayed;
+    } else {
+      return true;
+    }
+  } catch (error) {
+    console.error("Error fetching tools feature: ", error);
     throw error;
   }
 };
@@ -1669,12 +1755,38 @@ export const fetchPasswordPolicySetting = async () => {
 // Function to update the password policy setting in Firestore
 export const updatePasswordPolicySetting = async (newValue) => {
   try {
-    const docRef = doc(db, ADMINUSERS_COLLECTION, 'strongPasswordPolicy');
+    const docRef = doc(db, ADMINUSERS_COLLECTION, "strongPasswordPolicy");
     await setDoc(docRef, {
       isTrue: newValue,
     });
   } catch (error) {
-    console.error('Error updating password policy: ', error);
+    console.error("Error updating password policy: ", error);
+    throw error;
+  }
+};
+
+// Function to update the password policy setting in Firestore
+export const updateToolsFeature = async (newValue) => {
+  try {
+    const docRef = doc(db, ADMINUSERS_COLLECTION, "toolFeature");
+    await setDoc(docRef, {
+      isDisplayed: newValue,
+    });
+  } catch (error) {
+    console.error("Error updating tools feature visibilty: ", error);
+    throw error;
+  }
+};
+
+// Function to update the password policy setting in Firestore
+export const updateChatFeature = async (newValue) => {
+  try {
+    const docRef = doc(db, ADMINUSERS_COLLECTION, "chatFeature");
+    await setDoc(docRef, {
+      isDisplayed: newValue,
+    });
+  } catch (error) {
+    console.error("Error updating password policy: ", error);
     throw error;
   }
 };
@@ -1682,46 +1794,45 @@ export const updatePasswordPolicySetting = async (newValue) => {
 //Fetch meta data from adminUsers collection
 export const fetchMetaData = async () => {
   try {
-    const docRef = doc(db, ADMINUSERS_COLLECTION, 'metaData');
+    const docRef = doc(db, ADMINUSERS_COLLECTION, "metaData");
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
-      return docSnap.data().data || '';
+      return docSnap.data().data || "";
     } else {
-      return '';
+      return "";
     }
   } catch (error) {
-    console.error('Error fetching existing meta data:', error);
-    return ''; // Return empty string on error
+    console.error("Error fetching existing meta data:", error);
+    return ""; // Return empty string on error
   }
 };
-
 
 //Fetch title data from adminUsers collection
 export const fetchTitleData = async () => {
   try {
-    const docRef = doc(db, ADMINUSERS_COLLECTION, 'title');
+    const docRef = doc(db, ADMINUSERS_COLLECTION, "title");
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
-      return docSnap.data().text || '';
+      return docSnap.data().text || "";
     } else {
-      return '';
+      return "";
     }
   } catch (error) {
-    console.error('Error fetching existing title data:', error);
-    return ''; // Return empty string on error
+    console.error("Error fetching existing title data:", error);
+    return ""; // Return empty string on error
   }
 };
 
 // handle update meta data
 export const updateMetaData = async (newMeta) => {
   try {
-    const docRef = doc(db, ADMINUSERS_COLLECTION, 'metaData');
+    const docRef = doc(db, ADMINUSERS_COLLECTION, "metaData");
     await setDoc(docRef, { data: newMeta });
-    return 'Meta data updated successfully.';
+    return "Meta data updated successfully.";
   } catch (error) {
-    console.error('Error updating meta data:', error);
+    console.error("Error updating meta data:", error);
     throw error;
   }
 };
@@ -1729,22 +1840,27 @@ export const updateMetaData = async (newMeta) => {
 // handle update title data
 export const updateTitleText = async (newTitle) => {
   try {
-    const docRef = doc(db, ADMINUSERS_COLLECTION, 'title');
+    const docRef = doc(db, ADMINUSERS_COLLECTION, "title");
     await setDoc(docRef, { text: newTitle });
-    return 'Title text updated successfully.';
+    return "Title text updated successfully.";
   } catch (error) {
-    console.error('Error updating meta data:', error);
+    console.error("Error updating meta data:", error);
     throw error;
   }
 };
 
 //LIVE CHAT
-const CHATS_SUBCOLLECTION = 'chats';
+const CHATS_SUBCOLLECTION = "chats";
 
 // Fetch all users with CHATS_SUBCOLLECTION in their doc
 export function fetchChats(db, setChats) {
   // Reference to the 'activeChats' subcollection within 'chatRoom'
-  const activeChatsRef = collection(db, ADMINUSERS_COLLECTION, "chatRoom", "activeChats");
+  const activeChatsRef = collection(
+    db,
+    ADMINUSERS_COLLECTION,
+    "chatRoom",
+    "activeChats"
+  );
 
   // Listen for real-time updates in the 'activeChats' subcollection
   onSnapshot(activeChatsRef, async (activeChatsSnapshot) => {
@@ -1754,11 +1870,14 @@ export function fetchChats(db, setChats) {
     for (const activeChatDoc of activeChatsSnapshot.docs) {
       const userUid = activeChatDoc.id;
       const userRef = doc(db, "users", userUid);
-      
+
       // Fetch user details
       const userDoc = await getDoc(userRef);
       if (userDoc.exists()) {
-        usersWithChats.push({ userId: userUid, userName: userDoc.data().fullName });
+        usersWithChats.push({
+          userId: userUid,
+          userName: userDoc.data().fullName,
+        });
       }
     }
 
@@ -1767,11 +1886,15 @@ export function fetchChats(db, setChats) {
   });
 }
 
-
 //Sum of live chats
 export function countUsersWithChats(db, setUsersWithChatsCount) {
   // Reference to the 'activeChats' subcollection within 'chatRoom'
-  const activeChatsRef = collection(db, ADMINUSERS_COLLECTION, "chatRoom", "activeChats");
+  const activeChatsRef = collection(
+    db,
+    ADMINUSERS_COLLECTION,
+    "chatRoom",
+    "activeChats"
+  );
 
   // Listen for real-time updates in the 'activeChats' subcollection
   onSnapshot(activeChatsRef, (activeChatsSnapshot) => {
@@ -1781,29 +1904,41 @@ export function countUsersWithChats(db, setUsersWithChatsCount) {
   });
 }
 
-
 // Fetch all chats within the CHATS_SUBCOLLECTION subcollection for an individual user
 export const fetchChatMessages = (userUid, callback) => {
   try {
-    const messagesRef = collection(db, USERS_COLLECTION, userUid, CHATS_SUBCOLLECTION);
-    const q = query(messagesRef, orderBy('timeStamp', 'asc'));
+    const messagesRef = collection(
+      db,
+      USERS_COLLECTION,
+      userUid,
+      CHATS_SUBCOLLECTION
+    );
+    const q = query(messagesRef, orderBy("timeStamp", "asc"));
 
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const chats = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const chats = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
       callback(chats);
     });
 
     return unsubscribe; // Function to stop listening to changes
   } catch (err) {
     console.error(err);
-    throw new Error('Failed to load chat messages');
+    throw new Error("Failed to load chat messages");
   }
 };
 
 // Close Chat
 export const closeChat = async (db, userUid) => {
   try {
-    const chatsRef = collection(db, USERS_COLLECTION, userUid, CHATS_SUBCOLLECTION);
+    const chatsRef = collection(
+      db,
+      USERS_COLLECTION,
+      userUid,
+      CHATS_SUBCOLLECTION
+    );
     const querySnapshot = await getDocs(query(chatsRef));
 
     // Delete each chat document
@@ -1812,17 +1947,22 @@ export const closeChat = async (db, userUid) => {
     }
 
     // Add a notification to the user's notifications subcollection
-    await addDoc(collection(db, USERS_COLLECTION, userUid, 'notifications'), {
-      message: 'Your issue has been resolved.',
-      timeStamp: serverTimestamp()
+    await addDoc(collection(db, USERS_COLLECTION, userUid, "notifications"), {
+      message: "Your issue has been resolved.",
+      timeStamp: serverTimestamp(),
     });
     // Remove user from 'chatRoom'
-    const chatRoomRef = doc(db, ADMINUSERS_COLLECTION, "chatRoom", "activeChats", userUid);
+    const chatRoomRef = doc(
+      db,
+      ADMINUSERS_COLLECTION,
+      "chatRoom",
+      "activeChats",
+      userUid
+    );
     await deleteDoc(chatRoomRef);
-
   } catch (err) {
     console.error("Failed to close the chat:", err);
-    throw new Error('Failed to close the chat');
+    throw new Error("Failed to close the chat");
   }
 };
 
@@ -1830,7 +1970,9 @@ export const closeChat = async (db, userUid) => {
 export const sendMessage = async (userUid, chatMessage) => {
   try {
     // Create a new chat document reference
-    const newChatRef = doc(collection(db, 'users', userUid, CHATS_SUBCOLLECTION));
+    const newChatRef = doc(
+      collection(db, "users", userUid, CHATS_SUBCOLLECTION)
+    );
     const chatId = newChatRef.id;
     console.log(chatId);
     // Initialize the new chat document with the chat message and other data
@@ -1838,7 +1980,7 @@ export const sendMessage = async (userUid, chatMessage) => {
       chat: chatMessage,
       timeStamp: serverTimestamp(),
       read: false,
-      user: 'admin', // or the client's identifier
+      user: "admin", // or the client's identifier
       id: userUid,
       chatId: chatId,
       // userName: fullName,
@@ -1846,26 +1988,31 @@ export const sendMessage = async (userUid, chatMessage) => {
     return chatId;
   } catch (err) {
     console.error(err);
-    throw new Error('Failed to send chat');
+    throw new Error("Failed to send chat");
   }
 };
 
 // Real-time Chat Updates
 export const subscribeToChatUpdates = (userUid, chatId, callback) => {
-
   if (!userUid || !chatId) {
-    console.error('Invalid userUid or chatId');
+    console.error("Invalid userUid or chatId");
     return () => {};
   }
 
-  const docRef = doc(db, USERS_COLLECTION, userUid, CHATS_SUBCOLLECTION, chatId);
+  const docRef = doc(
+    db,
+    USERS_COLLECTION,
+    userUid,
+    CHATS_SUBCOLLECTION,
+    chatId
+  );
 
-  const unsubscribe = onSnapshot(docRef, snapshot => {
+  const unsubscribe = onSnapshot(docRef, (snapshot) => {
     // console.log('Snapshot data:', snapshot.data());
     if (snapshot.exists()) {
       callback(snapshot.data().messages);
     } else {
-      console.log('No such document!');
+      console.log("No such document!");
     }
   });
 
