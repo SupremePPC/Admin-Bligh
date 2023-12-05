@@ -6,7 +6,7 @@ import { PiPassword } from "react-icons/pi";
 import { MdDescription } from "react-icons/md"
 import ChangePassword from '../ChangePassword';
 import ChangeLogo from '../ChangeLogo';
-import PasswordSetting from '../PasswordSetting';
+import GeneralSetting from '../GeneralSetting';
 import "./style.css";
 import ChangeMetaData from '../ChangeMeta';
 
@@ -61,13 +61,13 @@ export default function SettingsPage() {
             </li>
              <li
               className={`account_item ${
-                activeTab === "passwordSetting" ? "active" : ""
+                activeTab === "generalSetting" ? "active" : ""
               }`}
-              onClick={() => handleTabClick("passwordSetting")}
+              onClick={() => handleTabClick("generalSetting")}
             >
               <span>
                 <PiPassword className="icon" />
-                Password Setting
+                General Setting
               </span>
               <FaAngleRight size={20}/>
             </li>
@@ -79,7 +79,7 @@ export default function SettingsPage() {
           {activeTab === "changeLogo" && <ChangeLogo />}
           {activeTab === "changeMeta" && <ChangeMetaData />}
           {activeTab === "changePassword" && <ChangePasswordTab />}
-          {activeTab === "passwordSetting" && <PasswordSetting />}
+          {activeTab === "generalSetting" && <GeneralSetting />}
           {/* 
           {activeTab === "bankingDetails" && <BankingDetailsTab />} */}
         </div>

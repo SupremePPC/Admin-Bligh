@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import chat_icon from "../../assets/live_chat.png";
 import Header from "./Header";
-import Swal from "sweetalert2";
+ import Swal from "sweetalert2";
 import { AiFillWechat } from "react-icons/ai";
 import {
   fetchChats,
